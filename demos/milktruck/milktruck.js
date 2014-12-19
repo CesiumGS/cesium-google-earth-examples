@@ -81,6 +81,11 @@ function makeOrthonormalFrame(matrix, dir, up) {
 	Cesium.Matrix3.setColumn(matrix, 2, newUp, matrix);
 }
 
+function getHeading(matrix) {
+	// TODO
+	return 0.0;
+}
+
 function Truck(scene) {
   this.doTick = true;
   
@@ -88,7 +93,7 @@ function Truck(scene) {
   this.ellipsoid = scene.globe.ellipsoid;
   
   // We do all our motion relative to a local coordinate frame that is
-  // anchored not too far from us.  In this frame, the x axis points
+  // anchored not too far from us. In this frame, the x axis points
   // east, the y axis points north, and the z axis points straight up
   // towards the sky.
   //
@@ -115,68 +120,59 @@ function Truck(scene) {
   this.fastTimer = 0;
   this.popupTimer = 0;
 
-  //ge.getOptions().setMouseNavigationEnabled(false);
-  //ge.getOptions().setFlyToSpeed(100);  // don't filter camera motion
+  // ge.getOptions().setMouseNavigationEnabled(false);
+  // ge.getOptions().setFlyToSpeed(100); // don't filter camera motion
 
-  //window.google.earth.fetchKml(ge, MODEL_URL,
-  //                             function(obj) { me.finishInit(obj); });
+  // window.google.earth.fetchKml(ge, MODEL_URL,
+  // function(obj) { me.finishInit(obj); });
 }
 
 Truck.prototype.finishInit = function(model) {
   /*
-  walkKmlDom(kml, function() {
-    if (this.getType() == 'KmlPlacemark' &&
-        this.getGeometry() &&
-        this.getGeometry().getType() == 'KmlModel')
-      me.placemark = this;
-  });
-  */
+	 * walkKmlDom(kml, function() { if (this.getType() == 'KmlPlacemark' &&
+	 * this.getGeometry() && this.getGeometry().getType() == 'KmlModel')
+	 * me.placemark = this; });
+	 */
 
   this.model = model;
 
   /*
-  ge.getFeatures().appendChild(me.placemark);
-
-  me.balloon = ge.createHtmlStringBalloon('');
-  me.balloon.setFeature(me.placemark);
-  me.balloon.setMaxWidth(350);
-  me.balloon.setForegroundColor(BALLOON_FG);
-  me.balloon.setBackgroundColor(BALLOON_BG);
-  */
+	 * ge.getFeatures().appendChild(me.placemark);
+	 * 
+	 * me.balloon = ge.createHtmlStringBalloon('');
+	 * me.balloon.setFeature(me.placemark); me.balloon.setMaxWidth(350);
+	 * me.balloon.setForegroundColor(BALLOON_FG);
+	 * me.balloon.setBackgroundColor(BALLOON_BG);
+	 */
 
   this.teleportTo(INIT_LOC.lat, INIT_LOC.lon, INIT_LOC.heading);
 
   this.lastMillis = (new Date()).getTime();
 
   /*
-  var href = window.location.href;
+	 * var href = window.location.href;
+	 * 
+	 * me.shadow = ge.createGroundOverlay(''); me.shadow.setVisibility(false);
+	 * me.shadow.setIcon(ge.createIcon(''));
+	 * me.shadow.setLatLonBox(ge.createLatLonBox(''));
+	 * me.shadow.setAltitudeMode(ge.ALTITUDE_CLAMP_TO_SEA_FLOOR);
+	 * me.shadow.getIcon().setHref(PAGE_PATH + 'shadowrect.png');
+	 * me.shadow.setVisibility(true); ge.getFeatures().appendChild(me.shadow);
+	 */
 
-  me.shadow = ge.createGroundOverlay('');
-  me.shadow.setVisibility(false);
-  me.shadow.setIcon(ge.createIcon(''));
-  me.shadow.setLatLonBox(ge.createLatLonBox(''));
-  me.shadow.setAltitudeMode(ge.ALTITUDE_CLAMP_TO_SEA_FLOOR);
-  me.shadow.getIcon().setHref(PAGE_PATH + 'shadowrect.png');
-  me.shadow.setVisibility(true);
-  ge.getFeatures().appendChild(me.shadow);
-  */
-
-  //google.earth.addEventListener(ge, "frameend", function() { me.tick(); });
+  // google.earth.addEventListener(ge, "frameend", function() { me.tick(); });
   var that = this;
   this.scene.postRender.addEventListener(function() { that.tick(); });
 
   this.cameraCut();
 
   /*
-  // Make sure keyboard focus starts out on the page.
-  ge.getWindow().blur();
-
-  // If the user clicks on the Earth window, try to restore keyboard
-  // focus back to the page.
-  google.earth.addEventListener(ge.getWindow(), "mouseup", function(event) {
-      ge.getWindow().blur();
-    });
-  */
+	 * // Make sure keyboard focus starts out on the page.
+	 * ge.getWindow().blur(); // If the user clicks on the Earth window, try to
+	 * restore keyboard // focus back to the page.
+	 * google.earth.addEventListener(ge.getWindow(), "mouseup", function(event) {
+	 * ge.getWindow().blur(); });
+	 */
 }
 
 leftButtonDown = false;
@@ -254,7 +250,7 @@ Truck.prototype.tick = function() {
   var temp = Cesium.Cartesian2.clone(this.pos);
   if (Cesium.Cartesian2.magnitude(temp) > 100) {
     // Re-anchor our local coordinate frame whenever we've strayed a
-    // bit away from it.  This is necessary because the earth is not
+    // bit away from it. This is necessary because the earth is not
     // flat!
     this.adjustAnchor();
   }
@@ -277,14 +273,14 @@ Truck.prototype.tick = function() {
 
     // Degrade turning at higher speeds.
     //
-    //           angular turn speed vs. vehicle speed
-    //    |     -------
-    //    |    /       \-------
-    //    |   /                 \-------
-    //    |--/                           \---------------
-    //    |
-    //    +-----+-------------------------+-------------- speed
-    //    0    SPEED_MAX_TURN           SPEED_MIN_TURN
+    // angular turn speed vs. vehicle speed
+    // | -------
+    // | / \-------
+    // | / \-------
+    // |--/ \---------------
+    // |
+    // +-----+-------------------------+-------------- speed
+    // 0 SPEED_MAX_TURN SPEED_MIN_TURN
     var SPEED_MAX_TURN = 25.0;
     var SPEED_MIN_TURN = 120.0;
     if (absSpeed < SPEED_MAX_TURN) {
@@ -318,13 +314,13 @@ Truck.prototype.tick = function() {
     // TODO: if we're slipping, transfer some of the slip
     // velocity into forward velocity.
 
-    // Damp sideways slip.  Ad-hoc frictiony hack.
+    // Damp sideways slip. Ad-hoc frictiony hack.
     //
     // I'm using a damped exponential filter here, like:
     // val = val * c0 + val_new * (1 - c0)
     //
     // For a variable time step:
-    //  c0 = exp(-dt / TIME_CONSTANT)
+    // c0 = exp(-dt / TIME_CONSTANT)
     var right = Cesium.Matrix3.getColumn(this.modelFrame, 0, new Cesium.Cartesian3());
     var slip = Cesium.Cartesian3.dot(this.vel, right);
     c0 = Math.exp(-dt / 0.5);
@@ -431,14 +427,11 @@ Truck.prototype.tick = function() {
   Cesium.Matrix4.fromRotationTranslation(orientation, gpos, this.model.modelMatrix);
 
   /*
-  var latLonBox = me.shadow.getLatLonBox();
-  var radius = .00005;
-  latLonBox.setNorth(lla[0] - radius);
-  latLonBox.setSouth(lla[0] + radius);
-  latLonBox.setEast(lla[1] - radius);
-  latLonBox.setWest(lla[1] + radius);
-  latLonBox.setRotation(-newhtr[0]);
-  */
+	 * var latLonBox = me.shadow.getLatLonBox(); var radius = .00005;
+	 * latLonBox.setNorth(lla[0] - radius); latLonBox.setSouth(lla[0] + radius);
+	 * latLonBox.setEast(lla[1] - radius); latLonBox.setWest(lla[1] + radius);
+	 * latLonBox.setRotation(-newhtr[0]);
+	 */
 
   this.tickPopups(dt);
   
@@ -449,12 +442,12 @@ Truck.prototype.tick = function() {
 function estimateGroundNormal(globe, pos, frame) {
   // Take four height samples around the given position, and use it to
   // estimate the ground normal at that position.
-  //  (North)
-  //     0
-  //     *
-  //  2* + *3
-  //     *
-  //     1
+  // (North)
+  // 0
+  // *
+  // 2* + *3
+  // *
+  // 1
   var east = Cesium.Cartesian3.Matrix3.getColumn(frame, 0, new Cesium.Cartesian3());
   var north = Cesium.Cartesian3.Matrix3.getColumn(frame, 1, new Cesium.Cartesian3());
   
@@ -524,8 +517,8 @@ Truck.prototype.showIdlePopup = function() {
     % IDLE_MESSAGES.length;
   var message = "<center>" + IDLE_MESSAGES[index] + "</center>";
   // TODO
-  //me.balloon.setContentString(message);
-  //ge.setBalloon(me.balloon);
+  // me.balloon.setContentString(message);
+  // ge.setBalloon(me.balloon);
 };
 
 var FAST_MESSAGES = [
@@ -541,8 +534,8 @@ Truck.prototype.showFastPopup = function() {
     % FAST_MESSAGES.length;
   var message = "<center>" + FAST_MESSAGES[index] + "</center>";
   // TODO
-  //me.balloon.setContentString(message);
-  //ge.setBalloon(me.balloon);
+  // me.balloon.setContentString(message);
+  // ge.setBalloon(me.balloon);
 };
 
 Truck.prototype.scheduleTick = function() {
@@ -555,17 +548,43 @@ Truck.prototype.scheduleTick = function() {
 // Cut the camera to look at me.
 Truck.prototype.cameraCut = function() {
   // TODO
-  //var me = this;
-  //var lo = me.model.getLocation();
-  //var la = ge.createLookAt('');
-  //la.set(lo.getLatitude(), lo.getLongitude(),
-  //       10 /* altitude */,
-  //       ge.ALTITUDE_RELATIVE_TO_SEA_FLOOR,
-  //       fixAngle(180 + me.model.getOrientation().getHeading() + 45),
-  //       80, /* tilt */
-  //       50 /* range */         
-  //       );
-  //ge.getView().setAbstractView(la);
+  // var lo = me.model.getLocation();
+  // var la = ge.createLookAt('');
+  // la.set(lo.getLatitude(), lo.getLongitude(),
+  // 10 /* altitude */,
+  // ge.ALTITUDE_RELATIVE_TO_SEA_FLOOR,
+  // fixAngle(180 + me.model.getOrientation().getHeading() + 45),
+  // 80, /* tilt */
+  // 50 /* range */
+  // );
+  // ge.getView().setAbstractView(la);
+	
+	var camera = this.scene.camera;
+	var heading = fixAngle(180 + Cesium.Math.toDegrees(getHeading(this.model.modelMatrix)) + 45);
+	
+	var modelPosition = Cesium.Matrix4.getTranslation(this.model.modelMatrix, new Cesium.Cartesian3());
+	Cesium.Cartesian3.clone(modelPosition, camera.position);
+	camera.heading = Cesium.Math.toRadians(heading);
+	
+	var offset = Cesium.Cartesian3.clone(camera.direction);
+	Cesium.Cartesian3.multiplyByScalar(offset, 50.0, offset);
+	Cesium.Cartesian3.negate(offset, offset);
+	Cesium.Cartesian3.add(camera.position, offset, camera.position);
+	
+	var modelCart = this.ellipsoid.cartesianToCartographic(camera.position);
+	modelCart.height = 10.0;
+	this.ellipsoid.cartographicToCartesian(modelCart, camera.position);
+	
+	var direction = Cesium.Cartesian3.subtract(modelPosition, camera.position, new Cesium.Cartesian3());
+	Cesium.Cartesian3.normalize(direction, direction);
+	var up = this.ellipsoid.geodeticSurfaceNormal(modelPosition);
+	var right = Cesium.Cartesian3.cross(direction, up, new Cesium.Cartesian3());
+	Cesium.Cartesian3.normalize(right, right);
+	Cesium.Cartesian3.cross(right, direction, up);
+	
+	Cesium.Cartesian3.clone(direction, camera.direction);
+	Cesium.Cartesian3.clone(up, camera.up);
+	Cesium.Cartesian3.clone(right, camera.right);
 };
 
 Truck.prototype.cameraFollow = function(dt, truckPos, localToGlobalFrame) {
@@ -596,11 +615,11 @@ Truck.prototype.cameraFollow = function(dt, truckPos, localToGlobalFrame) {
   camera.heading = headingRadians;
   
   // TODO
-  //camera.tilt = Cesium.Math.toRadians(80.0);
+  // camera.tilt = Cesium.Math.toRadians(80.0);
   
-  //la.set(camLat, camLon, camAlt, ge.ALTITUDE_RELATIVE_TO_SEA_FLOOR, 
-  //      heading, 80 /*tilt*/, 0 /*range*/);
-  //ge.getView().setAbstractView(la);
+  // la.set(camLat, camLon, camAlt, ge.ALTITUDE_RELATIVE_TO_SEA_FLOOR,
+  // heading, 80 /*tilt*/, 0 /*range*/);
+  // ge.getView().setAbstractView(la);
 };
 
 // heading is optional.
@@ -647,7 +666,7 @@ Truck.prototype.teleportTo = function(lat, lon, heading) {
 	}
 };
 
-// Move our anchor closer to our current position.  Retain our global
+// Move our anchor closer to our current position. Retain our global
 // motion state (position, orientation, velocity).
 Truck.prototype.adjustAnchor = function() {
   var oldLocalFrame = this.localFrame;
