@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->  
+<head>
+  <title>Creating Ground Overlays</title>
+
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
+
+  <script src="../Cesium/Cesium.js"></script>
+  <style>
+    @import url(../Cesium/Widgets/widgets.css);
+  </style>
+  
+</head>
+<body onload="if(window.prettyPrint)prettyPrint();">
+  <h1>Cesium Examples - Creating Ground Overlays</h1>
+  <div id="page">
+  <div id="preview">
+  <div id="cesiumContainer"></div>
+  </div>
+  <div id="source">
+  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+var latitude = 40.0;
+var longitude = -100.0;
+var north = latitude + .35;
+var south = latitude - .35;
+var east = longitude + 1.55;
+var west = longitude - 1.55;
+var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
+var overlay = scene.primitives.add(new Cesium.RectanglePrimitive({
+    rectangle: rectangle
+}));
+
+overlay.material = new Cesium.Material({
+    fabric: {
+        type: 'Image',
+        uniforms: {
+            image: './static/Cesium_Logo_Color.jpg'
+        }
+    }
+});
+</pre></div>
+    
+  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+var groundOverlay = ge.createGroundOverlay('');
+groundOverlay.setIcon(ge.createIcon(''))
+groundOverlay.getIcon().setHref(&quot;http://www.google.com/intl/en_ALL/images/logo.gif&quot;);
+groundOverlay.setLatLonBox(ge.createLatLonBox(''));
+
+var center = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+var north = center.getLatitude() + .35;
+var south = center.getLatitude() - .35;
+var east = center.getLongitude() + .55;
+var west = center.getLongitude() - .55;
+var rotation = 0;
+var latLonBox = groundOverlay.getLatLonBox();
+latLonBox.setBox(north, south, east, west, rotation);
+
+ge.getFeatures().appendChild(groundOverlay);
+  </pre></div>
+  </div>
+  <div id="resources">
+  <h2>Resources:</h2>
+  <ul>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/RectanglePrimitive.html" target="_blank" >RectanglePrimitive</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/Material.html" target="_blank">Material</a> </li>
+  </ul>
+  </div>
+  </div>
+
+  <script>
+    var viewer = new Cesium.Viewer('cesiumContainer');
+    var scene = viewer.scene;
+    
+    var latitude = 40.0;
+    var longitude = -100.0;
+    var north = latitude + .35;
+    var south = latitude - .35;
+    var east = longitude + 1.55;
+    var west = longitude - 1.55;
+    var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
+    var overlay = scene.primitives.add(new Cesium.RectanglePrimitive({
+        rectangle: rectangle
+    }));
+    
+    overlay.material = new Cesium.Material({
+        fabric: {
+            type: 'Image',
+            uniforms: {
+                image: './static/Cesium_Logo_Color.jpg'
+            }
+        }
+    });
+    scene.camera.flyToRectangle({
+        destination: rectangle
+    });
+    
+    
+    // Comparable Google Earth API code:
+    //
+    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/groundoverlay.html
+  </script>
+</body>
+</html>
