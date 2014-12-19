@@ -547,18 +547,6 @@ Truck.prototype.scheduleTick = function() {
 
 // Cut the camera to look at me.
 Truck.prototype.cameraCut = function() {
-  // TODO
-  // var lo = me.model.getLocation();
-  // var la = ge.createLookAt('');
-  // la.set(lo.getLatitude(), lo.getLongitude(),
-  // 10 /* altitude */,
-  // ge.ALTITUDE_RELATIVE_TO_SEA_FLOOR,
-  // fixAngle(180 + me.model.getOrientation().getHeading() + 45),
-  // 80, /* tilt */
-  // 50 /* range */
-  // );
-  // ge.getView().setAbstractView(la);
-	
 	var camera = this.scene.camera;
 	var heading = fixAngle(180 + Cesium.Math.toDegrees(getHeading(this.model.modelMatrix)) + 45);
 	
@@ -585,6 +573,8 @@ Truck.prototype.cameraCut = function() {
 	Cesium.Cartesian3.clone(direction, camera.direction);
 	Cesium.Cartesian3.clone(up, camera.up);
 	Cesium.Cartesian3.clone(right, camera.right);
+	
+	// TODO: tilt 80?
 };
 
 Truck.prototype.cameraFollow = function(dt, truckPos, localToGlobalFrame) {

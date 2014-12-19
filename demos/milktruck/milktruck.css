@@ -1,0 +1,32 @@
+@import url(../../Cesium/Widgets/widgets.css);
+
+body {
+  font-family: arial; 
+}
+
+textarea {
+  padding: 6px;
+}
+
+form {
+  background: #fafafa; 
+  margin-bottom: 0px; 
+  width: 100%
+}
+
+#cesiumContainer {
+    width: 1024px; height: 600px; margin: 0; padding: 0; overflow: hidden;
+}
+
+.button { background-color: #D0D0D0; cursor: pointer; }
+.button:link { background-color: #D0D0D0; cursor: pointer; }
+.button:hover { background-color: #B0B0FF; cursor: pointer; }
+.button:active { background-color: #FFB0B0; cursor: pointer; }
+.medw { width: 80px; }
+.wide { width: 120px; }
+.narrow { width: 40px; }
+
+.title {
+  font-family: Impact;
+  font-size: 50pt;
+}

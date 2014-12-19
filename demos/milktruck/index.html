@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<!--
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+  <title>Monster Milktruck!</title>
+  <link rel=stylesheet href='milktruck.css' type='text/css' />
+  <script src="../../Cesium/Cesium.js"></script>
+  <script type="text/javascript" src="milktruck.js"></script>
+</head>
+<body onKeyDown="return keyDown(event);" onKeyUp="return keyUp(event);">
+<center>
+  <div class="title">
+    <center>
+      <i>MONSTER MILKTRUCK!</i>
+    </center>
+  </div>
+  
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer('cesiumContainer');
+    viewer.scene.terrainProvider = new Cesium.CesiumTerrainProvider({
+      url : '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
+    });
+    
+    var truck = new Truck();
+  </script>
+
+  <table>
+    <tr>
+      <td>
+    To drive: use the buttons, or keyboard arrows (with focus on page).
+
+    <div>
+      <form name='searchform' id='searchform' action='javascript:submitLocation();void(0);'>
+        <input type=text size=60 id='address' value='(enter a location to go there)'></input>
+        <input type=submit value='Teleport!'>
+      </form>
+
+      Presets:
+      <input type=button value="Th' Plex" onclick="truck.teleportTo(37.423501,-122.086744,90);">
+      <!-- <input type=button value="San Francisco" onclick="doGeocode('San Francisco');"> -->
+      <input type=button value="Whistler" onclick="truck.teleportTo(50.085734,-122.855824,220);">
+      <input type=button value="Pismo" onclick="truck.teleportTo(35.040675,-120.629513,170);">
+      <input type=button value="Tokyo" onclick="truck.teleportTo(35.668607,139.822026,180);">
+      <input type=button value="Everest" onclick="truck.teleportTo(27.991283,86.924340,70);">
+    </div>
+
+
+      </td>
+      <td>
+        <table>
+      <tr>
+        <td></td>
+        <td><input type=button class="button medw" onmousedown="gasButtonDown=true;" onmouseup="gasButtonDown = false;" value="gas"></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><input type=button class="button medw" onmousedown="leftButtonDown=true;" onmouseup="leftButtonDown=false;" value="left"></td>
+        <td></td>
+        <td><input type=button class="button medw" onmousedown="rightButtonDown=true;" onmouseup="rightButtonDown=false;" value="right"></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><input type=button class="button medw" onmousedown="reverseButtonDown=true;" onmouseup="reverseButtonDown=false;" value="reverse"></td>
+        <td></td>
+      </tr>
+    </table>
+      </td>
+    </tr>
+  </table>
+</center>
+</body>
+</html>
