@@ -4,16 +4,22 @@
 </a>
 </p>
 <p>
-Google Earth plugin API samples ported to Cesium.  Click on any example below to run it.  To learn more, check out <a href="http://cesiumjs.org/2014/10/13/Cesium-for-Google-Earth-Developers-Part-I/" target="_blank">Cesium for Google Earth Developers</a>.
+Google Earth plugin API samples ported to Cesium, an open-source WebGL virtual globe and map engine.
+</p>
+<p>
+Click on any example below to run it.  To learn more about Cesium, check out <a href="http://cesiumjs.org/2014/10/13/Cesium-for-Google-Earth-Developers-Part-I/" target="_blank">Cesium for Google Earth Developers</a> tutorial series.
 </p>
 
 <p>
-To run the examples locally, clone the repo, install [node.js](http://nodejs.org/), and then from the `cesium-google-earth-examples` root directory, run:
-```
+To run the examples locally, clone the repo, install [node.js](http://nodejs.org/), and then from the `cesium-google-earth-examples` root directory, run
+<pre>
 npm install
 node server.js
-```
-Browse to `http://localhost:8000/`
+</pre>
+Browse to 
+<pre>
+http://localhost:8000/
+</pre>
 </p>
 
 <table class="examplesTable">
