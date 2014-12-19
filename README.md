@@ -12,7 +12,9 @@ Click on any example below to run it.  To learn more about Cesium, check out the
 
 <p>
 <pre>
-// TODO: Fix links below to point to github hosted apps.  Also fix/remove CSS class reference.
+// TODO: Add all examples from index.html
+//   TODO: Fix links to point to github hosted apps.
+//   TODO: Also fix/remove CSS class reference.
 </pre>
 </p>
 
