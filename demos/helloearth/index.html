@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Hello Cesium!</title>
+  <script src="../../Cesium/Cesium.js"></script>
+  <style>
+    @import url(../../Cesium/Widgets/widgets.css);
+    html, body, #cesiumContainer {
+        width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer('cesiumContainer');
+    viewer.scene.terrainProvider = new Cesium.CesiumTerrainProvider({
+      url : '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
+    });
+
+    // Comparable Google Earth API code:
+    //
+    // https://code.google.com/p/earth-api-samples/source/browse/trunk/demos/helloearth/index.html
+
+    // google.load("earth", "1");
+    //
+    // var ge = null;
+    //
+    // function init() {
+    //   google.earth.createInstance("map3d", initCallback, failureCallback);
+    // }
+    //
+    // function initCallback(object) {
+    //   ge = object;
+    //   ge.getWindow().setVisibility(true);
+    // }
+    //
+    // function failureCallback(object) {
+    // }
+  </script>
+</body>
+</html>
