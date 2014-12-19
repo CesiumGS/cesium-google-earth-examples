@@ -41,14 +41,12 @@ limitations under the License.
   </div>
   <div id="source">
   <div id="cesiumSource"><h2>Cesium Source</h1><pre class="prettyprint lang-js">
-var circleGeometry = new Cesium.CircleGeometry({
-    center : Cesium.Cartesian3.fromDegrees(-95.0, 43.0),
-    radius : 500.0,
-    vertexFormat : Cesium.PerInstanceColorAppearance.VERTEX_FORMAT
-});
-
 var circleInstance = new Cesium.GeometryInstance({
-    geometry : circleGeometry,
+    geometry : new Cesium.CircleGeometry({
+        center : Cesium.Cartesian3.fromDegrees(-95.0, 43.0),
+        radius : 500.0,
+        vertexFormat : Cesium.PerInstanceColorAppearance.VERTEX_FORMAT
+    });,
     attributes : {
         color : Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.WHITE)
     }
@@ -56,14 +54,9 @@ var circleInstance = new Cesium.GeometryInstance({
 
 scene.primitives.add(new Cesium.Primitive({
     geometryInstances: circleInstance,
-    appearance: new Cesium.PerInstanceColorAppearance({
-        closed: true
-    })
+    appearance: new Cesium.PerInstanceColorAppearance()
 }));
-
-scene.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(-95.0, 43.0, 2000.0)
-});</pre></div>
+</pre></div>
     
   <div id="geSource"><h2>Google Earth Source</h1><pre class="prettyprint lang-js">
 function makeCircle(radius, x, y) {
@@ -90,39 +83,35 @@ ge.getFeatures().appendChild(polygonPlacemark);
   <div id="resources">
   <h2>Resources:</h2>
   <ul>
-  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/RectanglePrimitive.html" target="_blank">RectanglePrimitive</a> </li>
-  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/Material.html" target="_blank">Material</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/CircleGeometry.html" target="_blank">CircleGeometry</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/GeometryInstance.html" target="_blank">GeometryInstance</a> </li>
   </ul>
   </div>
   </div>
-
-<!-- TODO below here -->
+  
   <script>
-    var viewer = new Cesium.Viewer('cesiumContainer');
-    var scene = viewer.scene;
-    var circleGeometry = new Cesium.CircleGeometry({
-        center : Cesium.Cartesian3.fromDegrees(-95.0, 43.0),
-        radius : 500.0,
-        vertexFormat : Cesium.PerInstanceColorAppearance.VERTEX_FORMAT
-    });
+  var viewer = new Cesium.Viewer('cesiumContainer');
+  var scene = viewer.scene;
 
-    var circleInstance = new Cesium.GeometryInstance({
-        geometry : circleGeometry,
-        attributes : {
-            color : Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.WHITE)
-        }
-    });
+  var circleInstance = new Cesium.GeometryInstance({
+      geometry : new Cesium.CircleGeometry({
+          center : Cesium.Cartesian3.fromDegrees(-95.0, 40.0),
+          radius : 500.0,
+          vertexFormat : Cesium.PerInstanceColorAppearance.VERTEX_FORMAT
+      });,
+      attributes : {
+          color : Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.WHITE)
+      }
+  });
 
-    scene.primitives.add(new Cesium.Primitive({
-        geometryInstances: circleInstance,
-        appearance: new Cesium.PerInstanceColorAppearance({
-            closed: true
-        })
-    }));
-    
-    scene.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(-95.0, 43.0, 2000.0)
-    });
+  scene.primitives.add(new Cesium.Primitive({
+      geometryInstances: circleInstance,
+      appearance: new Cesium.PerInstanceColorAppearance()
+  }));
+
+  scene.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(-95.0, 40.0, 2000.0)
+  });
   </script>
 </body>
 </html>
