@@ -39,7 +39,32 @@ limitations under the License.
   <div id="cesiumContainer"></div>
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
-
+    var scene = viewer.scene;
+    
+    var latitude = 40.0;
+    var longitude = -100.0;
+    var north = latitude + .35;
+    var south = latitude - .35;
+    var east = longitude + 1.55;
+    var west = longitude - 1.55;
+    var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
+    var overlay = scene.primitives.add(new Cesium.RectanglePrimitive({
+        rectangle: rectangle
+    }));
+    
+    overlay.material = new Cesium.Material({
+        fabric: {
+            type: 'Image',
+            uniforms: {
+                image: './images/Cesium_Logo_Color.jpg'
+            }
+        }
+    });
+    scene.camera.flyToRectangle({
+        destination: rectangle
+    });
+    
+    
     // Comparable Google Earth API code:
     //
     // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/groundoverlay.html
