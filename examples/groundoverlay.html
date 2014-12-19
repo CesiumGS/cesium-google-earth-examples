@@ -30,13 +30,71 @@ limitations under the License.
   <script src="../Cesium/Cesium.js"></script>
   <style>
     @import url(../Cesium/Widgets/widgets.css);
-    html, body, #cesiumContainer {
-        width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
-    }
   </style>
+  
 </head>
 <body onload="if(window.prettyPrint)prettyPrint();">
+  <h1>Cesium Examples - Creating Ground Overlays</h1>
+  <div id="page">
+  <div id="preview">
   <div id="cesiumContainer"></div>
+  </div>
+  <div id="source">
+  <div id="cesiumSource"><h2>Cesium Source</h1><pre class="prettyprint lang-js">
+var viewer = new Cesium.Viewer('cesiumContainer');
+var scene = viewer.scene;
+
+var latitude = 40.0;
+var longitude = -100.0;
+var north = latitude + .35;
+var south = latitude - .35;
+var east = longitude + 1.55;
+var west = longitude - 1.55;
+var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
+var overlay = scene.primitives.add(new Cesium.RectanglePrimitive({
+    rectangle: rectangle
+}));
+
+overlay.material = new Cesium.Material({
+    fabric: {
+        type: 'Image',
+        uniforms: {
+            image: './images/Cesium_Logo_Color.jpg'
+        }
+    }
+});
+scene.camera.flyToRectangle({
+    destination: rectangle
+});</pre></div>
+    
+  <div id="geSource"><h2>Google Earth Source</h1><pre class="prettyprint lang-js">
+var groundOverlay = ge.createGroundOverlay('');
+groundOverlay.setIcon(ge.createIcon(''))
+groundOverlay.getIcon().setHref(&quot;http://www.google.com/intl/en_ALL/images/logo.gif&quot;);
+groundOverlay.setLatLonBox(ge.createLatLonBox(''));
+
+var center = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+var north = center.getLatitude() + .35;
+var south = center.getLatitude() - .35;
+var east = center.getLongitude() + .55;
+var west = center.getLongitude() - .55;
+var rotation = 0;
+var latLonBox = groundOverlay.getLatLonBox();
+latLonBox.setBox(north, south, east, west, rotation);
+
+ge.getFeatures().appendChild(groundOverlay);
+  </pre></div>
+  </div>
+  <div id="resources">
+  <h2>Resources:</h2>
+  <ul>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/RectanglePrimitive.html">RectanglePrimitive</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/Material.html">Material</a> </li>
+  </ul>
+  </div>
+  </div>
+
+<!-- TODO below here -->
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
     var scene = viewer.scene;
@@ -69,8 +127,5 @@ limitations under the License.
     //
     // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/groundoverlay.html
   </script>
-
-<!-- TODO below here -->
-  
 </body>
 </html>

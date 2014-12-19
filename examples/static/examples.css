@@ -1,9 +1,14 @@
 @media screen {
   * { font-family: arial, helvetica, sans-serif; }
   
+  body {
+    margin: 0;
+  }
+  
   h1 {
     font-size: 16pt;
     font-weight: bold;
+    padding-left: 10px;
   }
   
   h2 {
@@ -45,8 +50,10 @@
     padding: 8px !important;
     border: 1px solid #eee !important;
     background-color: #fff;
-    overflow-x: scroll;
-    width: 30em;
+    overflow: scroll; 
+    max-height: 600px;
+    max-width: 600px;
+    
   }
   
   pre * {
@@ -59,12 +66,48 @@
     padding: 0;
   }
   
-  #playground-button {
-    display: block;
-    padding-top: 8px;
+  #cesiumContainer, #page, #preview, #source{
+    margin: 0; overflow: hidden;
   }
   
-  #playground-button img {
-    border: 0;
+  #cesiumContainer {
+    height: 520px;
+    width: 648px;
+    padding: 10px;
+  }
+
+  #preview {
+    
+    height: 100%;
+    float: left;
+  }
+  #source {
+    padding: 10px;
+    float: left;
+  }
+  #resources {
+    padding: 10px;
+    width: 648px;
+  }
+  
+  @media screen and (min-width: 1000px) {
+      #source {
+        width: calc(100% - 688px);
+      }
+      
+    #resources {
+        position: absolute;
+        top: 600px;
+    }
+  }
+
+  @media screen and (max-width: 1000px) {
+    #source {
+      width: 600px;
+    }
+      
+    #resources {
+      float: left;
+    }
   }
 }
