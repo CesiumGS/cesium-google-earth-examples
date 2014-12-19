@@ -19,19 +19,16 @@ limitations under the License.
 
 window.truck = null;
 
-// Pull the Milktruck model from 3D Warehouse.
-var PAGE_PATH = document.location.href.replace(/\/[^\/]+$/, '/');
-var MODEL_URL =
-  'http://sketchup.google.com/3dwarehouse/download?'
-  + 'mid=3c9a1cac8c73c61b6284d71745f1efa9&rtyp=zip&'
-  + 'fn=milktruck&ctyp=milktruck';
+var MODEL_URL = 'model/Cesium_Ground.gltf';
 var INIT_LOC = {
-  lat: 37.423501,
-  lon: -122.086744,
-  heading: 90
+  //lat: 37.423501,
+  //lon: -122.086744,
+	lon : -123.0744619, 
+	lat : 44.0503706,
+	heading: 90
 }; // googleplex
 
-var PREVENT_START_AIRBORNE = false;
+var PREVENT_START_AIRBORNE = true;
 var TICK_MS = 66;
 
 var BALLOON_FG = '#000000';
@@ -58,32 +55,48 @@ function rotate(v, axis, radians) {
     
     var vPerpPerpAxis = Cesium.Cartesian3.cross(axis, vPerpAxis, new Cesium.Cartesian3());
     
-    var r = Cesium.Cartesian3.multiplyByScalar(axis, vDotAxis, , new Cesium.Cartesian3());
+    var r = Cesium.Cartesian3.multiplyByScalar(axis, vDotAxis, new Cesium.Cartesian3());
     var s = Cesium.Cartesian3.multiplyByScalar(vPerpAxis, Math.cos(radians), new Cesium.Cartesian3());
     var t = Cesium.Cartesian3.multiplyByScalar(vPerpPerpAxis, Math.sin(radians), new Cesium.Cartesian3());
     
     var result = Cesium.Cartesian3.add(s, t, t);
-    Cartesian3.add(r, result, result);
+    Cesium.Cartesian3.add(r, result, result);
     return result;
 }
 
 function makeOrthonormalFrame(matrix, dir, up) {
 	var newRight = Cesium.Cartesian3.cross(dir, up, new Cesium.Cartesian3());
-	Cartesian3.normalize(newRight, newRight);
+	Cesium.Cartesian3.normalize(newRight, newRight);
 	
-	var newDir = Cesium.Cartesian3.cross(up, newRight, new Cartesian3());
-	Cesium.normalize(newDir, newDir);
+	var newDir = Cesium.Cartesian3.cross(up, newRight, new Cesium.Cartesian3());
+	Cesium.Cartesian3.normalize(newDir, newDir);
 	
-	var newUp = Cesium.Cartesian3.cross(newRight, newDir);
+	var newUp = Cesium.Cartesian3.cross(newRight, newDir, new Cesium.Cartesian3());
 	
 	Cesium.Matrix3.setColumn(matrix, 0, newRight, matrix);
 	Cesium.Matrix3.setColumn(matrix, 1, newDir, matrix);
 	Cesium.Matrix3.setColumn(matrix, 2, newUp, matrix);
 }
 
-function getHeading(matrix) {
-	// TODO
+function getHeading(matrix, ellipsoid) {
+	var position = Cesium.Matrix4.getTranslation(matrix, new Cesium.Cartesian3());
+	var toFixedFrame = Cesium.Transforms.eastNorthUpToFixedFrame(position, ellipsoid, new Cesium.Matrix4());
+    var transform = Cesium.Matrix4.getRotation(toFixedFrame, new Cesium.Matrix3());
+    Cesium.Matrix3.transpose(transform, transform);
+
+    var right = Cesium.Matrix3.getColumn(matrix, 0, new Cesium.Cartesian3());
+    Cesium.Matrix3.multiplyByVector(transform, right, right);
+    return Math.atan2(right.y, right.x);
+}
+
+// TODO
+function getRollFromLocalOrientation(orientation) {
+	// orientation is mat3
 	return 0.0;
+}
+
+function setLocalOrientationRoll(orientation, absRoll) {
+	// orientation is mat3
 }
 
 function Truck(scene) {
@@ -100,8 +113,8 @@ function Truck(scene) {
   // We periodically change the anchor point of this frame and
   // recompute the local coordinates.
   this.localAnchorLla = new Cesium.Cartographic();
-  this.localAnchorCartesian = ellipsoid.cartographicToCartesian(me.localAnchorLla);
-  this.localFrame = Cesium.Matrix3.clone(Matrix3.IDENTITY);
+  this.localAnchorCartesian = this.ellipsoid.cartographicToCartesian(this.localAnchorLla);
+  this.localFrame = Cesium.Matrix3.clone(Cesium.Matrix3.IDENTITY);
 
   // Position, in local cartesian coords.
   this.pos = new Cesium.Cartesian3();
@@ -111,7 +124,7 @@ function Truck(scene) {
 
   // Orientation matrix, transforming model-relative coords into local
   // coords.
-  this.modelFrame = Cesium.Matrix3.clone(Matrix3.IDENTITY);
+  this.modelFrame = Cesium.Matrix3.clone(Cesium.Matrix3.IDENTITY);
 
   this.roll = 0;
   this.rollSpeed = 0;
@@ -122,57 +135,62 @@ function Truck(scene) {
 
   // ge.getOptions().setMouseNavigationEnabled(false);
   // ge.getOptions().setFlyToSpeed(100); // don't filter camera motion
+  
+  var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(Cesium.Cartesian3.fromDegrees(INIT_LOC.lon, INIT_LOC.lat));
+  
+  this.model = scene.primitives.add(Cesium.Model.fromGltf({
+      url : MODEL_URL,
+      modelMatrix : modelMatrix,
+      minimumPixelSize : 128
+  }));
 
-  // window.google.earth.fetchKml(ge, MODEL_URL,
-  // function(obj) { me.finishInit(obj); });
-}
-
-Truck.prototype.finishInit = function(model) {
-  /*
-	 * walkKmlDom(kml, function() { if (this.getType() == 'KmlPlacemark' &&
-	 * this.getGeometry() && this.getGeometry().getType() == 'KmlModel')
-	 * me.placemark = this; });
-	 */
-
-  this.model = model;
-
-  /*
-	 * ge.getFeatures().appendChild(me.placemark);
-	 * 
-	 * me.balloon = ge.createHtmlStringBalloon('');
-	 * me.balloon.setFeature(me.placemark); me.balloon.setMaxWidth(350);
-	 * me.balloon.setForegroundColor(BALLOON_FG);
-	 * me.balloon.setBackgroundColor(BALLOON_BG);
-	 */
-
-  this.teleportTo(INIT_LOC.lat, INIT_LOC.lon, INIT_LOC.heading);
-
-  this.lastMillis = (new Date()).getTime();
-
-  /*
-	 * var href = window.location.href;
-	 * 
-	 * me.shadow = ge.createGroundOverlay(''); me.shadow.setVisibility(false);
-	 * me.shadow.setIcon(ge.createIcon(''));
-	 * me.shadow.setLatLonBox(ge.createLatLonBox(''));
-	 * me.shadow.setAltitudeMode(ge.ALTITUDE_CLAMP_TO_SEA_FLOOR);
-	 * me.shadow.getIcon().setHref(PAGE_PATH + 'shadowrect.png');
-	 * me.shadow.setVisibility(true); ge.getFeatures().appendChild(me.shadow);
-	 */
-
-  // google.earth.addEventListener(ge, "frameend", function() { me.tick(); });
   var that = this;
-  this.scene.postRender.addEventListener(function() { that.tick(); });
+  this.model.readyToRender.addEventListener(function(model) {
+	  /*
+	  walkKmlDom(kml, function() {
+	      if (this.getType() == 'KmlPlacemark' && this.getGeometry()
+	          && this.getGeometry().getType() == 'KmlModel')
+	          me.placemark = this;
+	  });
+	  */
 
-  this.cameraCut();
+	  /*
+		 * ge.getFeatures().appendChild(me.placemark);
+		 * 
+		 * me.balloon = ge.createHtmlStringBalloon('');
+		 * me.balloon.setFeature(me.placemark); me.balloon.setMaxWidth(350);
+		 * me.balloon.setForegroundColor(BALLOON_FG);
+		 * me.balloon.setBackgroundColor(BALLOON_BG);
+		 */
 
-  /*
-	 * // Make sure keyboard focus starts out on the page.
-	 * ge.getWindow().blur(); // If the user clicks on the Earth window, try to
-	 * restore keyboard // focus back to the page.
-	 * google.earth.addEventListener(ge.getWindow(), "mouseup", function(event) {
-	 * ge.getWindow().blur(); });
-	 */
+	  that.teleportTo(INIT_LOC.lon, INIT_LOC.lat, INIT_LOC.heading);
+
+	  that.lastMillis = (new Date()).getTime();
+
+	  /*
+		 * var href = window.location.href;
+		 * 
+		 * me.shadow = ge.createGroundOverlay(''); me.shadow.setVisibility(false);
+		 * me.shadow.setIcon(ge.createIcon(''));
+		 * me.shadow.setLatLonBox(ge.createLatLonBox(''));
+		 * me.shadow.setAltitudeMode(ge.ALTITUDE_CLAMP_TO_SEA_FLOOR);
+		 * me.shadow.getIcon().setHref(PAGE_PATH + 'shadowrect.png');
+		 * me.shadow.setVisibility(true); ge.getFeatures().appendChild(me.shadow);
+		 */
+
+	  // google.earth.addEventListener(ge, "frameend", function() { me.tick(); });
+	  that.scene.postRender.addEventListener(function() { that.tick(); });
+
+	  that.cameraCut();
+
+	  /*
+		 * // Make sure keyboard focus starts out on the page.
+		 * ge.getWindow().blur(); // If the user clicks on the Earth window, try to
+		 * restore keyboard // focus back to the page.
+		 * google.earth.addEventListener(ge.getWindow(), "mouseup", function(event) {
+		 * ge.getWindow().blur(); });
+		 */
+  });
 }
 
 leftButtonDown = false;
@@ -244,7 +262,7 @@ Truck.prototype.tick = function() {
   var c1 = 0;
 
   var gpos = Cesium.Matrix3.multiplyByVector(this.localFrame, this.pos, new Cesium.Cartesian3());
-  Cesium.Cartesian3.add(me.localAnchorCartesian, gpos, gpos);
+  Cesium.Cartesian3.add(this.localAnchorCartesian, gpos, gpos);
   var lla = this.ellipsoid.cartesianToCartographic(gpos);
 
   var temp = Cesium.Cartesian2.clone(this.pos);
@@ -255,12 +273,16 @@ Truck.prototype.tick = function() {
     this.adjustAnchor();
   }
 
-  var dir = Cesium.Matrix3.getColumn(this.modelFrame, 1, new Cartesian3());
-  var up = Cesium.Matrix3.getColumn(this.modelFrame, 2, new Cartesian3());
+  var dir = Cesium.Matrix3.getColumn(this.modelFrame, 1, new Cesium.Cartesian3());
+  var up = Cesium.Matrix3.getColumn(this.modelFrame, 2, new Cesium.Cartesian3());
 
   var absSpeed = Cesium.Cartesian3(this.vel);
 
   var groundAlt = this.scene.globe.getHeight(lla);
+  if (!Cesium.defined(groundAlt)) {
+	  return;
+  }
+  
   var airborne = (groundAlt + 0.30 < this.pos.z);
   var steerAngle = 0;
   
@@ -330,10 +352,10 @@ Truck.prototype.tick = function() {
     forwardSpeed = Cesium.Cartesian3.dot(dir, this.vel);
     if (gasButtonDown) {
       // Accelerate forwards.
-      Cartesian3.add(this.vel, Cesium.Cartesian3.multiplyByScalar(dir, ACCEL * dt, new Cesium.Cartesian3()), this.vel);
+      Cesium.Cartesian3.add(this.vel, Cesium.Cartesian3.multiplyByScalar(dir, ACCEL * dt, new Cesium.Cartesian3()), this.vel);
     } else if (reverseButtonDown) {
       if (forwardSpeed > -MAX_REVERSE_SPEED)
-        Cartesian3.add(this.vel, Cesium.Cartesian3.multiplyByScalar(dir, -DECEL * dt, new Cesium.Cartesian3()), this.vel);
+        Cesium.Cartesian3.add(this.vel, Cesium.Cartesian3.multiplyByScalar(dir, -DECEL * dt, new Cesium.Cartesian3()), this.vel);
     }
   }
 
@@ -352,7 +374,7 @@ Truck.prototype.tick = function() {
   // accel = 0.0009 * v^2
   absSpeed = Cesium.Cartesian3.magnitude(this.vel);
   if (absSpeed > 0.01) {
-    var veldir = Cesium.Cartesian3.normalize(this.vel);
+    var veldir = Cesium.Cartesian3.normalize(this.vel, new Cesium.Cartesian3());
     var DRAG_FACTOR = 0.00090;
     var drag = absSpeed * absSpeed * DRAG_FACTOR;
 
@@ -418,7 +440,7 @@ Truck.prototype.tick = function() {
   // Spring back to center, with damping.
   this.rollSpeed += (ROLL_SPRING * -this.roll + ROLL_DAMP * this.rollSpeed);
   this.roll += this.rollSpeed * dt;
-  methis.roll = clamp(this.roll, -30, 30);
+  this.roll = clamp(this.roll, -30, 30);
   absRoll += this.roll;
 
   var orientation = Cesium.Matrix4.getRotation(this.model.modelMatrix, new Cesium.Matrix3());
@@ -448,10 +470,10 @@ function estimateGroundNormal(globe, pos, frame) {
   // 2* + *3
   // *
   // 1
-  var east = Cesium.Cartesian3.Matrix3.getColumn(frame, 0, new Cesium.Cartesian3());
-  var north = Cesium.Cartesian3.Matrix3.getColumn(frame, 1, new Cesium.Cartesian3());
+  var east = Cesium.Matrix3.getColumn(frame, 0, new Cesium.Cartesian3());
+  var north = Cesium.Matrix3.getColumn(frame, 1, new Cesium.Cartesian3());
   
-  var pos0 = Cesium.Cartesian3.add(pos, east, new Cartesian3());
+  var pos0 = Cesium.Cartesian3.add(pos, east, new Cesium.Cartesian3());
   var pos1 = Cesium.Cartesian3.subtract(pos, east, new Cesium.Cartesian3());
   var pos2 = Cesium.Cartesian3.add(pos, north, new Cesium.Cartesian3());
   var pos3 = Cesium.Cartesian3.subtract(pos, north, new Cesium.Cartesian3());
@@ -464,7 +486,7 @@ function estimateGroundNormal(globe, pos, frame) {
   var dx = getAlt(pos1) - getAlt(pos0);
   var dy = getAlt(pos3) - getAlt(pos2);
   var normal = new Cesium.Cartesian3(dx, dy, 2);
-  Cartesian3.normalize(normal, normal);
+  Cesium.Cartesian3.normalize(normal, normal);
   return normal;
 }
 
@@ -548,7 +570,7 @@ Truck.prototype.scheduleTick = function() {
 // Cut the camera to look at me.
 Truck.prototype.cameraCut = function() {
 	var camera = this.scene.camera;
-	var heading = fixAngle(180 + Cesium.Math.toDegrees(getHeading(this.model.modelMatrix)) + 45);
+	var heading = fixAngle(180 + Cesium.Math.toDegrees(getHeading(this.model.modelMatrix, this.ellipsoid)) + 45);
 	
 	var modelPosition = Cesium.Matrix4.getTranslation(this.model.modelMatrix, new Cesium.Cartesian3());
 	Cesium.Cartesian3.clone(modelPosition, camera.position);
@@ -583,8 +605,8 @@ Truck.prototype.cameraFollow = function(dt, truckPos, localToGlobalFrame) {
 
   var camera = this.scene.camera;
 
-  var truckHeading = Cesium.Math.toDegrees(getHeading(this.model.modelMatrix));
-  var heading = CesiumMath.toDegrees(camera.heading);
+  var truckHeading = Cesium.Math.toDegrees(getHeading(this.model.modelMatrix, this.ellipsoid));
+  var camHeading = Cesium.Math.toDegrees(camera.heading);
   
   var deltaHeading = fixAngle(truckHeading - camHeading);
   var heading = camHeading + c1 * deltaHeading;
@@ -599,7 +621,11 @@ Truck.prototype.cameraFollow = function(dt, truckPos, localToGlobalFrame) {
   var camPos = Cesium.Cartesian3.add(truckPos, Cesium.Cartesian3.multiplyByScalar(up, CAM_HEIGHT, new Cesium.Cartesian3()), new Cesium.Cartesian3());
   camPos = Cesium.Cartesian3.add(camPos, Cesium.Cartesian3.multiplyByScalar(headingDir, -TRAILING_DISTANCE, new Cesium.Cartesian3()), new Cesium.Cartesian3());
   var camLla = this.ellipsoid.cartesianToCartographic(camPos, new Cesium.Cartographic());
-  var camLla.height = camLla.height - this.scene.globe.getHeight(camLla);
+  
+  var height = this.scene.globe.getHeight(camLla);
+  if (Cesium.defined(height)) {
+	  camLla.height = camLla.height - height;
+  }
   
   this.ellipsoid.cartographicToCartesian(camLla, camera.position);
   camera.heading = headingRadians;
@@ -613,9 +639,22 @@ Truck.prototype.cameraFollow = function(dt, truckPos, localToGlobalFrame) {
 };
 
 // heading is optional.
-Truck.prototype.teleportTo = function(lat, lon, heading) {
-	var cart = Cesium.Cartographic.fromDegrees(lat, lon);
+Truck.prototype.teleportTo = function(lon, lat, heading) {
+	var cart = Cesium.Cartographic.fromDegrees(lon, lat);
+	cart.height = 0.0;
+	
+	// TODO
+	/*
 	cart.height = this.scene.globe.getHeight(cart);
+	
+	var that = this;
+	if (!Cesium.defined(cart.height)) {
+		window.setTimeout(function() {
+			that.teleportTo(lon, lat, heading);
+		}, 500);
+		return;
+	}
+	*/
 	
 	var location = this.ellipsoid.cartographicToCartesian(cart);
 	var translation = new Cesium.Cartesian4(location.x, location.y, location.z, 1.0);
@@ -645,15 +684,16 @@ Truck.prototype.teleportTo = function(lat, lon, heading) {
 	this.cameraCut();
 
 	// make sure to not start airborne
+	/*
 	if (PREVENT_START_AIRBORNE) {
-		var that = this;
 		window.setTimeout(function() {
 			var groundAlt = that.scene.globe.getHeight(Cesium.Cartographic.fromDegrees(lat, lon));
-			var airborne = (groundAlt + 0.30 < that.pos.z);
+			var airborne = groundAlt + 0.30 < that.pos.z;
 			if (airborne)
-				that.teleportTo(lat, lon, heading);
+				that.teleportTo(lon, lat, heading);
 		}, 500);
 	}
+	*/
 };
 
 // Move our anchor closer to our current position. Retain our global
@@ -675,7 +715,7 @@ Truck.prototype.adjustAnchor = function() {
 
   var newVelocity = Cesium.Matrix3.multiplyByVector(oldFrameToNewFrame, this.vel, new Cesium.Cartesian3());
   var newModelFrame = Cesium.Matrix3.multiply(oldFrameToNewFrame, this.modelFrame, new Cesium.Matrix3());
-  var newPosition = Cesium.Cartesian3.subtract(globalPos, newAnchorCartesian, new Cartesian3());
+  var newPosition = Cesium.Cartesian3.subtract(globalPos, newAnchorCartesian, new Cesium.Cartesian3());
   Cesium.Matrix3.multiplyByVector(newLocalFrameTranspose, newPosition, newPosition);
 
   Cesium.Cartographic.clone(newAnchorLla, this.localAnchorLla);
