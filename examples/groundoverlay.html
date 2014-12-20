@@ -41,6 +41,9 @@ limitations under the License.
   </div>
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+
+// TODO: update this.
+
 var latitude = 40.0;
 var longitude = -100.0;
 var north = latitude + .35;
@@ -91,6 +94,35 @@ ge.getFeatures().appendChild(groundOverlay);
 
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
+
+    var source = new Cesium.CustomDataSource();
+    viewer.dataSources.add(source);
+
+    var latitude = 40.0;
+    var longitude = -100.0;
+    var north = latitude + .35;
+    var south = latitude - .35;
+    var east = longitude + 1.55;
+    var west = longitude - 1.55;
+    var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
+
+    var material = new Cesium.ImageMaterialProperty();
+    material.image = './static/Cesium_Logo_Color.jpg';
+
+    var entity = source.entities.add({
+        rectangle : {
+            coordinates : rectangle,
+            material : material
+        }
+    });
+
+    viewer.scene.camera.flyToRectangle({
+        destination : rectangle
+    });
+
+
+/*
+    var viewer = new Cesium.Viewer('cesiumContainer');
     var scene = viewer.scene;
     
     var latitude = 40.0;
@@ -100,23 +132,18 @@ ge.getFeatures().appendChild(groundOverlay);
     var east = longitude + 1.55;
     var west = longitude - 1.55;
     var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
-    var overlay = scene.primitives.add(new Cesium.RectanglePrimitive({
-        rectangle: rectangle
+    scene.primitives.add(new Cesium.RectanglePrimitive({
+        rectangle: rectangle,
+        material : Cesium.Material.fromType('Image', {
+            image : './static/Cesium_Logo_Color.jpg'          
+        })
     }));
     
-    overlay.material = new Cesium.Material({
-        fabric: {
-            type: 'Image',
-            uniforms: {
-                image: './static/Cesium_Logo_Color.jpg'
-            }
-        }
-    });
     scene.camera.flyToRectangle({
         destination: rectangle
     });
-    
-    
+*/
+
     // Comparable Google Earth API code:
     //
     // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/groundoverlay.html
