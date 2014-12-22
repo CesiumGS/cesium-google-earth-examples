@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->  
+<head>
+  <title>Creating Multi-Geometry Placemarks</title>
+
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
+
+  <script src="../Cesium/Cesium.js"></script>
+  <style>
+    @import url(../Cesium/Widgets/widgets.css);
+  </style>
+  
+</head>
+<body onload="if(window.prettyPrint)prettyPrint();">
+  <h1>Cesium Examples - Creating Multi-Geometry Placemarks</h1>
+  <div id="page">
+  <div id="preview">
+  <div id="cesiumContainer"></div>
+  </div>
+  <div id="source">
+  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+function circle(radius, center) {
+  return {
+    position : center,
+    ellipse : {
+        semiMajorAxis : radius,
+        semiMinorAxis : radius,
+        fill: false,
+        outline: true,
+        outlineColor: Cesium.Color.WHITE
+    }
+  };  
+}
+
+var center = Cesium.Cartesian3.fromDegrees(-85.0, 20.0);
+var source = new Cesium.CustomDataSource();
+viewer.dataSources.add(source);
+
+source.entities.add(circle(500, center));
+source.entities.add(circle(1000, center));
+source.entities.add(circle(1500, center));
+source.entities.add(circle(2000, center));
+</pre></div>
+    
+  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+function makeCircle(radius, x, y) {
+  var center = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+  var ring = ge.createLinearRing('');
+  var steps = 25;
+  var pi2 = Math.PI * 2;
+  for (var i = 0; i < steps; i++) {
+    var lat = center.getLatitude() + x + radius * Math.cos(i / steps * pi2);
+    var lng = center.getLongitude() + y + radius * Math.sin(i / steps * pi2);
+    ring.getCoordinates().pushLatLngAlt(lat, lng, 0);
+  }
+  return ring;
+}
+
+var multGeoPlacemark = ge.createPlacemark('');
+multGeoPlacemark.setGeometry(ge.createMultiGeometry(''));
+var geoms = multGeoPlacemark.getGeometry().getGeometries();
+geoms.appendChild(makeCircle(.25, 0, 0));
+geoms.appendChild(makeCircle(.55, 0, 0));
+geoms.appendChild(makeCircle(.85, 0, 0));
+geoms.appendChild(makeCircle(1.15, 0, 0));
+ge.getFeatures().appendChild(multGeoPlacemark);
+  </pre></div>
+  </div>
+  <div id="resources">
+  <h2>Resources:</h2>
+  <ul>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/CircleGeometry.html" target="_blank">CircleGeometry</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/GeometryInstance.html" target="_blank">GeometryInstance</a> </li>
+  </ul>
+  </div>
+  </div>
+  
+  <script>
+  var viewer = new Cesium.Viewer('cesiumContainer');
+
+  function circle(radius, center) {
+      return {
+          position : center,
+          ellipse : {
+              semiMajorAxis : radius,
+              semiMinorAxis : radius,
+              fill: false,
+              outline: true,
+              outlineColor: Cesium.Color.WHITE
+          }
+      };  
+  }
+  
+  var center = Cesium.Cartesian3.fromDegrees(-85.0, 20.0);
+  var source = new Cesium.CustomDataSource();
+  viewer.dataSources.add(source);
+
+  source.entities.add(circle(500, center));
+  source.entities.add(circle(1000, center));
+  source.entities.add(circle(1500, center));
+  source.entities.add(circle(2000, center));
+  
+  viewer.scene.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(-85.0, 20.0, 5500.0)
+  });
+  
+  // Comparable Google Earth API code:
+  //
+  // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/multigeometry.html
+  </script>
+</body>
+</html>
