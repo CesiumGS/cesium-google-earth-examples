@@ -66,7 +66,7 @@
     padding: 0;
   }
   
-  #cesiumContainer, #page, #preview, #source{
+  #buttonContainer, #cesiumContainer, #page, #preview, #source{
     margin: 0; overflow: hidden;
   }
   
@@ -74,11 +74,23 @@
     height: 520px;
     width: 648px;
     padding: 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  
+  #buttonContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 15px;
+    z-index: 1;
   }
 
   #preview {
-    
-    height: 100%;
+    position: relative;
+    height: 700px;
+    width: 660px;
     float: left;
   }
   #source {

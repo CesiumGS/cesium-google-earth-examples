@@ -37,29 +37,34 @@ limitations under the License.
   <h1>Cesium Examples - Creating Placemarks</h1>
   <div id="page">
   <div id="preview">
+  <div id="buttonContainer"><button onclick="addPin()" class="cesium-button">Add Pin</button></div>
   <div id="cesiumContainer"></div>
   </div>
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-var latitude = 40.0;
-var longitude = -100.0;
-var north = latitude + .35;
-var south = latitude - .35;
-var east = longitude + 1.55;
-var west = longitude - 1.55;
-var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
-var overlay = scene.primitives.add(new Cesium.RectanglePrimitive({
-    rectangle: rectangle
-}));
+var counter = 0;
+var pinBuilder = new Cesium.PinBuilder();
+var billboards = scene.primitives.add(new Cesium.BillboardCollection());
+var labels = scene.primitives.add(new Cesium.LabelCollection());
+function addPin(){
+    var position = Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude);
+    
+    labels.add({
+        position : position,
+        text     : 'pin' + counter,
+        verticalOrigin : Cesium.VerticalOrigin.TOP,
+        horizontalOrigin : Cesium.HorizontalOrigin.CENTER,
+    });
+    
+    billboards.add({
+        image : pinBuilder.fromColor(Cesium.Color.SALMON, 48),
+        verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+        position : position
+    });
 
-overlay.material = new Cesium.Material({
-    fabric: {
-        type: 'Image',
-        uniforms: {
-            image: './static/Cesium_Logo_Color.jpg'
-        }
-    }
-});
+    counter++;
+}
+addPin();
 </pre></div>
     
   <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
@@ -99,16 +104,19 @@ counter++;
     
     var counter = 0;
     var pinBuilder = new Cesium.PinBuilder();
-    var billboardCollection = viewer.scene.primitives.add(new Cesium.BillboardCollection());
+    var billboards = scene.primitives.add(new Cesium.BillboardCollection());
+    var labels = scene.primitives.add(new Cesium.LabelCollection());
     function addPin(){
-        var position = Cesium.Cartesian3.fromDegrees(camera.positionCartographic.longitude, camera.positionCartographic.latitude, 0);
-        var labels = scene.primitives.add(new Cesium.LabelCollection());
+        var position = Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude);
+        
         labels.add({
             position : position,
-            text     : 'pin' + counter
+            text     : 'pin' + counter,
+            verticalOrigin : Cesium.VerticalOrigin.TOP,
+            horizontalOrigin : Cesium.HorizontalOrigin.CENTER,
         });
         
-        billboardCollection.add({
+        billboards.add({
             image : pinBuilder.fromColor(Cesium.Color.SALMON, 48),
             verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
             position : position
@@ -116,10 +124,10 @@ counter++;
 
         counter++;
     }
+    addPin();
     
-    addPin()
     scene.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(camera.positionCartographic.longitude, camera.positionCartographic.latitude, 30000)
+        destination: Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude, 30000)
     });
     
     // Comparable Google Earth API code:

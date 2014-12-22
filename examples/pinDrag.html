@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->  
+<head>
+  <title>Draggable Placemark</title>
+
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
+
+  <script src="../Cesium/Cesium.js"></script>
+  <style>
+    @import url(../Cesium/Widgets/widgets.css);
+  </style>
+  
+</head>
+<body onload="if(window.prettyPrint)prettyPrint();">
+  <h1>Cesium Examples - Draggable Placemark</h1>
+  <div id="page">
+  <div id="preview">
+  <div id="cesiumContainer"></div>
+  </div>
+  <div id="source">
+  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+var dragging = false;
+var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+handler.setInputAction(
+    function (click) {
+        var pickedObject = scene.pick(click.position);
+        if (Cesium.defined(pickedObject) && (pickedObject.primitive === pin)) {
+            pin.scale = 1.2;
+            dragging = true;
+            scene.screenSpaceCameraController.enableRotate = false;
+        }
+    },
+    Cesium.ScreenSpaceEventType.LEFT_DOWN
+);
+
+var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+handler.setInputAction(
+    function (movement) {
+        if (dragging) {
+            pin.position = scene.camera.pickEllipsoid(movement.endPosition);
+        }
+    },
+    Cesium.ScreenSpaceEventType.MOUSE_MOVE
+);
+
+handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+handler.setInputAction(
+    function () {
+        pin.scale = 1;
+        dragging = false;
+        scene.screenSpaceCameraController.enableRotate = true;
+    },
+    Cesium.ScreenSpaceEventType.LEFT_UP
+);
+</pre></div>
+    
+  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+placemark.setName('Drag Me!');
+
+// listen for mousedown on the window (look specifically for point placemarks)
+google.earth.addEventListener(ge.getWindow(), 'mousedown', function(event) {
+  if (event.getTarget().getType() == 'KmlPlacemark' &&
+      event.getTarget().getGeometry().getType() == 'KmlPoint') {
+    //event.preventDefault();
+    var placemark = event.getTarget();
+    
+    dragInfo = {
+      placemark: event.getTarget(),
+      dragged: false
+    };
+  } 
+});
+
+// listen for mousemove on the globe
+google.earth.addEventListener(ge.getGlobe(), 'mousemove', function(event) {
+  if (dragInfo) {
+    event.preventDefault();
+    var point = dragInfo.placemark.getGeometry();
+    point.setLatitude(event.getLatitude());
+    point.setLongitude(event.getLongitude());
+    dragInfo.dragged = true;
+  }
+});
+
+// listen for mouseup on the window
+google.earth.addEventListener(ge.getWindow(), 'mouseup', function(event) {
+  if (dragInfo) {
+    if (dragInfo.dragged) {
+      // if the placemark was dragged, prevent balloons from popping up
+      event.preventDefault();
+    }
+    
+    dragInfo = null;
+  }
+});
+  </pre></div>
+  </div>
+  <div id="resources">
+  <h2>Resources:</h2>
+  <ul>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/PinBuilder.html" target="_blank" >PinBuilder</a> </li>
+  </ul>
+  </div>
+  </div>
+
+  <script>
+    var viewer = new Cesium.Viewer('cesiumContainer');
+    var scene = viewer.scene;
+    var camera = viewer.scene.camera;
+    
+    var pinBuilder = new Cesium.PinBuilder();
+    var billboards = scene.primitives.add(new Cesium.BillboardCollection());
+    var position = Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude);
+        
+    var pin = billboards.add({
+        image : pinBuilder.fromColor(Cesium.Color.SALMON, 48),
+        verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+        position : position
+    });
+    
+    var dragging = false;
+    var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+    handler.setInputAction(
+        function (click) {
+            var pickedObject = scene.pick(click.position);
+            if (Cesium.defined(pickedObject) && (pickedObject.primitive === pin)) {
+                pin.scale = 1.2;
+                dragging = true;
+                scene.screenSpaceCameraController.enableRotate = false;
+            }
+        },
+        Cesium.ScreenSpaceEventType.LEFT_DOWN
+    );
+    
+    var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+    handler.setInputAction(
+        function (movement) {
+            if (dragging) {
+                pin.position = scene.camera.pickEllipsoid(movement.endPosition);
+            }
+        },
+        Cesium.ScreenSpaceEventType.MOUSE_MOVE
+    );
+    
+    handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+    handler.setInputAction(
+        function () {
+            pin.scale = 1;
+            dragging = false;
+            scene.screenSpaceCameraController.enableRotate = true;
+        },
+        Cesium.ScreenSpaceEventType.LEFT_UP
+    );
+    
+    scene.camera.flyTo({
+        destination: Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude, 300000)
+    });
+    
+    // Comparable Google Earth API code:
+    //
+    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/placemark-dragdrop.html
+  </script>
+</body>
+</html>
