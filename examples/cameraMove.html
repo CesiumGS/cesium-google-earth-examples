@@ -44,14 +44,12 @@ limitations under the License.
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
     var camera = viewer.scene.camera;
     var height = camera.positionCartographic.height;
-    var move = function() {
-        var lat = camera.positionCartographic.latitude + Cesium.Math.toRadians(2.0);
-        var lon = camera.positionCartographic.longitude + Cesium.Math.toRadians(20.0);
-        camera.flyTo({
-            destination: Cesium.Cartesian3.fromRadians(lon, lat, height),
-            duration: 1.0
-        });
-    };
+    var lat = camera.positionCartographic.latitude + Cesium.Math.toRadians(2.0);
+    var lon = camera.positionCartographic.longitude + Cesium.Math.toRadians(20.0);
+    camera.flyTo({
+        destination: Cesium.Cartesian3.fromRadians(lon, lat, height),
+        duration: 1.0
+    });
 </pre></div>
     
   <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
