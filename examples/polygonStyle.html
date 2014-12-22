@@ -40,20 +40,39 @@ limitations under the License.
   <div id="cesiumContainer"></div>
   </div>
   <div id="source">
-  <div id="cesiumSource"><h2>Cesium Source</h1><pre class="prettyprint lang-js">
-  var polygonInstance = new Cesium.GeometryInstance({
+  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+scene.primitives.add(new Cesium.Primitive({
+  geometryInstances: new Cesium.GeometryInstance({
       geometry : new Cesium.PolygonGeometry({
           polygonHierarchy : polygonHierarchy,
           vertexFormat : Cesium.PerInstanceColorAppearance.VERTEX_FORMAT
       }),
       attributes: {
-          color: Cesium.ColorGeometryInstanceAttribute.fromColor(new Cesium.Color(1.0, 1.0, 0.0, 0.8))
+          color: Cesium.ColorGeometryInstanceAttribute.fromColor(new Cesium.Color(1.0, 1.0, 0.0, 0.6))
       }
-  });
+  }),
+  appearance: new Cesium.PerInstanceColorAppearance()
+}));
 
+scene.primitives.add(new Cesium.Primitive({
+  geometryInstances : new Cesium.GeometryInstance({
+      geometry : new Cesium.PolygonOutlineGeometry({
+          polygonHierarchy : polygonHierarchy
+      }),
+      attributes : {
+          color : Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.RED)
+      }
+  }),
+  appearance : new Cesium.PerInstanceColorAppearance({
+      flat : true,
+      renderState : {
+          lineWidth : Math.min(2.0, scene.maximumAliasedLineWidth)
+      }
+  })
+}));
 </pre></div>
     
-  <div id="geSource"><h2>Google Earth Source</h1><pre class="prettyprint lang-js">
+  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
 // If polygonPlacemark doesn't already have a Style associated
 // with it, we create it now.
 if (!polygonPlacemark.getStyleSelector()) {
@@ -91,7 +110,7 @@ polyColor.setR(255);
   var viewer = new Cesium.Viewer('cesiumContainer');
   var scene = viewer.scene;
   
-  var lon = -95.0;
+  var lon = -105.0;
   var lat = 20.0;
   
   var polygonHierarchy = {
@@ -110,33 +129,29 @@ polyColor.setR(255);
           ])
       }]
   };
-
-  var polygonInstance = new Cesium.GeometryInstance({
-      geometry : new Cesium.PolygonGeometry({
-          polygonHierarchy : polygonHierarchy,
-          vertexFormat : Cesium.PerInstanceColorAppearance.VERTEX_FORMAT
-      }),
-      attributes: {
-          color: Cesium.ColorGeometryInstanceAttribute.fromColor(new Cesium.Color(1.0, 1.0, 0.0, 0.8))
-      }
-  });
   
-  var polygonOutlineInstance = new Cesium.GeometryInstance({
-      geometry : new Cesium.PolygonOutlineGeometry({
-          polygonHierarchy : polygonHierarchy
-      }),
-      attributes : {
-          color : Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.BLUE)
-      }
-  });
-
   scene.primitives.add(new Cesium.Primitive({
-      geometryInstances: polygonInstance,
+      geometryInstances: new Cesium.GeometryInstance({
+          geometry : new Cesium.PolygonGeometry({
+              polygonHierarchy : polygonHierarchy,
+              vertexFormat : Cesium.PerInstanceColorAppearance.VERTEX_FORMAT
+          }),
+          attributes: {
+              color: Cesium.ColorGeometryInstanceAttribute.fromColor(new Cesium.Color(1.0, 1.0, 0.0, 0.6))
+          }
+      }),
       appearance: new Cesium.PerInstanceColorAppearance()
   }));
 
   scene.primitives.add(new Cesium.Primitive({
-      geometryInstances : polygonOutlineInstance,
+      geometryInstances : new Cesium.GeometryInstance({
+          geometry : new Cesium.PolygonOutlineGeometry({
+              polygonHierarchy : polygonHierarchy
+          }),
+          attributes : {
+              color : Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.RED)
+          }
+      }),
       appearance : new Cesium.PerInstanceColorAppearance({
           flat : true,
           renderState : {
@@ -146,7 +161,7 @@ polyColor.setR(255);
   }));
   
   scene.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(-95.0, 20.0, 20000.0)
+      destination: Cesium.Cartesian3.fromDegrees(lon, lat, 20000.0)
   });
   </script>
 </body>

@@ -40,7 +40,7 @@ limitations under the License.
   <div id="cesiumContainer"></div>
   </div>
   <div id="source">
-  <div id="cesiumSource"><h2>Cesium Source</h1><pre class="prettyprint lang-js">
+  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
 var circleInstance = new Cesium.GeometryInstance({
     geometry : new Cesium.CircleGeometry({
         center : Cesium.Cartesian3.fromDegrees(-95.0, 43.0),
@@ -58,7 +58,7 @@ scene.primitives.add(new Cesium.Primitive({
 }));
 </pre></div>
     
-  <div id="geSource"><h2>Google Earth Source</h1><pre class="prettyprint lang-js">
+  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
 function makeCircle(radius, x, y) {
   var center = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
 
@@ -98,7 +98,7 @@ ge.getFeatures().appendChild(polygonPlacemark);
           center : Cesium.Cartesian3.fromDegrees(-95.0, 40.0),
           radius : 500.0,
           vertexFormat : Cesium.PerInstanceColorAppearance.VERTEX_FORMAT
-      });,
+      }),
       attributes : {
           color : Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.WHITE)
       }
