@@ -41,21 +41,14 @@ limitations under the License.
   </div>
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-var circleInstance = new Cesium.GeometryInstance({
-    geometry : new Cesium.CircleGeometry({
-        center : Cesium.Cartesian3.fromDegrees(-95.0, 43.0),
-        radius : 500.0,
-        vertexFormat : Cesium.PerInstanceColorAppearance.VERTEX_FORMAT
-    });,
-    attributes : {
-        color : Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.WHITE)
-    }
-});
-
-scene.primitives.add(new Cesium.Primitive({
-    geometryInstances: circleInstance,
-    appearance: new Cesium.PerInstanceColorAppearance()
-}));
+  var entity = source.entities.add({
+      position : Cesium.Cartesian3.fromDegrees(-95.0, 40.0),
+      ellipse : {
+          semiMajorAxis : 500.0,
+          semiMinorAxis : 500.0,
+          material : new Cesium.ColorMaterialProperty(Cesium.Color.WHITE)
+      }
+  });
 </pre></div>
     
   <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
@@ -91,25 +84,20 @@ ge.getFeatures().appendChild(polygonPlacemark);
   
   <script>
   var viewer = new Cesium.Viewer('cesiumContainer');
-  var scene = viewer.scene;
 
-  var circleInstance = new Cesium.GeometryInstance({
-      geometry : new Cesium.CircleGeometry({
-          center : Cesium.Cartesian3.fromDegrees(-95.0, 40.0),
-          radius : 500.0,
-          vertexFormat : Cesium.PerInstanceColorAppearance.VERTEX_FORMAT
-      }),
-      attributes : {
-          color : Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.WHITE)
+  var source = new Cesium.CustomDataSource();
+  viewer.dataSources.add(source);
+
+  var entity = source.entities.add({
+      position : Cesium.Cartesian3.fromDegrees(-95.0, 40.0),
+      ellipse : {
+          semiMajorAxis : 500.0,
+          semiMinorAxis : 500.0,
+          material : new Cesium.ColorMaterialProperty(Cesium.Color.WHITE)
       }
   });
 
-  scene.primitives.add(new Cesium.Primitive({
-      geometryInstances: circleInstance,
-      appearance: new Cesium.PerInstanceColorAppearance()
-  }));
-
-  scene.camera.flyTo({
+  viewer.scene.camera.flyTo({
       destination: Cesium.Cartesian3.fromDegrees(-95.0, 40.0, 2000.0)
   });
   
