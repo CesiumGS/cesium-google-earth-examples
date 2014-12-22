@@ -43,11 +43,14 @@ limitations under the License.
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
     var camera = viewer.scene.camera;
+    var height = camera.positionCartographic.height;
     var move = function() {
-        var position = camera.positionCartographic;
-        position.latitude += Cesium.Math.toRadians(2.0);
-        position.longitude += Cesium.Math.toRadians(20.0);
-        camera.setPositionCartographic(position);
+        var lat = camera.positionCartographic.latitude + Cesium.Math.toRadians(2.0);
+        var lon = camera.positionCartographic.longitude + Cesium.Math.toRadians(20.0);
+        camera.flyTo({
+            destination: Cesium.Cartesian3.fromRadians(lon, lat, height),
+            duration: 1.0
+        });
     };
 </pre></div>
     
@@ -70,11 +73,14 @@ ge.getView().setAbstractView(lookAt);
     var viewer = new Cesium.Viewer('cesiumContainer');
     
     var camera = viewer.scene.camera;
+    var height = camera.positionCartographic.height;
     var move = function() {
-        var position = camera.positionCartographic;
-        position.latitude += Cesium.Math.toRadians(2.0);
-        position.longitude += Cesium.Math.toRadians(20.0);
-        camera.setPositionCartographic(position);
+        var lat = camera.positionCartographic.latitude + Cesium.Math.toRadians(2.0);
+        var lon = camera.positionCartographic.longitude + Cesium.Math.toRadians(20.0);
+        camera.flyTo({
+            destination: Cesium.Cartesian3.fromRadians(lon, lat, height),
+            duration: 1.0
+        });
     };
     
     // Comparable Google Earth API code:
