@@ -42,13 +42,19 @@ limitations under the License.
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
 var camera = viewer.scene.camera;
+var height = camera.positionCartographic.height;
 var moveCamera = function(count) {
-  camera.rotate(Cesium.Cartesian3.UNIT_Z, Cesium.Math.toRadians(-5));
-  if (count < 40) {
-    setTimeout(function() {
-      moveCamera(count + 1);
-    }, 50);
-  }
+    var lat = camera.positionCartographic.latitude + Cesium.Math.toRadians(0.1);
+    var lon = camera.positionCartographic.longitude + Cesium.Math.toRadians(5.0);
+    camera.flyTo({
+        destination: Cesium.Cartesian3.fromRadians(lon, lat, height),
+        duration: 0.0
+    });
+    if (count < 40) {
+        setTimeout(function() {
+            moveCamera(count + 1);
+        }, 50);
+    }
 };
 
 moveCamera(0);
@@ -90,13 +96,19 @@ moveCamera(0);
     var viewer = new Cesium.Viewer('cesiumContainer');
     
     var camera = viewer.scene.camera;
+    var height = camera.positionCartographic.height;
     var moveCamera = function(count) {
-      camera.rotate(Cesium.Cartesian3.UNIT_Z, Cesium.Math.toRadians(-5));
-      if (count < 40) {
-        setTimeout(function() {
-          moveCamera(count + 1);
-        }, 50);
-      }
+        var lat = camera.positionCartographic.latitude + Cesium.Math.toRadians(0.1);
+        var lon = camera.positionCartographic.longitude + Cesium.Math.toRadians(5.0);
+        camera.flyTo({
+            destination: Cesium.Cartesian3.fromRadians(lon, lat, height),
+            duration: 0.0
+        });
+        if (count < 40) {
+            setTimeout(function() {
+                moveCamera(count + 1);
+            }, 50);
+        }
     };
 
     moveCamera(0);
