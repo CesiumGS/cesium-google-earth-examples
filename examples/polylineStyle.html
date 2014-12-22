@@ -41,15 +41,14 @@ limitations under the License.
   </div>
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-var polylines = scene.primitives.add(new Cesium.PolylineCollection());
-var polyline = polylines.add({
-    positions : Cesium.PolylinePipeline.generateCartesianArc({
-        positions : positions
-    }),
-    width: 8.0,
-    material : Cesium.Material.fromType('Color', {
-        color : new Cesium.Color(1.0, 1.0, 0.0, 0.8)
-    })
+var entity = source.entities.add({
+    polyline : {
+        positions : Cesium.PolylinePipeline.generateCartesianArc({
+            positions : positions
+        }),
+        width: 8.0,
+        material : new Cesium.ColorMaterialProperty(new Cesium.Color(1.0, 1.0, 0.0, 0.8))
+    }
 });
 </pre></div>
     
@@ -97,15 +96,17 @@ lineStyle.getColor().set('6600ffff');  // aabbggrr format
         lon + 4.5, lat + 1.5
     ]);
     
-    var polylines = scene.primitives.add(new Cesium.PolylineCollection());
-    var polyline = polylines.add({
-        positions : Cesium.PolylinePipeline.generateCartesianArc({
-            positions : positions
-        }),
-        width: 8.0,
-        material : Cesium.Material.fromType('Color', {
-            color : new Cesium.Color(1.0, 1.0, 0.0, 0.8)
-        })
+    var source = new Cesium.CustomDataSource();
+    viewer.dataSources.add(source);
+
+    var entity = source.entities.add({
+        polyline : {
+            positions : Cesium.PolylinePipeline.generateCartesianArc({
+                positions : positions
+            }),
+            width: 8.0,
+            material : new Cesium.ColorMaterialProperty(new Cesium.Color(1.0, 1.0, 0.0, 0.8))
+        }
     });
 
     scene.camera.flyToRectangle({

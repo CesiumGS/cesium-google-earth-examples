@@ -41,30 +41,29 @@ limitations under the License.
   </div>
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-var lat = 25.0;
-var lon = -90.0;
-var positions = Cesium.Cartesian3.fromDegreesArray([
-    lon, lat,
-    lon + 0.5, lat + 1.5,
-    lon + 1.0, lat,
-    lon + 1.5, lat + 1.5,
-    lon + 2.0, lat,
-    lon + 2.5, lat + 1.5,
-    lon + 3.0, lat,
-    lon + 3.5, lat + 1.5,
-    lon + 4.0, lat,
-    lon + 4.5, lat + 1.5
-]);
-
-var polylines = scene.primitives.add(new Cesium.PolylineCollection());
-var polyline = polylines.add({
-    positions : Cesium.PolylinePipeline.generateCartesianArc({
-        positions : positions
-    }),
-    material : Cesium.Material.fromType('Color', {
-        color : Cesium.Color.WHITE
-    })
-});
+    var lat = 25.0;
+    var lon = -90.0;
+    var positions = Cesium.Cartesian3.fromDegreesArray([
+        lon, lat,
+        lon + 0.5, lat + 1.5,
+        lon + 1.0, lat,
+        lon + 1.5, lat + 1.5,
+        lon + 2.0, lat,
+        lon + 2.5, lat + 1.5,
+        lon + 3.0, lat,
+        lon + 3.5, lat + 1.5,
+        lon + 4.0, lat,
+        lon + 4.5, lat + 1.5
+    ]);
+    
+    var entity = source.entities.add({
+        polyline : {
+            positions : Cesium.PolylinePipeline.generateCartesianArc({
+                positions : positions
+            }),
+            material : new Cesium.ColorMaterialProperty(Cesium.Color.WHITE)
+        }
+    });
 </pre></div>
     
   <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
@@ -114,7 +113,6 @@ ge.getFeatures().appendChild(lineStringPlacemark);
 
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
-    var scene = viewer.scene;
     
     var lat = 25.0;
     var lon = -90.0;
@@ -131,20 +129,21 @@ ge.getFeatures().appendChild(lineStringPlacemark);
         lon + 4.5, lat + 1.5
     ]);
     
-    var polylines = scene.primitives.add(new Cesium.PolylineCollection());
-    var polyline = polylines.add({
-        positions : Cesium.PolylinePipeline.generateCartesianArc({
-            positions : positions
-        }),
-        material : Cesium.Material.fromType('Color', {
-            color : Cesium.Color.WHITE
-        })
+    var source = new Cesium.CustomDataSource();
+    viewer.dataSources.add(source);
+
+    var entity = source.entities.add({
+        polyline : {
+            positions : Cesium.PolylinePipeline.generateCartesianArc({
+                positions : positions
+            }),
+            material : new Cesium.ColorMaterialProperty(Cesium.Color.WHITE)
+        }
     });
 
-    scene.camera.flyToRectangle({
+    viewer.scene.camera.flyToRectangle({
         destination: Cesium.Rectangle.fromDegrees(lon, lat, lon + 4.5, lat + 1.5)
     });
-    
     
     // Comparable Google Earth API code:
     //
