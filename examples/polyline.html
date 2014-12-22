@@ -58,9 +58,7 @@ limitations under the License.
     
     var entity = source.entities.add({
         polyline : {
-            positions : Cesium.PolylinePipeline.generateCartesianArc({
-                positions : positions
-            }),
+            positions : positions,
             material : new Cesium.ColorMaterialProperty(Cesium.Color.WHITE)
         }
     });
@@ -134,9 +132,7 @@ ge.getFeatures().appendChild(lineStringPlacemark);
 
     var entity = source.entities.add({
         polyline : {
-            positions : Cesium.PolylinePipeline.generateCartesianArc({
-                positions : positions
-            }),
+            positions : positions,
             material : new Cesium.ColorMaterialProperty(Cesium.Color.WHITE)
         }
     });

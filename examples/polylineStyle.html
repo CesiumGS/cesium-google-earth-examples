@@ -43,9 +43,7 @@ limitations under the License.
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
 var entity = source.entities.add({
     polyline : {
-        positions : Cesium.PolylinePipeline.generateCartesianArc({
-            positions : positions
-        }),
+        positions : positions,
         width: 8.0,
         material : new Cesium.ColorMaterialProperty(new Cesium.Color(1.0, 1.0, 0.0, 0.8))
     }
@@ -101,9 +99,7 @@ lineStyle.getColor().set('6600ffff');  // aabbggrr format
 
     var entity = source.entities.add({
         polyline : {
-            positions : Cesium.PolylinePipeline.generateCartesianArc({
-                positions : positions
-            }),
+            positions : positions,
             width: 8.0,
             material : new Cesium.ColorMaterialProperty(new Cesium.Color(1.0, 1.0, 0.0, 0.8))
         }
