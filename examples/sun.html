@@ -20,7 +20,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->  
 <head>
-  <title>Move Camera</title>
+  <title>Show/Hide Sun (Dusk to Dawn)</title>
 
   <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
   <style type="text/css">@import "static/examples.css";</style>
@@ -34,58 +34,63 @@ limitations under the License.
   
 </head>
 <body onload="if(window.prettyPrint)prettyPrint();">
-  <h1>Cesium Examples - Move Camera</h1>
+  <h1>Cesium Examples - Show/Hide Sun (Dusk to Dawn)</h1>
   <div id="page">
   <div id="preview">
-  <div id="buttonContainer"><button onclick="move()" class="cesium-button">Move</button></div>
+  <div id="buttonContainer">
+    <button onclick="showSun()" class="cesium-button">Show</button>
+    <button onclick="hideSun()" class="cesium-button">Hide</button>
+  </div>
   <div id="cesiumContainer"></div>
   </div>
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-var camera = viewer.scene.camera;
-var height = camera.positionCartographic.height;
-var move = function() {
-    var lat = camera.positionCartographic.latitude + Cesium.Math.toRadians(2.0);
-    var lon = camera.positionCartographic.longitude + Cesium.Math.toRadians(20.0);
-    camera.flyTo({
-        destination: Cesium.Cartesian3.fromRadians(lon, lat, height),
-        duration: 1.0
-    });
-};
-</pre></div>
+function showSun(){
+    scene.globe.enableLighting = true;
+}
+
+function hideSun() {
+    scene.globe.enableLighting = false;
+}
+  </pre></div>
     
   <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
-var lookAt = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
-lookAt.setLatitude(lookAt.getLatitude() + 2);
-lookAt.setLongitude(lookAt.getLongitude() + 20);
-ge.getView().setAbstractView(lookAt);
+function showSun() {
+  ge.getSun().setVisibility(true);
+}
+
+function hideSun() {
+  ge.getSun().setVisibility(false);
+}
   </pre></div>
   </div>
   <div id="resources">
   <h2>Resources:</h2>
   <ul>
-  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/Camera.html" target="_blank" >Camera</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/Polyline.html" target="_blank" >Polyline</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/PolylineCollection.html" target="_blank">PolylineCollection</a> </li>
   </ul>
   </div>
   </div>
 
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
+    var scene = viewer.scene;
     
-    var camera = viewer.scene.camera;
-    var height = camera.positionCartographic.height;
-    var move = function() {
-        var lat = camera.positionCartographic.latitude + Cesium.Math.toRadians(2.0);
-        var lon = camera.positionCartographic.longitude + Cesium.Math.toRadians(20.0);
-        camera.flyTo({
-            destination: Cesium.Cartesian3.fromRadians(lon, lat, height),
-            duration: 1.0
-        });
-    };
+    function showSun(){
+        scene.globe.enableLighting = true;
+    }
     
+    function hideSun() {
+        scene.globe.enableLighting = false;
+    }
+
+    showSun();
+    
+    viewer._clockViewModel.multiplier = 1200;
     // Comparable Google Earth API code:
     //
-    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/camera-move.html
+    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/sun.html
   </script>
 </body>
 </html>
