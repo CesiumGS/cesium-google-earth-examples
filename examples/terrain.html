@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->  
+<head>
+  <title>Show/Hide Terrain</title>
+
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
+
+  <script src="../Cesium/Cesium.js"></script>
+  <style>
+    @import url(../Cesium/Widgets/widgets.css);
+  </style>
+  
+</head>
+<body onload="if(window.prettyPrint)prettyPrint();">
+  <h1>Cesium Examples - Show/Hide Terrain</h1>
+  <div id="page">
+  <div id="preview">
+  <div id="buttonContainer">
+    <button onclick="showTerrain()" class="cesium-button">Show Terrain</button>
+    <button onclick="hideTerrain()" class="cesium-button">Hide Terrain</button>
+  </div>
+  <div id="cesiumContainer"></div>
+  </div>
+  <div id="source">
+  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+var ellipsoidTerrainProvider = scene.terrainProvider;
+var cesiumTerrainProvider = new Cesium.CesiumTerrainProvider({
+    url : '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
+});
+
+function showTerrain() {
+    scene.terrainProvider = cesiumTerrainProvider;
+}
+
+function hideTerrain() {
+    scene.terrainProvider = ellipsoidTerrainProvider;
+}
+</pre></div>
+    
+  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+function showTerrain() {
+  var layerRoot = ge.getLayerRoot();
+  var terrainLayer = layerRoot.getLayerById(ge.LAYER_TERRAIN);
+  terrainLayer.setVisibility(true);
+  
+  // shortcut:
+  // layerRoot.enableLayerById(ge.LAYER_TERRAIN, true);
+}
+
+function hideTerrain() {
+  var layerRoot = ge.getLayerRoot();
+  var terrainLayer = layerRoot.getLayerById(ge.LAYER_TERRAIN);
+  terrainLayer.setVisibility(false);
+  
+  // shortcut:
+  // layerRoot.enableLayerById(ge.LAYER_TERRAIN, false);
+}
+  </pre></div>
+  </div>
+  <div id="resources">
+  <h2>Resources:</h2>
+  <ul>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/CesiumTerrainProvider.html" target="_blank" >CesiumTerrainProvider</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Apps/Sandcastle/index.html?src=Terrain.html" target="_blank" >Terrain Demo</a> </li>
+  </ul>
+  </div>
+  </div>
+
+  <script>
+    var viewer = new Cesium.Viewer('cesiumContainer');
+    var scene = viewer.scene;
+    
+    var ellipsoidTerrainProvider = scene.terrainProvider;
+    var cesiumTerrainProvider = new Cesium.CesiumTerrainProvider({
+        url : '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
+    });
+    
+    function showTerrain() {
+        scene.terrainProvider = cesiumTerrainProvider;
+    }
+
+    function hideTerrain() {
+        scene.terrainProvider = ellipsoidTerrainProvider;
+    }
+    
+    var eye, target, up;
+
+    eye = new Cesium.Cartesian3(-2496304.1498512086, -4391818.97382059, 3884176.4503971986);
+    target = Cesium.Cartesian3.add(eye, new Cesium.Cartesian3(0.9279518715011381, -0.29488412129953234, -0.22792252890604328), new Cesium.Cartesian3());
+    up = new Cesium.Cartesian3(-0.11836693744723503, -0.8130611584421428, 0.5700182635106171);
+    scene.camera.lookAt(eye, target, up);
+
+    showTerrain();
+
+    // Comparable Google Earth API code:
+    //
+    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/terrain.html
+  </script>
+</body>
+</html>
