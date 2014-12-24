@@ -100,7 +100,7 @@ counter++;
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
     var scene = viewer.scene;
-    var camera = viewer.scene.camera;
+    var camera = scene.camera;
     
     var counter = 0;
     var pinBuilder = new Cesium.PinBuilder();
@@ -126,7 +126,7 @@ counter++;
     }
     addPin();
     
-    scene.camera.flyTo({
+    viewer.camera.flyTo({
         destination: Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude, 30000)
     });
     
