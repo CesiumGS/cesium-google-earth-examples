@@ -137,7 +137,7 @@ ge.getFeatures().appendChild(lineStringPlacemark);
         }
     });
 
-    viewer.scene.camera.flyToRectangle({
+    viewer.camera.flyToRectangle({
         destination: Cesium.Rectangle.fromDegrees(lon, lat, lon + 4.5, lat + 1.5)
     });
     

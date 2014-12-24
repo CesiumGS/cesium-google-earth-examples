@@ -45,17 +45,17 @@ limitations under the License.
   </div>
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-var ellipsoidTerrainProvider = scene.terrainProvider;
+var ellipsoidTerrainProvider = viewer.terrainProvider;
 var cesiumTerrainProvider = new Cesium.CesiumTerrainProvider({
     url : '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
 });
 
 function showTerrain() {
-    scene.terrainProvider = cesiumTerrainProvider;
+    viewer.terrainProvider = cesiumTerrainProvider;
 }
 
 function hideTerrain() {
-    scene.terrainProvider = ellipsoidTerrainProvider;
+    viewer.terrainProvider = ellipsoidTerrainProvider;
 }
 </pre></div>
     
@@ -90,19 +90,18 @@ function hideTerrain() {
 
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
-    var scene = viewer.scene;
     
-    var ellipsoidTerrainProvider = scene.terrainProvider;
+    var ellipsoidTerrainProvider = viewer.terrainProvider;
     var cesiumTerrainProvider = new Cesium.CesiumTerrainProvider({
         url : '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
     });
     
     function showTerrain() {
-        scene.terrainProvider = cesiumTerrainProvider;
+        viewer.terrainProvider = cesiumTerrainProvider;
     }
 
     function hideTerrain() {
-        scene.terrainProvider = ellipsoidTerrainProvider;
+        viewer.terrainProvider = ellipsoidTerrainProvider;
     }
     
     var eye, target, up;
@@ -110,7 +109,7 @@ function hideTerrain() {
     eye = new Cesium.Cartesian3(-2496304.1498512086, -4391818.97382059, 3884176.4503971986);
     target = Cesium.Cartesian3.add(eye, new Cesium.Cartesian3(0.9279518715011381, -0.29488412129953234, -0.22792252890604328), new Cesium.Cartesian3());
     up = new Cesium.Cartesian3(-0.11836693744723503, -0.8130611584421428, 0.5700182635106171);
-    scene.camera.lookAt(eye, target, up);
+    viewer.camera.lookAt(eye, target, up);
 
     showTerrain();
 
