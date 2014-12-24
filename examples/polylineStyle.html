@@ -77,7 +77,6 @@ lineStyle.getColor().set('6600ffff');  // aabbggrr format
 
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
-    var scene = viewer.scene;
     
     var lat = 25.0;
     var lon = -90.0;
@@ -105,7 +104,7 @@ lineStyle.getColor().set('6600ffff');  // aabbggrr format
         }
     });
 
-    scene.camera.flyToRectangle({
+    viewer.camera.flyToRectangle({
         destination: Cesium.Rectangle.fromDegrees(lon, lat, lon + 4.5, lat + 1.5)
     });
     

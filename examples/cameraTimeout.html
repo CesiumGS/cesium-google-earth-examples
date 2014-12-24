@@ -41,7 +41,7 @@ limitations under the License.
   </div>
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-var camera = viewer.scene.camera;
+var camera = viewer.camera;
 var moveCamera = function(count) {
     var position = camera.positionCartographic;
     position.latitude += Cesium.Math.toRadians(0.1);
@@ -92,7 +92,7 @@ moveCamera(0);
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
     
-    var camera = viewer.scene.camera;
+    var camera = viewer.camera;
     var moveCamera = function(count) {
         var position = camera.positionCartographic;
         position.latitude += Cesium.Math.toRadians(0.1);
