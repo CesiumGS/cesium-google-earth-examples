@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->  
+<head>
+  <title>Move Camera with Timeouts</title>
+
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
+
+  <script src="../Cesium/Cesium.js"></script>
+  <style>
+    @import url(../Cesium/Widgets/widgets.css);
+  </style>
+  
+</head>
+<body onload="if(window.prettyPrint)prettyPrint();">
+  <h1>Cesium Examples - Move Camera with Timeouts</h1>
+  <div id="page">
+  <div id="preview">
+  <div id="cesiumContainer"></div>
+  </div>
+  <div id="source">
+  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+var camera = viewer.camera;
+var tiltCamera = function(count) {
+  var idealTilt = Cesium.Math.toRadians(80);  // all angles in the API are in degrees.
+  var c0 = 0.95;
+  camera.tilt = c0 * camera.tilt + (1 - c0) * idealTilt;
+
+  if (count < 60) {
+    setTimeout(function() {
+      tiltCamera(count + 1);
+    }, 33);
+  }
+}
+
+tiltCamera(0);
+</pre></div>
+    
+  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+var tiltCamera = function(count) {
+  var idealTilt = 80;  // all angles in the API are in degrees.
+  var c0 = 0.90;
+  var la = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+
+  var tilt = la.getTilt();
+  tilt = c0 * tilt + (1 - c0) * idealTilt;
+  la.setTilt(tilt);
+  ge.getView().setAbstractView(la);
+
+  if (count < 60) {
+    setTimeout(function() {
+      tiltCamera(count + 1);
+    }, 33);
+  }
+}
+
+tiltCamera(0);
+  </pre></div>
+  </div>
+  <div id="resources">
+  <h2>Resources:</h2>
+  <ul>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/Camera.html" target="_blank" >Camera</a> </li>
+  </ul>
+  </div>
+  </div>
+
+  <script>
+    var viewer = new Cesium.Viewer('cesiumContainer');
+    
+    var camera = viewer.camera;
+    var tiltCamera = function(count) {
+        var idealTilt = Cesium.Math.toRadians(80);  // all angles in the API are in degrees.
+        var c0 = 0.95;
+        camera.tilt = c0 * camera.tilt + (1 - c0) * idealTilt;
+
+        if (count < 60) {
+          setTimeout(function() {
+            tiltCamera(count + 1);
+          }, 33);
+        }
+      }
+
+      tiltCamera(0);
+    
+    // Comparable Google Earth API code:
+    //
+    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/camera-tilt.html
+  </script>
+</body>
+</html>

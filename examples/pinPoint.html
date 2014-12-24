@@ -43,7 +43,7 @@ limitations under the License.
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
 var pinBuilder = new Cesium.PinBuilder();
-var position = Cesium.Ellipsoid.WGS84.scaleToGeodeticSurface(viewer.scene.camera.position);
+var position = Cesium.Ellipsoid.WGS84.scaleToGeodeticSurface(viewer.camera.position);
 
 var entity = source.entities.add({
     position : position,
@@ -93,7 +93,7 @@ counter++;
 
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
-    var camera = viewer.scene.camera;
+    var camera = viewer.camera;
 
     var source = new Cesium.CustomDataSource();
     viewer.dataSources.add(source);
