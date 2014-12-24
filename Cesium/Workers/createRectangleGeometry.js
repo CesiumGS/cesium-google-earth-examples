@@ -22311,7 +22311,7 @@ define('Core/Transforms',[
      * //Set the view to in the inertial frame.
      * scene.preRender.addEventListener(function(scene, time) {
      *   var now = new Cesium.JulianDate();
-     *   scene.camera.transform = Cesium.Matrix4.fromRotationTranslation(Cesium.Transforms.computeTemeToPseudoFixedMatrix(now));
+     *   viewer.camera.transform = Cesium.Matrix4.fromRotationTranslation(Cesium.Transforms.computeTemeToPseudoFixedMatrix(now));
      * });
      */
     Transforms.computeTemeToPseudoFixedMatrix = function (date, result) {
@@ -22438,7 +22438,7 @@ define('Core/Transforms',[
      * scene.preRender.addEventListener(function(scene, time) {
      *   var icrfToFixed = Cesium.Transforms.computeIcrfToFixedMatrix(time);
      *   if (Cesium.defined(icrfToFixed)) {
-     *     scene.camera.transform = Cesium.Matrix4.fromRotationTranslation(icrfToFixed);
+     *     viewer.camera.transform = Cesium.Matrix4.fromRotationTranslation(icrfToFixed);
      *   }
      * });
      */
