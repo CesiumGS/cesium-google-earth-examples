@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->  
+<head>
+  <title>Line String Styling</title>
+
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
+
+  <script src="../Cesium/Cesium.js"></script>
+  <style>
+    @import url(../Cesium/Widgets/widgets.css);
+  </style>
+  
+</head>
+<body onload="if(window.prettyPrint)prettyPrint();">
+  <h1>Cesium Examples - Line String Styling</h1>
+  <div id="page">
+  <div id="preview">
+  <div id="cesiumContainer"></div>
+  </div>
+  <div id="source">
+  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+var entity = source.entities.add({
+    polyline : {
+        positions : positions,
+        width: 8.0,
+        material : new Cesium.ColorMaterialProperty(new Cesium.Color(1.0, 1.0, 0.0, 0.8))
+    }
+});
+</pre></div>
+    
+  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+// If lineStringPlacemark doesn't already have a Style associated
+// with it, we create it now.
+if (!lineStringPlacemark.getStyleSelector()) {
+  lineStringPlacemark.setStyleSelector(ge.createStyle(''));
+}
+
+// The Style of a Feature is retrieved as feature.getStyleSelector().
+// The Style itself contains a LineStyle, which is what we manipulate
+// to change the color and width of the line.
+var lineStyle = lineStringPlacemark.getStyleSelector().getLineStyle();
+lineStyle.setWidth(lineStyle.getWidth() + 2);
+lineStyle.getColor().set('6600ffff');  // aabbggrr format
+  </pre></div>
+  </div>
+  <div id="resources">
+  <h2>Resources:</h2>
+  <ul>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/Polyline.html" target="_blank" >Polyline</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/PolylineCollection.html" target="_blank">PolylineCollection</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Apps/Sandcastle/index.html?src=Polylines.html" target="_blank">Polyline Demo</a> </li>
+  </ul>
+  </div>
+  </div>
+
+  <script>
+    var viewer = new Cesium.Viewer('cesiumContainer');
+    
+    var lat = 25.0;
+    var lon = -90.0;
+    var positions = Cesium.Cartesian3.fromDegreesArray([
+        lon, lat,
+        lon + 0.5, lat + 1.5,
+        lon + 1.0, lat,
+        lon + 1.5, lat + 1.5,
+        lon + 2.0, lat,
+        lon + 2.5, lat + 1.5,
+        lon + 3.0, lat,
+        lon + 3.5, lat + 1.5,
+        lon + 4.0, lat,
+        lon + 4.5, lat + 1.5
+    ]);
+    
+    var source = new Cesium.CustomDataSource();
+    viewer.dataSources.add(source);
+
+    var entity = source.entities.add({
+        polyline : {
+            positions : positions,
+            width: 8.0,
+            material : new Cesium.ColorMaterialProperty(new Cesium.Color(1.0, 1.0, 0.0, 0.8))
+        }
+    });
+
+    viewer.camera.flyToRectangle({
+        destination: Cesium.Rectangle.fromDegrees(lon, lat, lon + 4.5, lat + 1.5)
+    });
+    
+    
+    // Comparable Google Earth API code:
+    //
+    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/linestring-style.html
+  </script>
+</body>
+</html>
