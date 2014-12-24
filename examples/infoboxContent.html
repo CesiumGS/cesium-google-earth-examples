@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->  
+<head>
+  <title>Changing Balloon Content</title>
+
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
+
+  <script src="../Cesium/Cesium.js"></script>
+  <style>
+    @import url(../Cesium/Widgets/widgets.css);
+  </style>
+  
+</head>
+<body onload="if(window.prettyPrint)prettyPrint();">
+  <h1>Cesium Examples - Changing Balloon Content</h1>
+  <div id="page">
+  <div id="preview">
+  <div id="buttonContainer">
+    <button onclick="show()" class="cesium-button">Show</button>
+    <button onclick="change()" class="cesium-button">Change Content</button>
+  </div>
+  <div id="cesiumContainer"></div>
+  </div>
+  <div id="source">
+  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+infoBoxViewModel.titleText = 'Pigeon Rank';
+infoBoxViewModel.descriptionRawHtml = '&lt;img src=&quot;http://www.google.com/technology/pigeon_system.jpg&quot;&gt;' +
+    '&lt;br&gt;PigeonRank&amp;#153; Technology';
+</pre></div>
+    
+  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+// Change the context of the current balloon.
+var balloon = ge.getBalloon();
+if (balloon) {
+  // Pigeon Rank
+  var content = 
+    '&lt;img src=&quot;http://www.google.com/technology/pigeon_system.jpg&quot;&gt;' +
+    '&lt;br&gt;PigeonRank&amp;#153; Technology';
+  balloon.setFeature(placemark); // optional
+  balloon.setMaxWidth(800);
+  
+  if (balloon.getType() == 'GEHtmlStringBalloon') {
+    balloon.setContentString(content);
+  } else if (balloon.getType() == 'GEHtmlDivBalloon') {
+    var div = document.createElement('DIV');
+    div.innerHTML = content;
+    balloon.setContentDiv(div);
+  } else if (balloon.getType() == 'GEFeatureBalloon') {
+    placemark.setDescription(content);
+  }
+}
+  </pre></div>
+  </div>
+  <div id="resources">
+  <h2>Resources:</h2>
+  <ul>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/InfoBox.html" target="_blank" >InfoBox</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/InfoBoxViewModel.html" target="_blank" >InfoBoxViewModel</a> </li>
+  </ul>
+  </div>
+  </div>
+
+  <script>
+    var viewer = new Cesium.Viewer('cesiumContainer');
+    
+    var infoBoxContainer = document.createElement('div');
+    infoBoxContainer.className = 'cesium-viewer-infoBoxContainer';
+    viewer.container.appendChild(infoBoxContainer);
+    var infoBox = new Cesium.InfoBox(infoBoxContainer);
+    var infoBoxViewModel = infoBox.viewModel;
+    var eventHelper = new Cesium.EventHelper();
+    eventHelper.add(infoBoxViewModel.closeClicked, close, this);
+    function show() {
+        infoBoxViewModel.showInfo = true;
+    }
+    function close() {
+        infoBoxViewModel.showInfo = false;
+    }
+    infoBoxViewModel.titleText = 'Cesium Logo';
+    infoBoxViewModel.descriptionRawHtml = '<img alt="CESIUMJS" src="./static/Cesium_Logo_Color.jpg"/>';
+    show();
+    
+    function change() {
+        infoBoxViewModel.titleText = 'Pigeon Rank';
+        infoBoxViewModel.descriptionRawHtml = '<img alt="PIGEON" src="http://www.google.com/technology/pigeon_system.jpg"/>' +
+            '<br>PigeonRank&#153; Technology';
+    }
+
+    // Comparable Google Earth API code:
+    //
+    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/balloon-change-content.html
+  </script>
+</body>
+</html>
