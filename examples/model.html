@@ -41,12 +41,12 @@ limitations under the License.
   </div>
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-var url = './static/splotchy_box.gltf';
 var position = Cesium.Ellipsoid.WGS84.scaleToGeodeticSurface(camera.position);
 var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(position);
 var model = scene.primitives.add(Cesium.Model.fromGltf({
-    url : url,
-    modelMatrix : modelMatrix
+    url : './static/Cesium_Man.gltf',
+    modelMatrix : modelMatrix,
+    scale : 10.0
 }));
 
 model.readyToRender.addEventListener(function(model) {
@@ -59,9 +59,6 @@ model.readyToRender.addEventListener(function(model) {
 </pre></div>
     
   <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
-// Create a 3D model, initialize it from a Collada file, and place it
-// in the world.
-
 var placemark = ge.createPlacemark('');
 placemark.setName('model');
 var model = ge.createModel('');
@@ -70,7 +67,6 @@ var loc = ge.createLocation('');
 model.setLocation(loc);
 var link = ge.createLink('');
 
-// A textured model created in Sketchup and exported as Collada.
 link.setHref('http://earth-api-samples.googlecode.com/svn/trunk/examples/' +
              'static/splotchy_box.dae');
 model.setLink(link);
@@ -89,7 +85,9 @@ ge.getView().setAbstractView(la);
   <div id="resources">
   <h2>Resources:</h2>
   <ul>
-  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/Model.html" target="_blank" >Model</a> </li>
+  <li> <a href="http://cesiumjs.org/2014/03/03/Cesium-3D-Models-Tutorial/" target="_blank" >Cesium 3D Models Tutorial</a> </li>
+  <li> <a href="http://cesiumjs.org/convertmodel.html" target="_blank" >COLLADA-to-glTF Converter</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/Model.html" target="_blank" >Model</a> class in Cesium</li>
   </ul>
   </div>
   </div>
@@ -99,12 +97,12 @@ ge.getView().setAbstractView(la);
     var scene = viewer.scene;
     var camera = viewer.camera;
 
-    var url = './static/splotchy_box.gltf';
     var position = Cesium.Ellipsoid.WGS84.scaleToGeodeticSurface(camera.position);
     var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(position);
     var model = scene.primitives.add(Cesium.Model.fromGltf({
-        url : url,
-        modelMatrix : modelMatrix
+        url : './static/Cesium_Man.gltf',
+        modelMatrix : modelMatrix,
+        scale : 10
     }));
 
     model.readyToRender.addEventListener(function(model) {
