@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->  
+<head>
+  <title>Toggling Event Listeners</title>
+
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
+
+  <script src="../Cesium/Cesium.js"></script>
+  <style>
+    @import url(../Cesium/Widgets/widgets.css);
+  </style>
+  
+</head>
+<body onload="if(window.prettyPrint)prettyPrint();">
+  <h1>Cesium Examples - Toggling Event Listeners</h1>
+  <div id="page">
+  <div id="preview">
+  <div id="buttonContainer">
+    <button onclick="enable()" class="cesium-button">Enable Event</button>
+    <button onclick="disable()" class="cesium-button">Disable Event</button>
+  </div>
+  <div id="cesiumContainer"></div>
+  </div>
+  <div id="source">
+  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+function action (click) {
+    var pickedObject = scene.pick(click.position);
+    if (Cesium.defined(pickedObject) && (pickedObject.primitive === pin)) {
+        alert('Pin Clicked!');
+    }
+    
+}
+function enable(){
+    handler.setInputAction(action, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+}
+function disable() {
+    handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
+}
+</pre></div>
+    
+  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+// global state
+var eventListenerActive;
+
+function enableListener() {
+  if (!eventListenerActive) {
+    google.earth.addEventListener(placemark, 'click', myEventHandler);
+    eventListenerActive = true;
+  }
+}
+
+function disableListener() {
+  if (eventListenerActive) {
+    google.earth.removeEventListener(placemark, 'click', myEventHandler);
+    eventListenerActive = false;
+  }
+}
+
+function myEventHandler(event) {
+  // wrap alerts in API callbacks and event handlers
+  // in a setTimeout to prevent deadlock in some browsers
+  setTimeout(function() {
+    alert('You clicked the placemark!');
+  }, 0);
+}
+  </pre></div>
+  </div>
+  <div id="resources">
+  <h2>Resources:</h2>
+  <ul>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/Camera.html" target="_blank" >Camera</a> </li>
+  </ul>
+  </div>
+  </div>
+
+  <script>
+    var viewer = new Cesium.Viewer('cesiumContainer');
+    var scene = viewer.scene;
+    var camera = viewer.camera;
+    var pinBuilder = new Cesium.PinBuilder();
+    var billboards = scene.primitives.add(new Cesium.BillboardCollection());
+    var position = Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude);
+        
+    var pin = billboards.add({
+        image : pinBuilder.fromColor(Cesium.Color.SALMON, 48),
+        verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+        position : position
+    });
+    
+    var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+    function action (click) {
+        var pickedObject = scene.pick(click.position);
+        if (Cesium.defined(pickedObject) && (pickedObject.primitive === pin)) {
+            alert('Pin Clicked!');
+        }
+        
+    }
+    function enable(){
+        handler.setInputAction(action, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+    }
+    function disable() {
+        handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
+    }
+    enable();
+
+    // Comparable Google Earth API code:
+    //
+    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/event-listeners.html
+  </script>
+</body>
+</html>
