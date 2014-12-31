@@ -46,18 +46,21 @@ handler.setInputAction(
     function (click) {
         var alertText = '';
 
-        function addText(key, value) { 
-          alertText += key + ': ' + value+ '\n' ;
-        }
-        addText('screenX', click.position.x);
-        addText('screenY', click.position.y);
-        
-        var position = viewer.camera.pickEllipsoid(click.position);
-        if (Cesium.defined(position)){
-            var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-            addText('lon', Cesium.Math.toDegrees(cartographicPosition.longitude));
-            addText('lat', Cesium.Math.toDegrees(cartographicPosition.latitude));
-        }
+          function addText(key, value) { 
+            alertText += key + ': ' + value+ '\n' ;
+          }
+
+          var position = viewer.camera.pickEllipsoid(click.position);
+
+          addText('screenX', click.position.x);
+          addText('screenY', click.position.y);
+          addText('didHitGlobe', Cesium.defined(position));
+          
+          if (Cesium.defined(position)){
+              var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
+              addText('longitude', Cesium.Math.toDegrees(cartographicPosition.longitude));
+              addText('latitude', Cesium.Math.toDegrees(cartographicPosition.latitude));
+          }
         
         alert(alertText);
     },
@@ -124,14 +127,17 @@ google.earth.addEventListener(ge.getWindow(), 'click', eventHandler);
             function addText(key, value) { 
               alertText += key + ': ' + value+ '\n' ;
             }
+
+            var position = viewer.camera.pickEllipsoid(click.position);
+
             addText('screenX', click.position.x);
             addText('screenY', click.position.y);
+            addText('didHitGlobe', Cesium.defined(position));
             
-            var position = viewer.camera.pickEllipsoid(click.position);
             if (Cesium.defined(position)){
                 var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-                addText('lon', Cesium.Math.toDegrees(cartographicPosition.longitude));
-                addText('lat', Cesium.Math.toDegrees(cartographicPosition.latitude));
+                addText('longitude', Cesium.Math.toDegrees(cartographicPosition.longitude));
+                addText('latitude', Cesium.Math.toDegrees(cartographicPosition.latitude));
             }
             
             alert(alertText);
