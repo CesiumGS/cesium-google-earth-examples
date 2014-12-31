@@ -65,19 +65,30 @@ function stop() {
     }
 }
 
-function onTick() {
-    var pos = camera.positionCartographic;
-    camera.position = destination(pos.longitude, pos.latitude, 100, -camera.heading);
+var terrainSamplePositions = [];
+function sampleTerrainSuccess() {
+    var position = terrainSamplePositions[0];
+    position.height += height; // add height to terrain height
+    camera.position = Cesium.Ellipsoid.WGS84.cartographicToCartesian(position);
 }
 
-function destination(lon, lat, dist, heading) {
-    dist /= 6371000; // angular dist
+function sampleTerrain(lon, lat) {
+    terrainSamplePositions = [new Cesium.Cartographic(lon, lat)];
+    Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess);
+}
+
+function onTick() {
+    var pos = camera.positionCartographic;
+    var lon = pos.longitude;
+    var lat = pos.latitude;
+    var dist = 1/63710; // angular dist;
+    var heading = -camera.heading;
+
     var newLat = Math.asin(Math.sin(lat) * Math.cos(dist)
             + Math.cos(lat) * Math.sin(dist) * Math.cos(heading));
-    var newLon = (lon + Math.atan2(Math.sin(heading) * Math.sin(dist) 
-            * Math.cos(newLat), Math.cos(dist) - Math.sin(lat) 
-            * Math.sin(lon)));
-    return Cesium.Cartesian3.fromRadians(newLon, newLat, height);
+    var newLon = (lon + Math.atan2(Math.sin(heading) * Math.sin(dist) * Math.cos(newLat),
+            Math.cos(dist) - Math.sin(lat) * Math.sin(lon))); 
+    sampleTerrain(newLon, newLat);
 }
 </pre></div>
     
@@ -154,6 +165,13 @@ function destination(lat, lng, dist, heading) {
     var scene = viewer.scene;
     var camera = viewer.camera;
 
+    var globe = scene.globe;
+    globe.depthTestAgainstTerrain = true;
+    var cesiumTerrainProviderMeshes = new Cesium.CesiumTerrainProvider({
+        url : '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
+    });
+    viewer.terrainProvider = cesiumTerrainProviderMeshes;
+
     var clock = viewer.clock;
     var eventHelper = new Cesium.EventHelper();
     var removeCallback;
@@ -173,26 +191,39 @@ function destination(lat, lng, dist, heading) {
             running = false;
         }
     }
-
-    function onTick() {
-        var pos = camera.positionCartographic;
-        camera.position = destination(pos.longitude, pos.latitude, 100, -camera.heading);
+    
+    var terrainSamplePositions = [];
+    function sampleTerrainSuccess() {
+        var position = terrainSamplePositions[0];
+        position.height += height; // add height to terrain height
+        camera.position = Cesium.Ellipsoid.WGS84.cartographicToCartesian(position);
     }
 
-    function destination(lon, lat, dist, heading) {
-        dist /= 6371000; // angular dist
+    function sampleTerrain(lon, lat) {
+        terrainSamplePositions = [new Cesium.Cartographic(lon, lat)];
+        Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess);
+    }
+    
+    function onTick() {
+        var pos = camera.positionCartographic;
+        var lon = pos.longitude;
+        var lat = pos.latitude;
+        var dist = 1/63710; // angular dist;
+        var heading = -camera.heading;
+
         var newLat = Math.asin(Math.sin(lat) * Math.cos(dist)
                 + Math.cos(lat) * Math.sin(dist) * Math.cos(heading));
         var newLon = (lon + Math.atan2(Math.sin(heading) * Math.sin(dist) * Math.cos(newLat),
                 Math.cos(dist) - Math.sin(lat) * Math.sin(lon))); 
-        return Cesium.Cartesian3.fromRadians(newLon, newLat, height);
+        sampleTerrain(newLon, newLat);
     }
     
     var eye = new Cesium.Cartesian3(-2496304.1498512086, -4391818.97382059, 3884176.4503971986);
     var target = Cesium.Cartesian3.add(eye, new Cesium.Cartesian3(-0.7643045598990259, 0.643704706480502, -0.03850701978089475), new Cesium.Cartesian3());
     var up = new Cesium.Cartesian3(-0.11836693744723503, -0.8130611584421428, 0.5700182635106171);
     camera.lookAt(eye, target, up);
-    height = camera.positionCartographic.height;
+    sampleTerrain(camera.positionCartographic.longitude, camera.positionCartographic.latitude);
+
 
     // Comparable Google Earth API code:
     //
