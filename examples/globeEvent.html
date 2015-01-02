@@ -41,28 +41,37 @@ limitations under the License.
   </div>
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+var alertText = '';
+function addText(key, value) { 
+    alertText += key + ': ' + value+ '\n' ;
+}
+function showAlert() {
+    alert(alertText);
+    alertText = '';
+}
+function sampleTerrainSuccess() {
+    console.log('success');
+    addText('height', terrainSamplePositions[0].height);
+    showAlert();
+}
 var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
 handler.setInputAction(
     function (click) {
-        var alertText = '';
+        var position = viewer.camera.pickEllipsoid(click.position);
 
-          function addText(key, value) { 
-            alertText += key + ': ' + value+ '\n' ;
-          }
-
-          var position = viewer.camera.pickEllipsoid(click.position);
-
-          addText('screenX', click.position.x);
-          addText('screenY', click.position.y);
-          addText('didHitGlobe', Cesium.defined(position));
-          
-          if (Cesium.defined(position)){
-              var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-              addText('longitude', Cesium.Math.toDegrees(cartographicPosition.longitude));
-              addText('latitude', Cesium.Math.toDegrees(cartographicPosition.latitude));
-          }
+        addText('screenX', click.position.x);
+        addText('screenY', click.position.y);
+        addText('didHitGlobe', Cesium.defined(position));
         
-        alert(alertText);
+        if (Cesium.defined(position)){
+            var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
+            addText('longitude', Cesium.Math.toDegrees(cartographicPosition.longitude));
+            addText('latitude', Cesium.Math.toDegrees(cartographicPosition.latitude));
+            terrainSamplePositions = [cartographicPosition];
+            Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess, showAlert);
+        } else {
+            showAlert();
+        }
     },
     Cesium.ScreenSpaceEventType.LEFT_CLICK
 );
@@ -119,15 +128,30 @@ google.earth.addEventListener(ge.getWindow(), 'click', eventHandler);
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
     var scene = viewer.scene;
+    
+    var globe = scene.globe;
+    globe.depthTestAgainstTerrain = true;
+    var cesiumTerrainProviderMeshes = new Cesium.CesiumTerrainProvider({
+        url : '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
+    });
+    viewer.terrainProvider = cesiumTerrainProviderMeshes;
+    
+    var alertText = '';
+    function addText(key, value) { 
+        alertText += key + ': ' + value+ '\n' ;
+    }
+    function showAlert() {
+        alert(alertText);
+        alertText = '';
+    }
+    function sampleTerrainSuccess() {
+        console.log('success');
+        addText('height', terrainSamplePositions[0].height);
+        showAlert();
+    }
     var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
     handler.setInputAction(
         function (click) {
-            var alertText = '';
-
-            function addText(key, value) { 
-              alertText += key + ': ' + value+ '\n' ;
-            }
-
             var position = viewer.camera.pickEllipsoid(click.position);
 
             addText('screenX', click.position.x);
@@ -138,9 +162,11 @@ google.earth.addEventListener(ge.getWindow(), 'click', eventHandler);
                 var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
                 addText('longitude', Cesium.Math.toDegrees(cartographicPosition.longitude));
                 addText('latitude', Cesium.Math.toDegrees(cartographicPosition.latitude));
+                terrainSamplePositions = [cartographicPosition];
+                Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess, showAlert);
+            } else {
+                showAlert();
             }
-            
-            alert(alertText);
         },
         Cesium.ScreenSpaceEventType.LEFT_CLICK
     );
