@@ -51,11 +51,9 @@ limitations under the License.
   </div>
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-viewer.useDefaultRenderLoop = false;
 var viewEvent = new Cesium.Event();
 var eventHelper = new Cesium.EventHelper();
 eventHelper.add(viewEvent, viewChanged);
-
 var viewTimeout;
 function viewChanged(){
     document.getElementById('viewChanged').style.display = 'block';
@@ -63,8 +61,6 @@ function viewChanged(){
     if (viewTimeout !== null)
       window.clearTimeout(viewTimeout);
 
-    // hide the 'view changed' message after 250 ms of
-    // inactivity
     viewTimeout = window.setTimeout(function() {
       document.getElementById('viewChanged').style.display = 'none';
       viewTimeout = null;
@@ -72,30 +68,14 @@ function viewChanged(){
 }
 
 var oldCamera = camera.clone();
-function startRenderLoop(widget) {
-    var lastFrameTime = 0;
-    function render() {
-        if (widget.isDestroyed()) {
-            return;
-        }
-        if (!Cesium.Cartesian3.equalsEpsilon(oldCamera.position, camera.position, Cesium.Math.EPSILON4)){
-            viewEvent.raiseEvent();
-        }
-        oldCamera = camera.clone();
-        try {
-            widget.resize();
-            widget.render();
-            requestAnimationFrame(render);
-        } catch (error) {
-            alert('Render error');
-        }
+function preRender() {
+    if (!Cesium.Cartesian3.equalsEpsilon(oldCamera.position, camera.position, Cesium.Math.EPSILON4)){
+        viewEvent.raiseEvent();
     }
-
-    requestAnimationFrame(render);
+    oldCamera = camera.clone();
 }
 
-startRenderLoop(viewer.cesiumWidget);
-</pre></div>
+scene.preRender.addEventListener(preRender);</pre></div>
     
   <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
 var vcTimeout = null;
@@ -134,7 +114,6 @@ google.earth.addEventListener(ge.getView(), 'viewchangeend', function() {
     var camera = viewer.camera;
     var scene = viewer.scene;
     
-    viewer.useDefaultRenderLoop = false;
     var viewEvent = new Cesium.Event();
     var eventHelper = new Cesium.EventHelper();
     eventHelper.add(viewEvent, viewChanged);
@@ -145,38 +124,22 @@ google.earth.addEventListener(ge.getView(), 'viewchangeend', function() {
         if (viewTimeout !== null)
           window.clearTimeout(viewTimeout);
 
-        // hide the 'view changed' message after 250 ms of
-        // inactivity
         viewTimeout = window.setTimeout(function() {
           document.getElementById('viewChanged').style.display = 'none';
           viewTimeout = null;
         }, 250);
     }
-    
-    var oldCamera = camera.clone();
-    function startRenderLoop(widget) {
-        var lastFrameTime = 0;
-        function render() {
-            if (widget.isDestroyed()) {
-                return;
-            }
-            if (!Cesium.Cartesian3.equalsEpsilon(oldCamera.position, camera.position, Cesium.Math.EPSILON4)){
-                viewEvent.raiseEvent();
-            }
-            oldCamera = camera.clone();
-            try {
-                widget.resize();
-                widget.render();
-                requestAnimationFrame(render);
-            } catch (error) {
-                alert('Render error');
-            }
-        }
 
-        requestAnimationFrame(render);
+    var oldCamera = camera.clone();
+    function preRender() {
+        if (!Cesium.Cartesian3.equalsEpsilon(oldCamera.position, camera.position, Cesium.Math.EPSILON4)){
+            viewEvent.raiseEvent();
+        }
+        oldCamera = camera.clone();
     }
-    
-    startRenderLoop(viewer.cesiumWidget);
+
+    scene.preRender.addEventListener(preRender);
+
     // Comparable Google Earth API code:
     //
     // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/event-viewchange.html
