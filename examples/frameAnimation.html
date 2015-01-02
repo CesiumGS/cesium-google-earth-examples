@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->  
+<head>
+  <title>Smooth Animation with frameend</title>
+
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
+
+  <script src="../Cesium/Cesium.js"></script>
+  <style>
+    @import url(../Cesium/Widgets/widgets.css);
+  </style>
+  
+</head>
+<body onload="if(window.prettyPrint)prettyPrint();">
+  <h1>Cesium Examples - Smooth Animation with frameend</h1>
+  <div id="page">
+  <div id="preview">
+  <div id="buttonContainer">
+    <button onclick="start()" class="cesium-button">Start Animation</button>
+    <button onclick="stop()" class="cesium-button">Stop Animation</button>
+  </div>
+  <div id="cesiumContainer"></div>
+  </div>
+  <div id="source">
+  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+var clock = viewer.clock;
+var eventHelper = new Cesium.EventHelper();
+var removeCallback;
+var height = 1000;
+var running = false;
+
+function start() {
+    if (!running) {
+        running = true;
+        removeCallback = eventHelper.add(clock.onTick, onTick);
+    }
+}
+
+function stop() {
+    if (running) {
+        removeCallback();
+        running = false;
+    }
+}
+
+var terrainSamplePositions = [];
+function sampleTerrainSuccess() {
+    var position = terrainSamplePositions[0];
+    position.height += height; // add height to terrain height
+    camera.position = Cesium.Ellipsoid.WGS84.cartographicToCartesian(position);
+}
+
+function sampleTerrain(lon, lat) {
+    terrainSamplePositions = [new Cesium.Cartographic(lon, lat)];
+    Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess);
+}
+
+function onTick() {
+    var pos = camera.positionCartographic;
+    var lon = pos.longitude;
+    var lat = pos.latitude;
+    var dist = 1/63710; // angular dist;
+    var heading = -camera.heading;
+
+    var newLat = Math.asin(Math.sin(lat) * Math.cos(dist)
+            + Math.cos(lat) * Math.sin(dist) * Math.cos(heading));
+    var newLon = (lon + Math.atan2(Math.sin(heading) * Math.sin(dist) * Math.cos(newLat),
+            Math.cos(dist) - Math.sin(lat) * Math.sin(lon))); 
+    sampleTerrain(newLon, newLat);
+}
+</pre></div>
+    
+  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+function startAnimation() {
+  if (!animRunning) {
+    ge.getOptions().setFlyToSpeed(ge.SPEED_TELEPORT);
+    animRunning = true;
+    google.earth.addEventListener(ge, 'frameend', tickAnimation);
+    
+    // start it off
+    tickAnimation();
+  }
+}
+
+function stopAnimation() {
+  if (animRunning) {
+    google.earth.removeEventListener(ge, 'frameend', tickAnimation);
+    animRunning = false;
+  }
+}
+
+function tickAnimation() {
+  // an example of some camera manipulation that's possible w/ the Earth API
+  var camera = ge.getView().copyAsCamera(ge.ALTITUDE_RELATIVE_TO_GROUND);
+  var dest = destination(camera.getLatitude(), camera.getLongitude(), 10,
+                         camera.getHeading());
+
+  camera.setAltitude(ANIM_ALTITUDE);
+  camera.setLatitude(dest[0]);
+  camera.setLongitude(dest[1]);
+
+  ge.getView().setAbstractView(camera);
+}
+
+/* Helper functions, courtesy of
+   http://www.movable-type.co.uk/scripts/latlong.html */
+function distance(lat1, lng1, lat2, lng2) {
+  var a = Math.sin(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180);
+  var b = Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.cos((lng2 - lng1) * Math.PI / 180);
+  return 6371000 * Math.acos(a + b);
+}
+
+function destination(lat, lng, dist, heading) {
+  lat *= Math.PI / 180;
+  lng *= Math.PI / 180;
+  heading *= Math.PI / 180;
+  dist /= 6371000; // angular dist
+  
+  var lat2 = Math.asin(Math.sin(lat) * Math.cos(dist) + 
+                       Math.cos(lat) * Math.sin(dist) * Math.cos(heading));
+
+  return [
+      180 / Math.PI * lat2,
+      180 / Math.PI *
+        (lng + Math.atan2(Math.sin(heading) * Math.sin(dist) * Math.cos(lat2),
+                          Math.cos(dist) - Math.sin(lat) * Math.sin(lat2)))];
+}
+  </pre></div>
+  </div>
+  <div id="resources">
+  <h2>Resources:</h2>
+  <ul>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/Event.html" target="_blank" >Event</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/EventHelper.html" target="_blank" >EventHelper</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/Clock.html" target="_blank" >Clock</a> </li>
+  </ul>
+  </div>
+  </div>
+
+  <script>
+    var viewer = new Cesium.Viewer('cesiumContainer');
+    var scene = viewer.scene;
+    var camera = viewer.camera;
+
+    var globe = scene.globe;
+    globe.depthTestAgainstTerrain = true;
+    var cesiumTerrainProviderMeshes = new Cesium.CesiumTerrainProvider({
+        url : '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
+    });
+    viewer.terrainProvider = cesiumTerrainProviderMeshes;
+
+    var clock = viewer.clock;
+    var eventHelper = new Cesium.EventHelper();
+    var removeCallback;
+    var height = 1000;
+    var running = false;
+    
+    function start() {
+        if (!running) {
+            running = true;
+            removeCallback = eventHelper.add(clock.onTick, onTick);
+        }
+    }
+
+    function stop() {
+        if (running) {
+            removeCallback();
+            running = false;
+        }
+    }
+    
+    var terrainSamplePositions = [];
+    function sampleTerrainSuccess() {
+        var position = terrainSamplePositions[0];
+        position.height += height; // add height to terrain height
+        camera.position = Cesium.Ellipsoid.WGS84.cartographicToCartesian(position);
+    }
+
+    function sampleTerrain(lon, lat) {
+        terrainSamplePositions = [new Cesium.Cartographic(lon, lat)];
+        Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess);
+    }
+    
+    function onTick() {
+        var pos = camera.positionCartographic;
+        var lon = pos.longitude;
+        var lat = pos.latitude;
+        var dist = 1/63710; // angular dist;
+        var heading = -camera.heading;
+
+        var newLat = Math.asin(Math.sin(lat) * Math.cos(dist)
+                + Math.cos(lat) * Math.sin(dist) * Math.cos(heading));
+        var newLon = (lon + Math.atan2(Math.sin(heading) * Math.sin(dist) * Math.cos(newLat),
+                Math.cos(dist) - Math.sin(lat) * Math.sin(lon))); 
+        sampleTerrain(newLon, newLat);
+    }
+    
+    var eye = new Cesium.Cartesian3(-2496304.1498512086, -4391818.97382059, 3884176.4503971986);
+    var target = Cesium.Cartesian3.add(eye, new Cesium.Cartesian3(-0.7643045598990259, 0.643704706480502, -0.03850701978089475), new Cesium.Cartesian3());
+    var up = new Cesium.Cartesian3(-0.11836693744723503, -0.8130611584421428, 0.5700182635106171);
+    camera.lookAt(eye, target, up);
+    sampleTerrain(camera.positionCartographic.longitude, camera.positionCartographic.latitude);
+
+
+    // Comparable Google Earth API code:
+    //
+    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/event-frameend.html
+  </script>
+</body>
+</html>
