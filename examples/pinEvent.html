@@ -20,7 +20,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->  
 <head>
-  <title>Globe/Window Event Handling</title>
+  <title>Placemark Click Event Handling</title>
 
   <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
   <style type="text/css">@import "static/examples.css";</style>
@@ -34,7 +34,7 @@ limitations under the License.
   
 </head>
 <body onload="if(window.prettyPrint)prettyPrint();">
-  <h1>Cesium Examples - Globe/Window Event Handling</h1>
+  <h1>Cesium Examples - Placemark Click Event Handling</h1>
   <div id="page">
   <div id="preview">
   <div id="cesiumContainer"></div>
@@ -50,39 +50,35 @@ function showAlert() {
     alertText = '';
 }
 function sampleTerrainSuccess() {
-    console.log('success');
     addText('height', terrainSamplePositions[0].height);
     showAlert();
 }
-var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
-handler.setInputAction(
-    function (click) {
-        var position = viewer.camera.pickEllipsoid(click.position);
 
+var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+handler.setInputAction(function (click) {
+    var pickedObject = scene.pick(click.position);
+    if (Cesium.defined(pickedObject) && (pickedObject.primitive === pin)) {
+        addText('target', pickedObject.id);
+        var position = viewer.camera.pickEllipsoid(click.position);
         addText('screenX', click.position.x);
         addText('screenY', click.position.y);
         addText('didHitGlobe', Cesium.defined(position));
-        
-        if (Cesium.defined(position)){
-            var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-            addText('longitude', Cesium.Math.toDegrees(cartographicPosition.longitude));
-            addText('latitude', Cesium.Math.toDegrees(cartographicPosition.latitude));
-            terrainSamplePositions = [cartographicPosition];
-            Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess, showAlert);
-        } else {
-            showAlert();
-        }
-    },
-    Cesium.ScreenSpaceEventType.LEFT_CLICK
-);
+        var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
+        addText('longitude', Cesium.Math.toDegrees(cartographicPosition.longitude));
+        addText('latitude', Cesium.Math.toDegrees(cartographicPosition.latitude));
+        terrainSamplePositions = [cartographicPosition];
+        Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess, showAlert);
+    }
+    
+}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 </pre></div>
     
   <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
-function eventHandler(event) {
+google.earth.addEventListener(placemark, 'click', function(event) {
   var text = 'Click:';
 
   function addToMessage(append1, append2) { 
-    text += ' ' + append1 + ': ' + append2 + '\n' ;
+   text += ' ' + append1 + ': ' + append2 + '\n' ;
   }
 
   addToMessage('target type', event.getTarget().getType());
@@ -110,17 +106,14 @@ function eventHandler(event) {
   setTimeout(function() {
     alert(text);
   }, 0);
-}
-// listen to the click event on the globe and window
-google.earth.addEventListener(ge.getGlobe(), 'click', eventHandler);
-google.earth.addEventListener(ge.getWindow(), 'click', eventHandler);
+});
   </pre></div>
   </div>
   <div id="resources">
   <h2>Resources:</h2>
   <ul>
-    <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/ScreenSpaceEventHandler.html" target="_blank" >ScreenSpaceEventHandler</a> </li>
-    <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/ScreenSpaceEventType.html" target="_blank" >ScreenSpaceEventType</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/ScreenSpaceEventHandler.html" target="_blank" >ScreenSpaceEventHandler</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/ScreenSpaceEventType.html" target="_blank" >ScreenSpaceEventType</a> </li>
   </ul>
   </div>
   </div>
@@ -128,7 +121,16 @@ google.earth.addEventListener(ge.getWindow(), 'click', eventHandler);
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
     var scene = viewer.scene;
-    
+    var camera = viewer.camera;
+    var pinBuilder = new Cesium.PinBuilder();
+    var billboards = scene.primitives.add(new Cesium.BillboardCollection());
+    var position = Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude);
+    var pin = billboards.add({
+        image : pinBuilder.fromColor(Cesium.Color.SALMON, 48),
+        verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+        position : position,
+        id : 'Pin1'
+    });
     var globe = scene.globe;
     globe.depthTestAgainstTerrain = true;
     var cesiumTerrainProviderMeshes = new Cesium.CesiumTerrainProvider({
@@ -148,31 +150,28 @@ google.earth.addEventListener(ge.getWindow(), 'click', eventHandler);
         addText('height', terrainSamplePositions[0].height);
         showAlert();
     }
+    
     var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
-    handler.setInputAction(
-        function (click) {
+    handler.setInputAction(function (click) {
+        var pickedObject = scene.pick(click.position);
+        if (Cesium.defined(pickedObject) && (pickedObject.primitive === pin)) {
+            addText('target', pickedObject.id);
             var position = viewer.camera.pickEllipsoid(click.position);
-
             addText('screenX', click.position.x);
             addText('screenY', click.position.y);
             addText('didHitGlobe', Cesium.defined(position));
-            
-            if (Cesium.defined(position)){
-                var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-                addText('longitude', Cesium.Math.toDegrees(cartographicPosition.longitude));
-                addText('latitude', Cesium.Math.toDegrees(cartographicPosition.latitude));
-                terrainSamplePositions = [cartographicPosition];
-                Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess, showAlert);
-            } else {
-                showAlert();
-            }
-        },
-        Cesium.ScreenSpaceEventType.LEFT_CLICK
-    );
-    
+            var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
+            addText('longitude', Cesium.Math.toDegrees(cartographicPosition.longitude));
+            addText('latitude', Cesium.Math.toDegrees(cartographicPosition.latitude));
+            terrainSamplePositions = [cartographicPosition];
+            Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess, showAlert);
+        }
+        
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
     // Comparable Google Earth API code:
     //
-    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/event-globe.html
+    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/event-placemark.html
   </script>
 </body>
 </html>
