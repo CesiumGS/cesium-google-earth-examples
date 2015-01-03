@@ -73,7 +73,7 @@
   #cesiumContainer {
     height: 520px;
     width: 648px;
-    padding: 10px;
+    margin: 10px;
     position: absolute;
     top: 0;
     left: 0;

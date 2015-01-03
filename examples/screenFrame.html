@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->  
+<head>
+  <title>Screen Overlay (Frame)</title>
+
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
+
+  <script src="../Cesium/Cesium.js"></script>
+  <style>
+    @import url(../Cesium/Widgets/widgets.css);
+  </style>
+  
+</head>
+<body onload="if(window.prettyPrint)prettyPrint();">
+  <h1>Cesium Examples - Screen Overlay (Frame)</h1>
+  <div id="page">
+  <div id="preview">
+  <div id="cesiumContainer"></div>
+  </div>
+  <div id="source">
+  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+var widget = new Cesium.CesiumWidget('cesiumContainer');
+    
+//add overlay by creating an HTML element
+var img = document.createElement('img');
+img.src = './static/frame.png';
+widget.container.appendChild(img)
+
+//position overlay with CSS styling
+img.style.position = 'absolute';
+img.style.top = '0';
+img.style.left = '0';
+img.style['pointer-events'] = 'none';
+</pre></div>
+    
+  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+var screenOverlay = ge.createScreenOverlay('');
+
+// Set the visibility to false while we construct the overlay.
+screenOverlay.setVisibility(false);
+
+var icon = ge.createIcon('');
+icon.setHref('http://earth-api-samples.googlecode.com/svn/trunk/examples/' +
+             'static/frame.png');  // Loads an gilded picture frame.
+screenOverlay.setIcon(icon);
+
+// Position the overlay.  ScreenXY(0,0) is mapped to OverlayXY(0,0)
+var screenXY = screenOverlay.getScreenXY();
+screenXY.setXUnits(ge.UNITS_PIXELS);
+screenXY.setYUnits(ge.UNITS_PIXELS);
+screenXY.setX(0);
+screenXY.setY(0);
+
+var overlayXY = screenOverlay.getOverlayXY();
+overlayXY.setXUnits(ge.UNITS_PIXELS);
+overlayXY.setYUnits(ge.UNITS_PIXELS);
+overlayXY.setX(0);
+overlayXY.setY(0);
+
+// Set object's size in fractions of the 3d view window.  By setting
+// to (1, 1), this image will cover the entire Earth window.
+var overlaySize = screenOverlay.getSize()
+overlaySize.setXUnits(ge.UNITS_FRACTION);
+overlaySize.setYUnits(ge.UNITS_FRACTION);
+overlaySize.setX(1);
+overlaySize.setY(1);
+
+screenOverlay.setVisibility(true);
+
+ge.getFeatures().appendChild(screenOverlay);
+  </pre></div>
+  </div>
+  </div>
+
+  <script>
+    var widget = new Cesium.CesiumWidget('cesiumContainer');
+    
+    //add overlay by creating an HTML element
+    var img = document.createElement('img');
+    img.src = './static/frame.png';
+    widget.container.appendChild(img)
+    
+    //position overlay with CSS styling
+    img.style.position = 'absolute';
+    img.style.top = '0';
+    img.style.left = '0';
+    img.style['pointer-events'] = 'none';
+
+    // Comparable Google Earth API code:
+    //
+    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/screenoverlay-frame.html
+  </script>
+</body>
+</html>
