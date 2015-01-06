@@ -41,7 +41,7 @@ limitations under the License.
   </div>
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-  var entity = source.entities.add({
+  var entity = viewer.entities.add({
       position : Cesium.Cartesian3.fromDegrees(-95.0, 40.0),
       ellipse : {
           semiMajorAxis : 500.0,
@@ -85,10 +85,7 @@ ge.getFeatures().appendChild(polygonPlacemark);
   <script>
   var viewer = new Cesium.Viewer('cesiumContainer');
 
-  var source = new Cesium.CustomDataSource();
-  viewer.dataSources.add(source);
-
-  var entity = source.entities.add({
+  var entity = viewer.entities.add({
       position : Cesium.Cartesian3.fromDegrees(-95.0, 40.0),
       ellipse : {
           semiMajorAxis : 500.0,

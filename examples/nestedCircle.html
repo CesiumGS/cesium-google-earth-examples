@@ -56,10 +56,10 @@ function circle(radius, center) {
 
 var center = Cesium.Cartesian3.fromDegrees(-85.0, 20.0);
 
-source.entities.add(circle(500, center));
-source.entities.add(circle(1000, center));
-source.entities.add(circle(1500, center));
-source.entities.add(circle(2000, center));
+viewer.entities.add(circle(500, center));
+viewer.entities.add(circle(1000, center));
+viewer.entities.add(circle(1500, center));
+viewer.entities.add(circle(2000, center));
 </pre></div>
     
   <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
@@ -98,9 +98,6 @@ ge.getFeatures().appendChild(multGeoPlacemark);
   <script>
   var viewer = new Cesium.Viewer('cesiumContainer');
 
-  var source = new Cesium.CustomDataSource();
-  viewer.dataSources.add(source);
-
   function circle(radius, center) {
       return {
           position : center,
@@ -116,10 +113,10 @@ ge.getFeatures().appendChild(multGeoPlacemark);
   
   var center = Cesium.Cartesian3.fromDegrees(-85.0, 20.0);
 
-  source.entities.add(circle(500, center));
-  source.entities.add(circle(1000, center));
-  source.entities.add(circle(1500, center));
-  source.entities.add(circle(2000, center));
+  viewer.entities.add(circle(500, center));
+  viewer.entities.add(circle(1000, center));
+  viewer.entities.add(circle(1500, center));
+  viewer.entities.add(circle(2000, center));
   
   viewer.camera.flyTo({
       destination: Cesium.Cartesian3.fromDegrees(-85.0, 20.0, 5500.0)
