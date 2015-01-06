@@ -9250,24 +9250,33 @@ define('Core/Matrix4',[
      * //Prints "Both matrices are equal" on the console
      */
     Matrix4.equals = function(left, right) {
+        // Given that most matrices will be transformation matrices, the elements
+        // are tested in order such that the test is likely to fail as early
+        // as possible.  I _think_ this is just as friendly to the L1 cache
+        // as testing in index order.  It is certainty faster in practice.
         return (left === right) ||
                (defined(left) &&
                 defined(right) &&
-                left[0] === right[0] &&
-                left[1] === right[1] &&
-                left[2] === right[2] &&
-                left[3] === right[3] &&
-                left[4] === right[4] &&
-                left[5] === right[5] &&
-                left[6] === right[6] &&
-                left[7] === right[7] &&
-                left[8] === right[8] &&
-                left[9] === right[9] &&
-                left[10] === right[10] &&
-                left[11] === right[11] &&
+                // Translation
                 left[12] === right[12] &&
                 left[13] === right[13] &&
                 left[14] === right[14] &&
+
+                // Rotation/scale
+                left[0] === right[0] &&
+                left[1] === right[1] &&
+                left[2] === right[2] &&
+                left[4] === right[4] &&
+                left[5] === right[5] &&
+                left[6] === right[6] &&
+                left[8] === right[8] &&
+                left[9] === right[9] &&
+                left[10] === right[10] &&
+
+                // Bottom row
+                left[3] === right[3] &&
+                left[7] === right[7] &&
+                left[11] === right[11] &&
                 left[15] === right[15]);
     };
 
@@ -15340,7 +15349,7 @@ define('Core/JulianDate',[
             }
         } else {
             //If no time is specified, it is considered the beginning of the day, local time.
-            minute = minute + new Date(Date.UTC(year, month - 1, day)).getTimezoneOffset();
+            minute = minute + new Date(year, month - 1, day).getTimezoneOffset();
         }
 
         //ISO8601 denotes a leap second by any time having a seconds component of 60 seconds.
@@ -22417,10 +22426,7 @@ define('Core/PolygonGeometryLibrary',[
     PolygonGeometryLibrary.subdivideLineCount = function(p0, p1, minDistance) {
         var distance = Cartesian3.distance(p0, p1);
         var n = distance / minDistance;
-        var countDivide = Math.ceil(Math.log(n) / Math.log(2));
-        if (countDivide < 1) {
-            countDivide = 0;
-        }
+        var countDivide = Math.max(0, Math.ceil(Math.log(n) / Math.log(2)));
         return Math.pow(2, countDivide);
     };
 
@@ -22440,10 +22446,7 @@ define('Core/PolygonGeometryLibrary',[
         positions.length = numVertices * 3;
 
         var index = 0;
-        positions[index++] = p0.x;
-        positions[index++] = p0.y;
-        positions[index++] = p0.z;
-        for ( var i = 1; i < numVertices; i++) {
+        for ( var i = 0; i < numVertices; i++) {
             var p = getPointAtDistance(p0, p1, i * distanceBetweenVertices, length);
             positions[index++] = p[0];
             positions[index++] = p[1];
@@ -25410,7 +25413,7 @@ define('Core/PolygonGeometry',[
 
             p1 = Cartesian3.fromArray(edgePositions, UL * 3, p1Scratch);
             p2 = Cartesian3.fromArray(edgePositions, UR * 3, p2Scratch);
-            if (Cartesian3.equalsEpsilon(p1, p2, CesiumMath.EPSILON6)) {
+            if (Cartesian3.equalsEpsilon(p1, p2, CesiumMath.EPSILON14)) {
                 continue;
             }
 
@@ -25524,7 +25527,7 @@ define('Core/PolygonGeometry',[
      * @constructor
      *
      * @param {Object} options Object with the following properties:
-     * @param {Object} options.polygonHierarchy A polygon hierarchy that can include holes.
+     * @param {PolygonHierarchy} options.polygonHierarchy A polygon hierarchy that can include holes.
      * @param {Number} [options.height=0.0] The height of the polygon.
      * @param {Number} [options.extrudedHeight] The height of the polygon.
      * @param {VertexFormat} [options.vertexFormat=VertexFormat.DEFAULT] The vertex attributes to be computed.
