@@ -56,7 +56,7 @@ var positions = Cesium.Cartesian3.fromDegreesArray([
     lon + 4.5, lat + 1.5
 ]);
 
-var entity = source.entities.add({
+var entity = viewer.entities.add({
     polyline : {
         positions : positions,
         material : new Cesium.ColorMaterialProperty(Cesium.Color.WHITE)
@@ -127,10 +127,7 @@ ge.getFeatures().appendChild(lineStringPlacemark);
         lon + 4.5, lat + 1.5
     ]);
     
-    var source = new Cesium.CustomDataSource();
-    viewer.dataSources.add(source);
-
-    var entity = source.entities.add({
+    var entity = viewer.entities.add({
         polyline : {
             positions : positions,
             material : new Cesium.ColorMaterialProperty(Cesium.Color.WHITE)
