@@ -53,15 +53,24 @@ function sampleTerrainSuccess() {
     var span = document.getElementById('altData');
     span.textContent = terrainSamplePositions[0].height.toFixed(2);
 }
-
+function insideCanvas(point){
+    var rectangle = viewer.canvas.getBoundingClientRect();
+    return (point.x >= 0 &&
+            point.x <= rectangle.width &&
+            point.y >= 0 &&
+            point.y <= rectangle.height);
+}
 var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
 handler.setInputAction(
     function (movement) {
-        var position = viewer.camera.pickEllipsoid(movement.endPosition);
-        if (Cesium.defined(position)) {
-            var positionCartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-            terrainSamplePositions = [positionCartographic];
-            Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess);
+        if (insideCanvas(movement.endPosition)){
+            var ray = viewer.camera.getPickRay(movement.endPosition);
+            var position = viewer.scene.globe.pick(ray, viewer.scene);
+            if (Cesium.defined(position)) {
+                var positionCartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
+                terrainSamplePositions = [positionCartographic];
+                Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess);
+            }
         }
     },
     Cesium.ScreenSpaceEventType.MOUSE_MOVE
@@ -112,15 +121,24 @@ google.earth.addEventListener(ge.getWindow(), 'mousemove', function(event) {
         var span = document.getElementById('altData');
         span.textContent = terrainSamplePositions[0].height.toFixed(2);
     }
-
+    function insideCanvas(point){
+        var rectangle = viewer.canvas.getBoundingClientRect();
+        return (point.x >= 0 &&
+                point.x <= rectangle.width &&
+                point.y >= 0 &&
+                point.y <= rectangle.height);
+    }
     var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
     handler.setInputAction(
         function (movement) {
-            var position = viewer.camera.pickEllipsoid(movement.endPosition);
-            if (Cesium.defined(position)) {
-                var positionCartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-                terrainSamplePositions = [positionCartographic];
-                Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess);
+            if (insideCanvas(movement.endPosition)){
+                var ray = viewer.camera.getPickRay(movement.endPosition);
+                var position = viewer.scene.globe.pick(ray, viewer.scene);
+                if (Cesium.defined(position)) {
+                    var positionCartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
+                    terrainSamplePositions = [positionCartographic];
+                    Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess);
+                }
             }
         },
         Cesium.ScreenSpaceEventType.MOUSE_MOVE
