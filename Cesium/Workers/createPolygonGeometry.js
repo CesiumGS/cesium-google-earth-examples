@@ -2632,6 +2632,51 @@ define('Core/Ellipsoid',[
     };
 
     /**
+     * The number of elements used to pack the object into an array.
+     * @type {Number}
+     */
+    Ellipsoid.packedLength = Cartesian3.packedLength;
+
+    /**
+     * Stores the provided instance into the provided array.
+     * @function
+     *
+     * @param {Object} value The value to pack.
+     * @param {Number[]} array The array to pack into.
+     * @param {Number} [startingIndex=0] The index into the array at which to start packing the elements.
+     */
+    Ellipsoid.pack = function(value, array, startingIndex) {
+                if (!defined(value)) {
+            throw new DeveloperError('value is required');
+        }
+        if (!defined(array)) {
+            throw new DeveloperError('array is required');
+        }
+        
+        startingIndex = defaultValue(startingIndex, 0);
+
+        Cartesian3.pack(value._radii, array, startingIndex);
+    };
+
+    /**
+     * Retrieves an instance from a packed array.
+     *
+     * @param {Number[]} array The packed array.
+     * @param {Number} [startingIndex=0] The starting index of the element to be unpacked.
+     * @param {Ellipsoid} [result] The object into which to store the result.
+     */
+    Ellipsoid.unpack = function(array, startingIndex, result) {
+                if (!defined(array)) {
+            throw new DeveloperError('array is required');
+        }
+        
+        startingIndex = defaultValue(startingIndex, 0);
+
+        var radii = Cartesian3.unpack(array, startingIndex);
+        return Ellipsoid.fromCartesian3(radii, result);
+    };
+
+    /**
      * Computes the unit vector directed from the center of this ellipsoid toward the provided Cartesian position.
      * @function
      *
@@ -3877,76 +3922,12 @@ define('Core/Intersect',[
 
     return freezeObject(Intersect);
 });
-/*global define,console*/
-define('Core/deprecationWarning',[
-        './defined',
-        './DeveloperError'
-    ], function(
-        defined,
-        DeveloperError) {
-    "use strict";
-
-    var warnings = {};
-
-    /**
-     * Logs a deprecation message to the console.  Use this function instead of
-     * <code>console.log</code> directly since this does not log duplicate messages
-     * unless it is called from multiple workers.
-     *
-     * @exports deprecationWarning
-     *
-     * @param {String} identifier The unique identifier for this deprecated API.
-     * @param {String} message The message to log to the console.
-     *
-     * @example
-     * // Deprecated function or class
-     * var Foo = function() {
-     *    deprecationWarning('Foo', 'Foo was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use newFoo instead.');
-     *    // ...
-     * }
-     *
-     * // Deprecated function
-     * Bar.prototype.func = function() {
-     *    deprecationWarning('Bar.func', 'Bar.func() was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use Bar.newFunc() instead.');
-     *    // ...
-     * };
-     *
-     * // Deprecated property
-     * defineProperties(Bar.prototype, {
-     *     prop : {
-     *         get : function() {
-     *             deprecationWarning('Bar.prop', 'Bar.prop was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use Bar.newProp instead.');
-     *             // ...
-     *         },
-     *         set : function(value) {
-     *             deprecationWarning('Bar.prop', 'Bar.prop was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use Bar.newProp instead.');
-     *             // ...
-     *         }
-     *     }
-     * });
-     *
-     * @private
-     */
-    var deprecationWarning = function(identifier, message) {
-                if (!defined(identifier) || !defined(message)) {
-            throw new DeveloperError('identifier and message are required.');
-        }
-        
-        if (!defined(warnings[identifier])) {
-            warnings[identifier] = true;
-            console.log(message);
-        }
-    };
-
-    return deprecationWarning;
-});
 /*global define*/
 define('Core/Rectangle',[
         './Cartographic',
         './defaultValue',
         './defined',
         './defineProperties',
-        './deprecationWarning',
         './DeveloperError',
         './Ellipsoid',
         './freezeObject',
@@ -3956,7 +3937,6 @@ define('Core/Rectangle',[
         defaultValue,
         defined,
         defineProperties,
-        deprecationWarning,
         DeveloperError,
         Ellipsoid,
         freezeObject,
@@ -4033,6 +4013,61 @@ define('Core/Rectangle',[
             }
         }
     });
+
+    /**
+     * The number of elements used to pack the object into an array.
+     * @type {Number}
+     */
+    Rectangle.packedLength = 4;
+
+    /**
+     * Stores the provided instance into the provided array.
+     *
+     * @param {BoundingSphere} value The value to pack.
+     * @param {Number[]} array The array to pack into.
+     * @param {Number} [startingIndex=0] The index into the array at which to start packing the elements.
+     */
+    Rectangle.pack = function(value, array, startingIndex) {
+                if (!defined(value)) {
+            throw new DeveloperError('value is required');
+        }
+
+        if (!defined(array)) {
+            throw new DeveloperError('array is required');
+        }
+        
+        startingIndex = defaultValue(startingIndex, 0);
+
+        array[startingIndex++] = value.west;
+        array[startingIndex++] = value.south;
+        array[startingIndex++] = value.east;
+        array[startingIndex] = value.north;
+    };
+
+    /**
+     * Retrieves an instance from a packed array.
+     *
+     * @param {Number[]} array The packed array.
+     * @param {Number} [startingIndex=0] The starting index of the element to be unpacked.
+     * @param {Rectangle} [result] The object into which to store the result.
+     */
+    Rectangle.unpack = function(array, startingIndex, result) {
+                if (!defined(array)) {
+            throw new DeveloperError('array is required');
+        }
+        
+        startingIndex = defaultValue(startingIndex, 0);
+
+        if (!defined(result)) {
+            result = new Rectangle();
+        }
+
+        result.west = array[startingIndex++];
+        result.south = array[startingIndex++];
+        result.east = array[startingIndex++];
+        result.north = array[startingIndex];
+        return result;
+    };
 
     /**
      * Computes the width of a rectangle in radians.
@@ -4491,59 +4526,6 @@ define('Core/Rectangle',[
         result.east = east;
         result.north = north;
         return result;
-    };
-
-    /**
-     * Computes the intersection of two rectangles
-     *
-     * @deprecated
-     *
-     * @param {Rectangle} rectangle On rectangle to find an intersection
-     * @param {Rectangle} otherRectangle Another rectangle to find an intersection
-     * @param {Rectangle} [result] The object onto which to store the result.
-     * @returns {Rectangle} The modified result parameter or a new Rectangle instance if none was provided.
-     */
-    Rectangle.intersectWith = function(rectangle, otherRectangle, result) {
-        deprecationWarning('Rectangle.intersectWith', 'Rectangle.intersectWith was deprecated in Cesium 1.5. It will be removed in Cesium 1.6. Use Rectangle.intersection.');
-
-                if (!defined(rectangle)) {
-            throw new DeveloperError('rectangle is required');
-        }
-        if (!defined(otherRectangle)) {
-            throw new DeveloperError('otherRectangle is required.');
-        }
-        
-        var west = Math.max(rectangle.west, otherRectangle.west);
-        var south = Math.max(rectangle.south, otherRectangle.south);
-        var east = Math.min(rectangle.east, otherRectangle.east);
-        var north = Math.min(rectangle.north, otherRectangle.north);
-        if (!defined(result)) {
-            return new Rectangle(west, south, east, north);
-        }
-        result.west = west;
-        result.south = south;
-        result.east = east;
-        result.north = north;
-        return result;
-    };
-
-    /**
-     * Determines if the rectangle is empty, i.e., if <code>west >= east</code>
-     * or <code>south >= north</code>.
-     *
-     * @deprecated
-     *
-     * @param {Rectangle} rectangle The rectangle
-     * @returns {Boolean} True if the rectangle is empty; otherwise, false.
-     */
-    Rectangle.isEmpty = function(rectangle) {
-        deprecationWarning('Rectangle.isEmpty', 'Rectangle.isEmpty was deprecated in Cesium 1.5. It will be removed in Cesium 1.6.');
-
-                if (!defined(rectangle)) {
-            throw new DeveloperError('rectangle is required');
-        }
-        
-        return rectangle.west >= rectangle.east || rectangle.south >= rectangle.north;
     };
 
     /**
@@ -10392,7 +10374,7 @@ define('Core/BoundingSphere',[
      *
      * @param {Number[]} array The packed array.
      * @param {Number} [startingIndex=0] The starting index of the element to be unpacked.
-     * @param {Cartesian3} [result] The object into which to store the result.
+     * @param {BoundingSphere} [result] The object into which to store the result.
      */
     BoundingSphere.unpack = function(array, startingIndex, result) {
                 if (!defined(array)) {
@@ -20012,7 +19994,6 @@ define('Core/GeometryPipeline',[
         './ComponentDatatype',
         './defaultValue',
         './defined',
-        './deprecationWarning',
         './DeveloperError',
         './EncodedCartesian3',
         './GeographicProjection',
@@ -20040,7 +20021,6 @@ define('Core/GeometryPipeline',[
         ComponentDatatype,
         defaultValue,
         defined,
-        deprecationWarning,
         DeveloperError,
         EncodedCartesian3,
         GeographicProjection,
@@ -22411,6 +22391,91 @@ define('Core/PolygonGeometryLibrary',[
      * @private
      */
     var PolygonGeometryLibrary = {};
+
+    PolygonGeometryLibrary.computeHierarchyPackedLength = function(polygonHierarchy) {
+        var numComponents = 0;
+        var stack = [polygonHierarchy];
+        while (stack.length > 0) {
+            var hierarchy = stack.pop();
+            if (!defined(hierarchy)) {
+                continue;
+            }
+
+            numComponents += 2;
+
+            var positions = hierarchy.positions;
+            var holes = hierarchy.holes;
+
+            if (defined(positions)) {
+                numComponents += positions.length * Cartesian3.packedLength;
+            }
+
+            if (defined(holes)) {
+                var length = holes.length;
+                for (var i = 0; i < length; ++i) {
+                    stack.push(holes[i]);
+                }
+            }
+        }
+
+        return numComponents;
+    };
+
+    PolygonGeometryLibrary.packPolygonHierarchy = function(polygonHierarchy, array, startingIndex) {
+        var stack = [polygonHierarchy];
+        while (stack.length > 0) {
+            var hierarchy = stack.pop();
+            if (!defined(hierarchy)) {
+                continue;
+            }
+
+            var positions = hierarchy.positions;
+            var holes = hierarchy.holes;
+
+            array[startingIndex++] = defined(positions) ? positions.length : 0;
+            array[startingIndex++] = defined(holes) ? holes.length : 0;
+
+            if (defined(positions)) {
+                var positionsLength = positions.length;
+                for (var i = 0; i < positionsLength; ++i, startingIndex += 3) {
+                    Cartesian3.pack(positions[i], array, startingIndex);
+                }
+            }
+
+            if (defined(holes)) {
+                var holesLength = holes.length;
+                for (var j = 0; j < holesLength; ++j) {
+                    stack.push(holes[j]);
+                }
+            }
+        }
+
+        return startingIndex;
+    };
+
+    PolygonGeometryLibrary.unpackPolygonHierarchy = function(array, startingIndex) {
+        var positionsLength = array[startingIndex++];
+        var holesLength = array[startingIndex++];
+
+        var positions = new Array(positionsLength);
+        var holes = holesLength > 0 ? new Array(holesLength) : undefined;
+
+        for (var i = 0; i < positionsLength; ++i, startingIndex += Cartesian3.packedLength) {
+            positions[i] = Cartesian3.unpack(array, startingIndex);
+        }
+
+        for (var j = 0; j < holesLength; ++j) {
+            holes[j] = PolygonGeometryLibrary.unpackPolygonHierarchy(array, startingIndex);
+            startingIndex = holes[j].startingIndex;
+            delete holes[j].startingIndex;
+        }
+
+        return {
+            positions : positions,
+            holes : holes,
+            startingIndex : startingIndex
+        };
+    };
 
     var distanceScratch = new Cartesian3();
     function getPointAtDistance(p0, p1, distance, length) {
@@ -24792,9 +24857,13 @@ define('Core/Quaternion',[
 /*global define*/
 define('Core/VertexFormat',[
         './defaultValue',
+        './defined',
+        './DeveloperError',
         './freezeObject'
     ], function(
         defaultValue,
+        defined,
+        DeveloperError,
         freezeObject) {
     "use strict";
 
@@ -24816,6 +24885,7 @@ define('Core/VertexFormat',[
      * });
      *
      * @see Geometry#attributes
+     * @see Packable
      */
     var VertexFormat = function(options) {
         options = defaultValue(options, defaultValue.EMPTY_OBJECT);
@@ -25000,6 +25070,89 @@ define('Core/VertexFormat',[
      * @see VertexFormat#normal
      */
     VertexFormat.DEFAULT = VertexFormat.POSITION_NORMAL_AND_ST;
+
+    /**
+     * The number of elements used to pack the object into an array.
+     * @type {Number}
+     */
+    VertexFormat.packedLength = 6;
+
+    /**
+     * Stores the provided instance into the provided array.
+     * @function
+     *
+     * @param {Object} value The value to pack.
+     * @param {Number[]} array The array to pack into.
+     * @param {Number} [startingIndex=0] The index into the array at which to start packing the elements.
+     */
+    VertexFormat.pack = function(value, array, startingIndex) {
+                if (!defined(value)) {
+            throw new DeveloperError('value is required');
+        }
+        if (!defined(array)) {
+            throw new DeveloperError('array is required');
+        }
+        
+        startingIndex = defaultValue(startingIndex, 0);
+
+        array[startingIndex++] = value.position ? 1.0 : 0.0;
+        array[startingIndex++] = value.normal ? 1.0 : 0.0;
+        array[startingIndex++] = value.st ? 1.0 : 0.0;
+        array[startingIndex++] = value.binormal ? 1.0 : 0.0;
+        array[startingIndex++] = value.tangent ? 1.0 : 0.0;
+        array[startingIndex++] = value.color ? 1.0 : 0.0;
+    };
+
+    /**
+     * Retrieves an instance from a packed array.
+     *
+     * @param {Number[]} array The packed array.
+     * @param {Number} [startingIndex=0] The starting index of the element to be unpacked.
+     * @param {VertexFormat} [result] The object into which to store the result.
+     */
+    VertexFormat.unpack = function(array, startingIndex, result) {
+                if (!defined(array)) {
+            throw new DeveloperError('array is required');
+        }
+        
+        startingIndex = defaultValue(startingIndex, 0);
+
+        if (!defined(result)) {
+            result = new VertexFormat();
+        }
+
+        result.position = array[startingIndex++] === 1.0;
+        result.normal   = array[startingIndex++] === 1.0;
+        result.st       = array[startingIndex++] === 1.0;
+        result.binormal = array[startingIndex++] === 1.0;
+        result.tangent  = array[startingIndex++] === 1.0;
+        result.color    = array[startingIndex++] === 1.0;
+        return result;
+    };
+
+    /**
+     * Duplicates a VertexFormat instance.
+     *
+     * @param {VertexFormat} cartesian The vertex format to duplicate.
+     * @param {VertexFormat} [result] The object onto which to store the result.
+     * @returns {VertexFormat} The modified result parameter or a new VertexFormat instance if one was not provided. (Returns undefined if vertexFormat is undefined)
+     */
+    VertexFormat.clone = function(vertexFormat, result) {
+        if (!defined(vertexFormat)) {
+            return undefined;
+        }
+        if (!defined(result)) {
+            result = new VertexFormat();
+        }
+
+        result.position = vertexFormat.position;
+        result.normal = vertexFormat.normal;
+        result.st = vertexFormat.st;
+        result.binormal = vertexFormat.binormal;
+        result.tangent = vertexFormat.tangent;
+        result.color = vertexFormat.color;
+        return result;
+    };
 
     return VertexFormat;
 });
@@ -25631,16 +25784,22 @@ define('Core/PolygonGeometry',[
             throw new DeveloperError('options.polygonHierarchy is required.');
         }
         
-        this._vertexFormat = vertexFormat;
-        this._ellipsoid = ellipsoid;
+        this._vertexFormat = VertexFormat.clone(vertexFormat);
+        this._ellipsoid = Ellipsoid.clone(ellipsoid);
         this._granularity = granularity;
         this._stRotation = stRotation;
         this._height = height;
-        this._extrudedHeight = extrudedHeight;
+        this._extrudedHeight = defaultValue(extrudedHeight, 0.0);
         this._extrude = extrude;
         this._polygonHierarchy = polygonHierarchy;
         this._perPositionHeight = perPositionHeight;
         this._workerName = 'createPolygonGeometry';
+
+        /**
+         * The number of elements used to pack the object into an array.
+         * @type {Number}
+         */
+        this.packedLength = PolygonGeometryLibrary.computeHierarchyPackedLength(polygonHierarchy) + Ellipsoid.packedLength + VertexFormat.packedLength + 6;
     };
 
     /**
@@ -25690,6 +25849,107 @@ define('Core/PolygonGeometry',[
             perPositionHeight : options.perPositionHeight
         };
         return new PolygonGeometry(newOptions);
+    };
+
+    /**
+     * Stores the provided instance into the provided array.
+     * @function
+     *
+     * @param {Object} value The value to pack.
+     * @param {Number[]} array The array to pack into.
+     * @param {Number} [startingIndex=0] The index into the array at which to start packing the elements.
+     */
+    PolygonGeometry.pack = function(value, array, startingIndex) {
+                if (!defined(value)) {
+            throw new DeveloperError('value is required');
+        }
+        if (!defined(array)) {
+            throw new DeveloperError('array is required');
+        }
+        
+        startingIndex = defaultValue(startingIndex, 0);
+
+        startingIndex = PolygonGeometryLibrary.packPolygonHierarchy(value._polygonHierarchy, array, startingIndex);
+
+        Ellipsoid.pack(value._ellipsoid, array, startingIndex);
+        startingIndex += Ellipsoid.packedLength;
+
+        VertexFormat.pack(value._vertexFormat, array, startingIndex);
+        startingIndex += VertexFormat.packedLength;
+
+        array[startingIndex++] = value._height;
+        array[startingIndex++] = value._extrudedHeight;
+        array[startingIndex++] = value._granularity;
+        array[startingIndex++] = value._stRotation;
+        array[startingIndex++] = value._extrude ? 1.0 : 0.0;
+        array[startingIndex] = value._perPositionHeight ? 1.0 : 0.0;
+    };
+
+    var scratchEllipsoid = Ellipsoid.clone(Ellipsoid.UNIT_SPHERE);
+    var scratchVertexFormat = new VertexFormat();
+    var scratchOptions = {
+        polygonHierarchy : undefined,
+        ellipsoid : scratchEllipsoid,
+        vertexFormat : scratchVertexFormat,
+        height : undefined,
+        extrudedHeight : undefined,
+        granularity : undefined,
+        stRotation : undefined,
+        perPositionHeight : undefined
+    };
+
+    /**
+     * Retrieves an instance from a packed array.
+     *
+     * @param {Number[]} array The packed array.
+     * @param {Number} [startingIndex=0] The starting index of the element to be unpacked.
+     * @param {PolygonGeometry} [result] The object into which to store the result.
+     */
+    PolygonGeometry.unpack = function(array, startingIndex, result) {
+                if (!defined(array)) {
+            throw new DeveloperError('array is required');
+        }
+        
+        startingIndex = defaultValue(startingIndex, 0);
+
+        var polygonHierarchy = PolygonGeometryLibrary.unpackPolygonHierarchy(array, startingIndex);
+        startingIndex = polygonHierarchy.startingIndex;
+        delete polygonHierarchy.startingIndex;
+
+        var ellipsoid = Ellipsoid.unpack(array, startingIndex, scratchEllipsoid);
+        startingIndex += Ellipsoid.packedLength;
+
+        var vertexFormat = VertexFormat.unpack(array, startingIndex, scratchVertexFormat);
+        startingIndex += VertexFormat.packedLength;
+
+        var height = array[startingIndex++];
+        var extrudedHeight = array[startingIndex++];
+        var granularity = array[startingIndex++];
+        var stRotation = array[startingIndex++];
+        var extrude = array[startingIndex++] === 1.0;
+        var perPositionHeight = array[startingIndex] === 1.0;
+
+        if (!defined(result)) {
+            scratchOptions.polygonHierarchy = polygonHierarchy;
+            scratchOptions.height = height;
+            scratchOptions.extrudedHeight = extrudedHeight;
+            scratchOptions.granularity = granularity;
+            scratchOptions.stRotation = stRotation;
+            scratchOptions.perPositionHeight = perPositionHeight;
+            return new PolygonGeometry(scratchOptions);
+        }
+
+        result._polygonHierarchy = polygonHierarchy;
+        result._ellipsoid = Ellipsoid.clone(ellipsoid, result._ellipsoid);
+        result._vertexFormat = VertexFormat.clone(vertexFormat, result._vertexFormat);
+        result._height = height;
+        result._extrudedHeight = extrudedHeight;
+        result._granularity = granularity;
+        result._stRotation = stRotation;
+        result._extrude = extrude;
+        result._perPositionHeight = perPositionHeight;
+
+        return result;
     };
 
     /**
@@ -25823,14 +26083,19 @@ define('Core/PolygonGeometry',[
 
 /*global define*/
 define('Workers/createPolygonGeometry',[
+        '../Core/defined',
         '../Core/Ellipsoid',
         '../Core/PolygonGeometry'
     ], function(
+        defined,
         Ellipsoid,
         PolygonGeometry) {
     "use strict";
 
-    function createPolygonGeometry(polygonGeometry) {
+    function createPolygonGeometry(polygonGeometry, offset) {
+        if (defined(offset)) {
+            polygonGeometry = PolygonGeometry.unpack(polygonGeometry, offset);
+        }
         polygonGeometry._ellipsoid = Ellipsoid.clone(polygonGeometry._ellipsoid);
         return PolygonGeometry.createGeometry(polygonGeometry);
     }
