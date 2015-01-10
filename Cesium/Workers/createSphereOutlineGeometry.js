@@ -2632,6 +2632,51 @@ define('Core/Ellipsoid',[
     };
 
     /**
+     * The number of elements used to pack the object into an array.
+     * @type {Number}
+     */
+    Ellipsoid.packedLength = Cartesian3.packedLength;
+
+    /**
+     * Stores the provided instance into the provided array.
+     * @function
+     *
+     * @param {Object} value The value to pack.
+     * @param {Number[]} array The array to pack into.
+     * @param {Number} [startingIndex=0] The index into the array at which to start packing the elements.
+     */
+    Ellipsoid.pack = function(value, array, startingIndex) {
+                if (!defined(value)) {
+            throw new DeveloperError('value is required');
+        }
+        if (!defined(array)) {
+            throw new DeveloperError('array is required');
+        }
+        
+        startingIndex = defaultValue(startingIndex, 0);
+
+        Cartesian3.pack(value._radii, array, startingIndex);
+    };
+
+    /**
+     * Retrieves an instance from a packed array.
+     *
+     * @param {Number[]} array The packed array.
+     * @param {Number} [startingIndex=0] The starting index of the element to be unpacked.
+     * @param {Ellipsoid} [result] The object into which to store the result.
+     */
+    Ellipsoid.unpack = function(array, startingIndex, result) {
+                if (!defined(array)) {
+            throw new DeveloperError('array is required');
+        }
+        
+        startingIndex = defaultValue(startingIndex, 0);
+
+        var radii = Cartesian3.unpack(array, startingIndex);
+        return Ellipsoid.fromCartesian3(radii, result);
+    };
+
+    /**
      * Computes the unit vector directed from the center of this ellipsoid toward the provided Cartesian position.
      * @function
      *
@@ -7986,76 +8031,12 @@ define('Core/Matrix4',[
     return Matrix4;
 });
 
-/*global define,console*/
-define('Core/deprecationWarning',[
-        './defined',
-        './DeveloperError'
-    ], function(
-        defined,
-        DeveloperError) {
-    "use strict";
-
-    var warnings = {};
-
-    /**
-     * Logs a deprecation message to the console.  Use this function instead of
-     * <code>console.log</code> directly since this does not log duplicate messages
-     * unless it is called from multiple workers.
-     *
-     * @exports deprecationWarning
-     *
-     * @param {String} identifier The unique identifier for this deprecated API.
-     * @param {String} message The message to log to the console.
-     *
-     * @example
-     * // Deprecated function or class
-     * var Foo = function() {
-     *    deprecationWarning('Foo', 'Foo was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use newFoo instead.');
-     *    // ...
-     * }
-     *
-     * // Deprecated function
-     * Bar.prototype.func = function() {
-     *    deprecationWarning('Bar.func', 'Bar.func() was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use Bar.newFunc() instead.');
-     *    // ...
-     * };
-     *
-     * // Deprecated property
-     * defineProperties(Bar.prototype, {
-     *     prop : {
-     *         get : function() {
-     *             deprecationWarning('Bar.prop', 'Bar.prop was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use Bar.newProp instead.');
-     *             // ...
-     *         },
-     *         set : function(value) {
-     *             deprecationWarning('Bar.prop', 'Bar.prop was deprecated in Cesium 1.01.  It will be removed in 1.03.  Use Bar.newProp instead.');
-     *             // ...
-     *         }
-     *     }
-     * });
-     *
-     * @private
-     */
-    var deprecationWarning = function(identifier, message) {
-                if (!defined(identifier) || !defined(message)) {
-            throw new DeveloperError('identifier and message are required.');
-        }
-        
-        if (!defined(warnings[identifier])) {
-            warnings[identifier] = true;
-            console.log(message);
-        }
-    };
-
-    return deprecationWarning;
-});
 /*global define*/
 define('Core/Rectangle',[
         './Cartographic',
         './defaultValue',
         './defined',
         './defineProperties',
-        './deprecationWarning',
         './DeveloperError',
         './Ellipsoid',
         './freezeObject',
@@ -8065,7 +8046,6 @@ define('Core/Rectangle',[
         defaultValue,
         defined,
         defineProperties,
-        deprecationWarning,
         DeveloperError,
         Ellipsoid,
         freezeObject,
@@ -8142,6 +8122,61 @@ define('Core/Rectangle',[
             }
         }
     });
+
+    /**
+     * The number of elements used to pack the object into an array.
+     * @type {Number}
+     */
+    Rectangle.packedLength = 4;
+
+    /**
+     * Stores the provided instance into the provided array.
+     *
+     * @param {BoundingSphere} value The value to pack.
+     * @param {Number[]} array The array to pack into.
+     * @param {Number} [startingIndex=0] The index into the array at which to start packing the elements.
+     */
+    Rectangle.pack = function(value, array, startingIndex) {
+                if (!defined(value)) {
+            throw new DeveloperError('value is required');
+        }
+
+        if (!defined(array)) {
+            throw new DeveloperError('array is required');
+        }
+        
+        startingIndex = defaultValue(startingIndex, 0);
+
+        array[startingIndex++] = value.west;
+        array[startingIndex++] = value.south;
+        array[startingIndex++] = value.east;
+        array[startingIndex] = value.north;
+    };
+
+    /**
+     * Retrieves an instance from a packed array.
+     *
+     * @param {Number[]} array The packed array.
+     * @param {Number} [startingIndex=0] The starting index of the element to be unpacked.
+     * @param {Rectangle} [result] The object into which to store the result.
+     */
+    Rectangle.unpack = function(array, startingIndex, result) {
+                if (!defined(array)) {
+            throw new DeveloperError('array is required');
+        }
+        
+        startingIndex = defaultValue(startingIndex, 0);
+
+        if (!defined(result)) {
+            result = new Rectangle();
+        }
+
+        result.west = array[startingIndex++];
+        result.south = array[startingIndex++];
+        result.east = array[startingIndex++];
+        result.north = array[startingIndex];
+        return result;
+    };
 
     /**
      * Computes the width of a rectangle in radians.
@@ -8600,59 +8635,6 @@ define('Core/Rectangle',[
         result.east = east;
         result.north = north;
         return result;
-    };
-
-    /**
-     * Computes the intersection of two rectangles
-     *
-     * @deprecated
-     *
-     * @param {Rectangle} rectangle On rectangle to find an intersection
-     * @param {Rectangle} otherRectangle Another rectangle to find an intersection
-     * @param {Rectangle} [result] The object onto which to store the result.
-     * @returns {Rectangle} The modified result parameter or a new Rectangle instance if none was provided.
-     */
-    Rectangle.intersectWith = function(rectangle, otherRectangle, result) {
-        deprecationWarning('Rectangle.intersectWith', 'Rectangle.intersectWith was deprecated in Cesium 1.5. It will be removed in Cesium 1.6. Use Rectangle.intersection.');
-
-                if (!defined(rectangle)) {
-            throw new DeveloperError('rectangle is required');
-        }
-        if (!defined(otherRectangle)) {
-            throw new DeveloperError('otherRectangle is required.');
-        }
-        
-        var west = Math.max(rectangle.west, otherRectangle.west);
-        var south = Math.max(rectangle.south, otherRectangle.south);
-        var east = Math.min(rectangle.east, otherRectangle.east);
-        var north = Math.min(rectangle.north, otherRectangle.north);
-        if (!defined(result)) {
-            return new Rectangle(west, south, east, north);
-        }
-        result.west = west;
-        result.south = south;
-        result.east = east;
-        result.north = north;
-        return result;
-    };
-
-    /**
-     * Determines if the rectangle is empty, i.e., if <code>west >= east</code>
-     * or <code>south >= north</code>.
-     *
-     * @deprecated
-     *
-     * @param {Rectangle} rectangle The rectangle
-     * @returns {Boolean} True if the rectangle is empty; otherwise, false.
-     */
-    Rectangle.isEmpty = function(rectangle) {
-        deprecationWarning('Rectangle.isEmpty', 'Rectangle.isEmpty was deprecated in Cesium 1.5. It will be removed in Cesium 1.6.');
-
-                if (!defined(rectangle)) {
-            throw new DeveloperError('rectangle is required');
-        }
-        
-        return rectangle.west >= rectangle.east || rectangle.south >= rectangle.north;
     };
 
     /**
@@ -9369,7 +9351,7 @@ define('Core/BoundingSphere',[
      *
      * @param {Number[]} array The packed array.
      * @param {Number} [startingIndex=0] The starting index of the element to be unpacked.
-     * @param {Cartesian3} [result] The object into which to store the result.
+     * @param {BoundingSphere} [result] The object into which to store the result.
      */
     BoundingSphere.unpack = function(array, startingIndex, result) {
                 if (!defined(array)) {
@@ -11171,6 +11153,7 @@ define('Core/EllipsoidOutlineGeometry',[
         './Cartesian3',
         './ComponentDatatype',
         './defaultValue',
+        './defined',
         './DeveloperError',
         './Ellipsoid',
         './Geometry',
@@ -11184,6 +11167,7 @@ define('Core/EllipsoidOutlineGeometry',[
         Cartesian3,
         ComponentDatatype,
         defaultValue,
+        defined,
         DeveloperError,
         Ellipsoid,
         Geometry,
@@ -11247,6 +11231,82 @@ define('Core/EllipsoidOutlineGeometry',[
         this._slicePartitions = slicePartitions;
         this._subdivisions = subdivisions;
         this._workerName = 'createEllipsoidOutlineGeometry';
+    };
+
+    /**
+     * The number of elements used to pack the object into an array.
+     * @type {Number}
+     */
+    EllipsoidOutlineGeometry.packedLength = Cartesian3.packedLength + 3;
+
+    /**
+     * Stores the provided instance into the provided array.
+     * @function
+     *
+     * @param {Object} value The value to pack.
+     * @param {Number[]} array The array to pack into.
+     * @param {Number} [startingIndex=0] The index into the array at which to start packing the elements.
+     */
+    EllipsoidOutlineGeometry.pack = function(value, array, startingIndex) {
+                if (!defined(value)) {
+            throw new DeveloperError('value is required');
+        }
+        if (!defined(array)) {
+            throw new DeveloperError('array is required');
+        }
+        
+        startingIndex = defaultValue(startingIndex, 0);
+
+        Cartesian3.pack(value._radii, array, startingIndex);
+        startingIndex += Cartesian3.packedLength;
+
+        array[startingIndex++] = value._stackPartitions;
+        array[startingIndex++] = value._slicePartitions;
+        array[startingIndex]   = value._subdivisions;
+    };
+
+    var scratchRadii = new Cartesian3();
+    var scratchOptions = {
+        radii : scratchRadii,
+        stackPartitions : undefined,
+        slicePartitions : undefined,
+        subdivisions : undefined
+    };
+
+    /**
+     * Retrieves an instance from a packed array.
+     *
+     * @param {Number[]} array The packed array.
+     * @param {Number} [startingIndex=0] The starting index of the element to be unpacked.
+     * @param {EllipsoidOutlineGeometry} [result] The object into which to store the result.
+     */
+    EllipsoidOutlineGeometry.unpack = function(array, startingIndex, result) {
+                if (!defined(array)) {
+            throw new DeveloperError('array is required');
+        }
+        
+        startingIndex = defaultValue(startingIndex, 0);
+
+        var radii = Cartesian3.unpack(array, startingIndex, scratchRadii);
+        startingIndex += Cartesian3.packedLength;
+
+        var stackPartitions = array[startingIndex++];
+        var slicePartitions = array[startingIndex++];
+        var subdivisions = array[startingIndex++];
+
+        if (!defined(result)) {
+            scratchOptions.stackPartitions = stackPartitions;
+            scratchOptions.slicePartitions = slicePartitions;
+            scratchOptions.subdivisions = subdivisions;
+            return new EllipsoidOutlineGeometry(scratchOptions);
+        }
+
+        result._radii = Cartesian3.clone(radii, result._radii);
+        result._stackPartitions = stackPartitions;
+        result._slicePartitions = slicePartitions;
+        result._subdivisions = subdivisions;
+
+        return result;
     };
 
     /**
@@ -11382,10 +11442,14 @@ define('Core/EllipsoidOutlineGeometry',[
 define('Core/SphereOutlineGeometry',[
         './Cartesian3',
         './defaultValue',
+        './defined',
+        './DeveloperError',
         './EllipsoidOutlineGeometry'
     ], function(
         Cartesian3,
         defaultValue,
+        defined,
+        DeveloperError,
         EllipsoidOutlineGeometry) {
     "use strict";
 
@@ -11430,6 +11494,60 @@ define('Core/SphereOutlineGeometry',[
     };
 
     /**
+     * The number of elements used to pack the object into an array.
+     * @type {Number}
+     */
+    SphereOutlineGeometry.packedLength = EllipsoidOutlineGeometry.packedLength;
+
+    /**
+     * Stores the provided instance into the provided array.
+     * @function
+     *
+     * @param {Object} value The value to pack.
+     * @param {Number[]} array The array to pack into.
+     * @param {Number} [startingIndex=0] The index into the array at which to start packing the elements.
+     */
+    SphereOutlineGeometry.pack = function(value, array, startingIndex) {
+                if (!defined(value)) {
+            throw new DeveloperError('value is required');
+        }
+        
+        EllipsoidOutlineGeometry.pack(value._ellipsoidGeometry, array, startingIndex);
+    };
+
+    var scratchEllipsoidGeometry = new EllipsoidOutlineGeometry();
+    var scratchOptions = {
+        radius : undefined,
+        radii : new Cartesian3(),
+        stackPartitions : undefined,
+        slicePartitions : undefined,
+        subdivisions : undefined
+    };
+
+    /**
+     * Retrieves an instance from a packed array.
+     *
+     * @param {Number[]} array The packed array.
+     * @param {Number} [startingIndex=0] The starting index of the element to be unpacked.
+     * @param {SphereOutlineGeometry} [result] The object into which to store the result.
+     */
+    SphereOutlineGeometry.unpack = function(array, startingIndex, result) {
+        var ellipsoidGeometry = EllipsoidOutlineGeometry.unpack(array, startingIndex, scratchEllipsoidGeometry);
+        scratchOptions.stackPartitions = ellipsoidGeometry._stackPartitions;
+        scratchOptions.slicePartitions = ellipsoidGeometry._slicePartitions;
+        scratchOptions.subdivisions = ellipsoidGeometry._subdivisions;
+
+        if (!defined(result)) {
+            scratchOptions.radius = ellipsoidGeometry._radii.x;
+            return new SphereOutlineGeometry(scratchOptions);
+        }
+
+        Cartesian3.clone(ellipsoidGeometry._radii, scratchOptions.radii);
+        result._ellipsoidGeometry = new EllipsoidOutlineGeometry(scratchOptions);
+        return result;
+    };
+
+    /**
      * Computes the geometric representation of an outline of a sphere, including its vertices, indices, and a bounding sphere.
      *
      * @param {SphereOutlineGeometry} sphereGeometry A description of the sphere outline.
@@ -11443,11 +11561,18 @@ define('Core/SphereOutlineGeometry',[
 });
 /*global define*/
 define('Workers/createSphereOutlineGeometry',[
+        '../Core/defined',
         '../Core/SphereOutlineGeometry'
     ], function(
+        defined,
         SphereOutlineGeometry) {
     "use strict";
 
-    return SphereOutlineGeometry.createGeometry;
+    return function(sphereGeometry, offset) {
+        if (defined(offset)) {
+            sphereGeometry = SphereOutlineGeometry.unpack(sphereGeometry, offset);
+        }
+        return SphereOutlineGeometry.createGeometry(sphereGeometry);
+    };
 });
 }());
