@@ -42,13 +42,18 @@ limitations under the License.
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
 var pinBuilder = new Cesium.PinBuilder();
-var billboards = scene.primitives.add(new Cesium.BillboardCollection());
+var pin;
 function addPin(id, position){
-    billboards.removeAll();
-    billboards.add({
-        image : pinBuilder.fromText(id, Cesium.Color.SALMON, 48),
-        verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
-        position : position
+    if (Cesium.defined(pin)){
+        viewer.entities.remove(pin)
+    }
+    pin = viewer.entities.add({
+        position : position,
+        billboard : {
+            image : pinBuilder.fromText(id, Cesium.Color.SALMON, 48).toDataURL(),
+            verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+            eyeOffset : new Cesium.Cartesian3(0, 0, -1000)
+        }
     });
 }
 
@@ -60,7 +65,6 @@ handler.setInputAction(function (click) {
     } else {
         addPin('G', camera.pickEllipsoid(click.position));
     }
-    
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 </pre></div>
     
@@ -125,9 +129,8 @@ function makePlacemark(lat, lng, alt, altMode, iconStr) {
   <div id="resources">
   <h2>Resources:</h2>
   <ul>
-  <li> <a href="http://cesiumjs.org/2014/03/03/Cesium-3D-Models-Tutorial/" target="_blank" >Cesium 3D Models Tutorial</a> </li>
-  <li> <a href="http://cesiumjs.org/convertmodel.html" target="_blank" >COLLADA-to-glTF Converter</a> </li>
-  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/Model.html" target="_blank" >Model</a> class in Cesium</li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/ScreenSpaceEventHandler.html" target="_blank" >ScreenSpaceEventHandler</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/PinBuilder.html" target="_blank" >PinBuilder</a> class in Cesium</li>
   </ul>
   </div>
   </div>
@@ -161,13 +164,18 @@ function makePlacemark(lat, lng, alt, altMode, iconStr) {
     });
     
     var pinBuilder = new Cesium.PinBuilder();
-    var billboards = scene.primitives.add(new Cesium.BillboardCollection());
+    var pin;
     function addPin(id, position){
-        billboards.removeAll();
-        billboards.add({
-            image : pinBuilder.fromText(id, Cesium.Color.SALMON, 48),
-            verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
-            position : position
+        if (Cesium.defined(pin)){
+            viewer.entities.remove(pin)
+        }
+        pin = viewer.entities.add({
+            position : position,
+            billboard : {
+                image : pinBuilder.fromText(id, Cesium.Color.SALMON, 48).toDataURL(),
+                verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+                eyeOffset : new Cesium.Cartesian3(0, 0, -1000)
+            }
         });
     }
     
@@ -179,7 +187,6 @@ function makePlacemark(lat, lng, alt, altMode, iconStr) {
         } else {
             addPin('G', camera.pickEllipsoid(click.position));
         }
-        
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
     camera.setPositionCartographic(Cesium.Cartographic.fromDegrees(lon, lat, 1500));
