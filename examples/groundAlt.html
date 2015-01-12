@@ -48,11 +48,6 @@ limitations under the License.
   </div>
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-var terrainSamplePositions = [];
-function sampleTerrainSuccess() {
-    var span = document.getElementById('altData');
-    span.textContent = terrainSamplePositions[0].height.toFixed(2);
-}
 function insideCanvas(point){
     var rectangle = viewer.canvas.getBoundingClientRect();
     return (point.x >= 0 &&
@@ -68,8 +63,8 @@ handler.setInputAction(
             var position = viewer.scene.globe.pick(ray, viewer.scene);
             if (Cesium.defined(position)) {
                 var positionCartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-                terrainSamplePositions = [positionCartographic];
-                Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess);
+                var span = document.getElementById('altData');
+                span.textContent = positionCartographic.height.toFixed(2);
             }
         }
     },
@@ -116,11 +111,6 @@ google.earth.addEventListener(ge.getWindow(), 'mousemove', function(event) {
     });
     viewer.terrainProvider = cesiumTerrainProviderMeshes;
 
-    var terrainSamplePositions = [];
-    function sampleTerrainSuccess() {
-        var span = document.getElementById('altData');
-        span.textContent = terrainSamplePositions[0].height.toFixed(2);
-    }
     function insideCanvas(point){
         var rectangle = viewer.canvas.getBoundingClientRect();
         return (point.x >= 0 &&
@@ -136,8 +126,8 @@ google.earth.addEventListener(ge.getWindow(), 'mousemove', function(event) {
                 var position = viewer.scene.globe.pick(ray, viewer.scene);
                 if (Cesium.defined(position)) {
                     var positionCartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-                    terrainSamplePositions = [positionCartographic];
-                    Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess);
+                    var span = document.getElementById('altData');
+                    span.textContent = positionCartographic.height.toFixed(2);
                 }
             }
         },
