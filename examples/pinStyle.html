@@ -41,29 +41,18 @@ limitations under the License.
   </div>
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-var counter = 0;
-var pinBuilder = new Cesium.PinBuilder();
-var billboards = scene.primitives.add(new Cesium.BillboardCollection());
-var labels = scene.primitives.add(new Cesium.LabelCollection());
-function addPin(){
-    var position = Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude);
-    
-    labels.add({
-        position : position,
-        text     : 'pin' + counter,
-        verticalOrigin : Cesium.VerticalOrigin.TOP,
-        horizontalOrigin : Cesium.HorizontalOrigin.CENTER,
-    });
-    
-    billboards.add({
-        image : pinBuilder.fromColor(Cesium.Color.SALMON, 48),
-        verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
-        position : position
-    });
-
-    counter++;
-}
-addPin();
+var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+handler.setInputAction(
+    function (movement) {
+        var pickedObject = scene.pick(movement.endPosition);
+        if (Cesium.defined(pickedObject) && (pickedObject.id === entity)) {
+            entity.billboard.image = './static/star.png'
+        } else {
+            entity.billboard.image = './static/square.png'
+        }
+    },
+    Cesium.ScreenSpaceEventType.MOUSE_MOVE
+);
 </pre></div>
     
   <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
@@ -102,21 +91,22 @@ placemark.setStyleSelector(styleMap);
     var scene = viewer.scene;
     var camera = scene.camera;
     
-    var billboards = scene.primitives.add(new Cesium.BillboardCollection());
     var position = Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude);
-    var b = billboards.add({
-        position: position,
-        image : './static/square.png'
+    var entity = viewer.entities.add({
+        position : position,
+        billboard :{
+            image : './static/square.png'
+        }
     });
 
     var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
     handler.setInputAction(
         function (movement) {
             var pickedObject = scene.pick(movement.endPosition);
-            if (Cesium.defined(pickedObject) && (pickedObject.primitive === b)) {
-                b.image = './static/star.png'
+            if (Cesium.defined(pickedObject) && (pickedObject.id === entity)) {
+                entity.billboard.image = './static/star.png'
             } else {
-                b.image = './static/square.png'
+                entity.billboard.image = './static/square.png'
             }
         },
         Cesium.ScreenSpaceEventType.MOUSE_MOVE

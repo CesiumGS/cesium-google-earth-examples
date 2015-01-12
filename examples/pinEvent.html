@@ -57,8 +57,8 @@ function sampleTerrainSuccess() {
 var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
 handler.setInputAction(function (click) {
     var pickedObject = scene.pick(click.position);
-    if (Cesium.defined(pickedObject) && (pickedObject.primitive === pin)) {
-        addText('target', pickedObject.id);
+    if (Cesium.defined(pickedObject) && (pickedObject.id === entity)) {
+        addText('target', pickedObject.id.id);
         var position = viewer.camera.pickEllipsoid(click.position);
         addText('screenX', click.position.x);
         addText('screenY', click.position.y);
@@ -69,7 +69,6 @@ handler.setInputAction(function (click) {
         terrainSamplePositions = [cartographicPosition];
         Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess, showAlert);
     }
-    
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 </pre></div>
     
@@ -119,18 +118,25 @@ google.earth.addEventListener(placemark, 'click', function(event) {
   </div>
 
   <script>
-    var viewer = new Cesium.Viewer('cesiumContainer');
+    var viewer = new Cesium.Viewer('cesiumContainer', {
+        selectionIndicator: false,
+        infoBox: false
+    });
     var scene = viewer.scene;
     var camera = viewer.camera;
     var pinBuilder = new Cesium.PinBuilder();
-    var billboards = scene.primitives.add(new Cesium.BillboardCollection());
+
     var position = Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude);
-    var pin = billboards.add({
-        image : pinBuilder.fromColor(Cesium.Color.SALMON, 48),
-        verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+    var entity = viewer.entities.add({
         position : position,
-        id : 'Pin1'
+        id : 'Pin1',
+        billboard :{
+            image : pinBuilder.fromColor(Cesium.Color.SALMON, 48),
+            verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+            position : position
+        }
     });
+
     var globe = scene.globe;
     globe.depthTestAgainstTerrain = true;
     var cesiumTerrainProviderMeshes = new Cesium.CesiumTerrainProvider({
@@ -154,8 +160,8 @@ google.earth.addEventListener(placemark, 'click', function(event) {
     var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
     handler.setInputAction(function (click) {
         var pickedObject = scene.pick(click.position);
-        if (Cesium.defined(pickedObject) && (pickedObject.primitive === pin)) {
-            addText('target', pickedObject.id);
+        if (Cesium.defined(pickedObject) && (pickedObject.id === entity)) {
+            addText('target', pickedObject.id.id);
             var position = viewer.camera.pickEllipsoid(click.position);
             addText('screenX', click.position.x);
             addText('screenY', click.position.y);
@@ -166,7 +172,6 @@ google.earth.addEventListener(placemark, 'click', function(event) {
             terrainSamplePositions = [cartographicPosition];
             Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess, showAlert);
         }
-        
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
     // Comparable Google Earth API code:
