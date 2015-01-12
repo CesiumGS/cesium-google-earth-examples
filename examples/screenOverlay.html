@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->  
+<head>
+  <title>Creating Screen Overlays</title>
+
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
+
+  <script src="../Cesium/Cesium.js"></script>
+  <style>
+    @import url(../Cesium/Widgets/widgets.css);
+  </style>
+  
+</head>
+<body onload="if(window.prettyPrint)prettyPrint();">
+  <h1>Cesium Examples - Creating Screen Overlays</h1>
+  <div id="page">
+  <div id="preview">
+  <div id="buttonContainer"><button onclick="addOverlay()" class="cesium-button">Add Overlay</button></div>
+  <div id="cesiumContainer"></div>
+  </div>
+  <div id="source">
+  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+//add overlay by creating an HTML element
+var img = document.createElement('img');
+img.src = './static/Cesium_Logo_Color_Small.jpg';
+viewer.container.appendChild(img)
+
+var rotation = Math.floor((Math.random() * 360) + 1) + 'deg';
+var topOffset = Math.floor((Math.random() * 201) - 100);
+var leftOffset = Math.floor((Math.random() * 201) - 100);
+
+//position overlay with CSS styling
+img.style.width = '100px';
+img.style.position = 'absolute';
+img.style.top = 'calc(50% + ' + topOffset + 'px)';
+img.style.left = 'calc(50% + ' + leftOffset + 'px)';
+img.style['pointer-events'] = 'none';
+img.style['-ms-transform'] = 'rotate(' + rotation + ')'; /* IE 9 */
+img.style['-webkit-transform'] = 'rotate(' + rotation + ')'; /* Chrome, Safari, Opera */
+img.style.transform = 'rotate(' + rotation + ')';
+</pre></div>
+    
+  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+var screenOverlay = ge.createScreenOverlay('');
+screenOverlay.setIcon(ge.createIcon(''));
+screenOverlay.getIcon().
+  setHref("http://www.google.com/intl/en_ALL/images/logo.gif");
+
+// Set the point inside the overlay that is used as the positioning
+// anchor point.
+screenOverlay.getOverlayXY().setXUnits(ge.UNITS_FRACTION);
+screenOverlay.getOverlayXY().setYUnits(ge.UNITS_FRACTION);
+screenOverlay.getOverlayXY().setX(.5);
+screenOverlay.getOverlayXY().setY(.5);
+
+// Set screen position in fractions.
+screenOverlay.getScreenXY().setXUnits(ge.UNITS_FRACTION);
+screenOverlay.getScreenXY().setYUnits(ge.UNITS_FRACTION);
+screenOverlay.getScreenXY().setX(Math.random());  // Random x.
+screenOverlay.getScreenXY().setY(Math.random());  // Random y.
+
+// Rotate around object's center point.
+screenOverlay.getRotationXY().setXUnits(ge.UNITS_FRACTION);
+screenOverlay.getRotationXY().setYUnits(ge.UNITS_FRACTION);
+screenOverlay.getRotationXY().setX(0.5);
+screenOverlay.getRotationXY().setY(0.5);
+
+// Set object's size in pixels.
+screenOverlay.getSize().setXUnits(ge.UNITS_PIXELS);
+screenOverlay.getSize().setYUnits(ge.UNITS_PIXELS);
+screenOverlay.getSize().setX(300);
+screenOverlay.getSize().setY(90);
+
+// Rotate by a random number of degrees.
+screenOverlay.setRotation(Math.random() * 360);
+
+ge.getFeatures().appendChild(screenOverlay);
+  </pre></div>
+  </div>
+  </div>
+
+  <script>
+    var viewer = new Cesium.Viewer('cesiumContainer');
+    
+    function addOverlay(){
+        //add overlay by creating an HTML element
+        var img = document.createElement('img');
+        img.src = './static/Cesium_Logo_Color_Small.jpg';
+        viewer.container.appendChild(img)
+        
+        var rotation = Math.floor((Math.random() * 360) + 1) + 'deg';
+        var topOffset = Math.floor((Math.random() * 201) - 100);
+        var leftOffset = Math.floor((Math.random() * 201) - 100);
+        
+        //position overlay with CSS styling
+        img.style.width = '100px';
+        img.style.position = 'absolute';
+        img.style.top = 'calc(50% + ' + topOffset + 'px)';
+        img.style.left = 'calc(50% + ' + leftOffset + 'px)';
+        img.style['pointer-events'] = 'none';
+        img.style['-ms-transform'] = 'rotate(' + rotation + ')'; /* IE 9 */
+        img.style['-webkit-transform'] = 'rotate(' + rotation + ')'; /* Chrome, Safari, Opera */
+        img.style.transform = 'rotate(' + rotation + ')';
+    }
+    // Comparable Google Earth API code:
+    //
+    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/screenoverlay.html
+  </script>
+</body>
+</html>
