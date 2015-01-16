@@ -457,7 +457,7 @@ Truck.prototype.tick = function() {
 
   this.tickPopups(dt);
   
-  this.cameraFollow(dt, gpos, this.localFrame);
+  this.cameraFollow(dt);
 };
 
 // TODO: would be nice to have globe.getGroundNormal() in the API.
@@ -590,7 +590,7 @@ Truck.prototype.cameraCut = function() {
 	});
 };
 
-Truck.prototype.cameraFollow = function(dt, truckPos, localToGlobalFrame) {
+Truck.prototype.cameraFollow = function(dt) {
   var c0 = Math.exp(-dt / 0.5);
   var c1 = 1 - c0;
 
@@ -624,48 +624,25 @@ Truck.prototype.teleportTo = function(lon, lat, heading) {
 	var cart = Cesium.Cartographic.fromDegrees(lon, lat);
 	cart.height = 0.0;
 	
-	// TODO
-	/*
-	cart.height = this.scene.globe.getHeight(cart);
-	
-	var that = this;
-	if (!Cesium.defined(cart.height)) {
-		window.setTimeout(function() {
-			that.teleportTo(lon, lat, heading);
-		}, 500);
-		return;
-	}
-	*/
+	//cart.height = this.scene.globe.getHeight(cart); // TODO
 	
 	var location = this.ellipsoid.cartographicToCartesian(cart);
-	var translation = new Cesium.Cartesian4(location.x, location.y, location.z, 1.0);
-	Cesium.Matrix4.setColumn(this.model.modelMatrix, 3, translation, this.model.modelMatrix);
-	if (!Cesium.defined(heading)) {
-		heading = 0.0;
-	}
+	heading = Cesium.defaultValue(heading, 0.0);
+	
+	this.model.modelMatrix = Cesium.Transforms.fromHeadingPitchRollToFixedFrame(location, heading, 0.0, 0.0);
+	
+	var camera = this.scene.camera;
+	camera.transform = this.model.modelMatrix;
 	
 	Cesium.Cartesian3.clone(Cesium.Cartesian3.ZERO, this.vel);
 	Cesium.Cartographic.fromDegrees(lat, lon, 0.0, this.localAnchorLla);
 	this.ellipsoid.cartographicToCartesian(this.localAnchorLla, this.localAnchorCartesian);
-	
-	var eastNorthUp = Cesium.Transforms.eastNorthUpToFixedFrame(this.localAnchorCartesian, this.ellipsoid);
-	Cesium.Matrix4.getRotation(eastNorthUp, this.localFrame);
-	Cesium.Matrix3.clone(Cesium.Matrix3.IDENTITY, this.modelFrame);
-
-	var axis = Cesium.Matrix3.getColumn(this.modelFrame, 2, new Cesium.Cartesian3());
-	var right = Cesium.Matrix3.getColumn(this.modelFrame, 0, new Cesium.Cartesian3());
-	right = rotate(right, axis, -heading);
-	Cesium.Matrix3.setColumn(this.modelFrame, 0, right, this.modelFrame);
-	var dir = Cesium.Matrix3.getColumn(this.modelFrame, 1, new Cesium.Cartesian3());
-	dir = rotate(dir, axis, -heading);
-	Cesium.Matrix3.setColumn(this.modelFrame, 1, dir, this.modelFrame);
-	
-	Cesium.Cartesian3.fromElements(0.0, 0.0, cart.height, this.pos);
 
 	this.cameraCut();
 
 	// make sure to not start airborne
 	/*
+	// TODO
 	if (PREVENT_START_AIRBORNE) {
 		window.setTimeout(function() {
 			var groundAlt = that.scene.globe.getHeight(Cesium.Cartographic.fromDegrees(lat, lon));
@@ -676,36 +653,6 @@ Truck.prototype.teleportTo = function(lon, lat, heading) {
 	}
 	*/
 };
-
-// Move our anchor closer to our current position. Retain our global
-// motion state (position, orientation, velocity).
-Truck.prototype.adjustAnchor = function() {
-  var oldLocalFrame = this.localFrame;
-
-  var globalPos = Cesium.Cartesian3.add(this.localAnchorCartesian,
-                         Cesium.Matrix3.multiplyByVector(oldLocalFrame, this.pos, new Cesium.Cartesian3()), new Cesium.Cartesian3());
-  var newAnchorLla = this.ellipsoid.cartesianToCartographic(globalPos);
-  newAnchorLla.height = 0;  // For convenience, anchor always has 0 altitude.
-
-  var newAnchorCartesian = this.ellipsoid.cartographicToCartesian(newAnchorLla);
-  var eastNorthUp = Cesium.Transforms.eastNorthUpToFixedFrame(newAnchorCartesian, this.ellipsoid);
-  var newLocalFrame = Cesium.Matrix4.getRotation(eastNorthUp, new Cesium.Matrix3());
-
-  var newLocalFrameTranspose = Cesium.Matrix3.transpose(newLocalFrame, new Cesium.Matrix3());
-  var oldFrameToNewFrame = Cesium.Matrix3.multiply(newLocalFrameTranspose, oldLocalFrame,  new Cesium.Matrix3());
-
-  var newVelocity = Cesium.Matrix3.multiplyByVector(oldFrameToNewFrame, this.vel, new Cesium.Cartesian3());
-  var newModelFrame = Cesium.Matrix3.multiply(oldFrameToNewFrame, this.modelFrame, new Cesium.Matrix3());
-  var newPosition = Cesium.Cartesian3.subtract(globalPos, newAnchorCartesian, new Cesium.Cartesian3());
-  Cesium.Matrix3.multiplyByVector(newLocalFrameTranspose, newPosition, newPosition);
-
-  Cesium.Cartographic.clone(newAnchorLla, this.localAnchorLla);
-  Cesium.Cartesian3.clone(newAnchorCartesian, this.localAnchorCartesian);
-  Cesium.Matrix3.clone(newLocalFrame, this.localFrame);
-  Cesium.Matrix3.clone(newModelFrame, this.modelFrame);
-  Cesium.Cartesian3.clone(newPosition, this.pos);
-  Cesium.Cartesian3.clone(newVelocity, this.vel);
-}
 
 // Keep an angle in [-180,180]
 function fixAngle(a) {
