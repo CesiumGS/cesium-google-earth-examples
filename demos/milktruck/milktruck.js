@@ -572,31 +572,22 @@ Truck.prototype.cameraCut = function() {
 	var camera = this.scene.camera;
 	var heading = fixAngle(180 + Cesium.Math.toDegrees(getHeading(this.model.modelMatrix, this.ellipsoid)) + 45);
 	
-	var modelPosition = Cesium.Matrix4.getTranslation(this.model.modelMatrix, new Cesium.Cartesian3());
-	Cesium.Cartesian3.clone(modelPosition, camera.position);
-	camera.heading = Cesium.Math.toRadians(heading);
+	Cesium.Cartesian3.clone(Cesium.Cartesian3.ZERO, camera.position);
+	
+	camera.setView({
+		heading : heading
+	});
 	
 	var offset = Cesium.Cartesian3.clone(camera.direction);
-	Cesium.Cartesian3.multiplyByScalar(offset, 50.0, offset);
-	Cesium.Cartesian3.negate(offset, offset);
+	Cesium.Cartesian3.multiplyByScalar(offset, -50.0, offset);
 	Cesium.Cartesian3.add(camera.position, offset, camera.position);
 	
-	var modelCart = this.ellipsoid.cartesianToCartographic(camera.position);
-	modelCart.height = 10.0;
-	this.ellipsoid.cartographicToCartesian(modelCart, camera.position);
+	Cesium.Cartesian3.multiplyByScalar(camera.up, 10.0, offset);
+	Cesium.Cartesian3.add(camera.position, offset, camera.position);
 	
-	var direction = Cesium.Cartesian3.subtract(modelPosition, camera.position, new Cesium.Cartesian3());
-	Cesium.Cartesian3.normalize(direction, direction);
-	var up = this.ellipsoid.geodeticSurfaceNormal(modelPosition);
-	var right = Cesium.Cartesian3.cross(direction, up, new Cesium.Cartesian3());
-	Cesium.Cartesian3.normalize(right, right);
-	Cesium.Cartesian3.cross(right, direction, up);
-	
-	Cesium.Cartesian3.clone(direction, camera.direction);
-	Cesium.Cartesian3.clone(up, camera.up);
-	Cesium.Cartesian3.clone(right, camera.right);
-	
-	// TODO: tilt 80?
+	camera.setView({
+	    pitch : -Cesium.Math.toRadians(80.0)
+	});
 };
 
 Truck.prototype.cameraFollow = function(dt, truckPos, localToGlobalFrame) {
@@ -611,31 +602,21 @@ Truck.prototype.cameraFollow = function(dt, truckPos, localToGlobalFrame) {
   var deltaHeading = fixAngle(truckHeading - camHeading);
   var heading = camHeading + c1 * deltaHeading;
   heading = fixAngle(heading);
-
-  var headingRadians = heading / 180 * Math.PI;
   
-  var dir = Cesium.Matrix3.getColumn(localToGlobalFrame, 1, new Cesium.Cartesian3());
-  var up = Cesium.Matrix3.getColumn(localToGlobalFrame, 2, new Cesium.Cartesian3());
+  Cesium.Cartesian3.clone(Cesium.Cartesian3.ZERO, camera.position);
+  camera.setView({
+	  heading : Cesium.Math.toRadians(heading),
+	  pitch : 0.0,
+	  roll : 0.0
+  });
   
-  var headingDir = rotate(dir, up, -headingRadians);
-  var camPos = Cesium.Cartesian3.add(truckPos, Cesium.Cartesian3.multiplyByScalar(up, CAM_HEIGHT, new Cesium.Cartesian3()), new Cesium.Cartesian3());
-  camPos = Cesium.Cartesian3.add(camPos, Cesium.Cartesian3.multiplyByScalar(headingDir, -TRAILING_DISTANCE, new Cesium.Cartesian3()), new Cesium.Cartesian3());
-  var camLla = this.ellipsoid.cartesianToCartographic(camPos, new Cesium.Cartographic());
+  var offsetUp = Cesium.Cartesian3.multiplyByScalar(camera.up, CAM_HEIGHT, new Cesium.Cartesian3());
+  Cesium.Cartesian3.multiplyByScalar(camera.direction, -TRAILING_DISTANCE, camera.position);
+  Cesium.Cartesian3.add(camera.position, offsetUp, camera.position);
   
-  var height = this.scene.globe.getHeight(camLla);
-  if (Cesium.defined(height)) {
-	  camLla.height = camLla.height - height;
-  }
-  
-  this.ellipsoid.cartographicToCartesian(camLla, camera.position);
-  camera.heading = headingRadians;
-  
-  // TODO
-  // camera.tilt = Cesium.Math.toRadians(80.0);
-  
-  // la.set(camLat, camLon, camAlt, ge.ALTITUDE_RELATIVE_TO_SEA_FLOOR,
-  // heading, 80 /*tilt*/, 0 /*range*/);
-  // ge.getView().setAbstractView(la);
+  camera.setView({
+	  pitch : -Cesium.Math.toRadians(80.0)
+  });
 };
 
 // heading is optional.
