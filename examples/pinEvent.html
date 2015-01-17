@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->  
+<head>
+  <title>Placemark Click Event Handling</title>
+
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
+
+  <script src="../Cesium/Cesium.js"></script>
+  <style>
+    @import url(../Cesium/Widgets/widgets.css);
+  </style>
+  
+</head>
+<body onload="if(window.prettyPrint)prettyPrint();">
+  <h1>Cesium Examples - Placemark Click Event Handling</h1>
+  <div id="page">
+  <div id="preview">
+  <div id="cesiumContainer"></div>
+  </div>
+  <div id="source">
+  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+var alertText = '';
+function addText(key, value) { 
+    alertText += key + ': ' + value+ '\n' ;
+}
+function showAlert() {
+    alert(alertText);
+    alertText = '';
+}
+function sampleTerrainSuccess() {
+    addText('height', terrainSamplePositions[0].height);
+    showAlert();
+}
+
+var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+handler.setInputAction(function (click) {
+    var pickedObject = scene.pick(click.position);
+    if (Cesium.defined(pickedObject) && (pickedObject.id === entity)) {
+        addText('target', pickedObject.id.id);
+        var position = viewer.camera.pickEllipsoid(click.position);
+        addText('screenX', click.position.x);
+        addText('screenY', click.position.y);
+        addText('didHitGlobe', Cesium.defined(position));
+        var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
+        addText('longitude', Cesium.Math.toDegrees(cartographicPosition.longitude));
+        addText('latitude', Cesium.Math.toDegrees(cartographicPosition.latitude));
+        terrainSamplePositions = [cartographicPosition];
+        Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess, showAlert);
+    }
+}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+</pre></div>
+    
+  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+google.earth.addEventListener(placemark, 'click', function(event) {
+  var text = 'Click:';
+
+  function addToMessage(append1, append2) { 
+   text += ' ' + append1 + ': ' + append2 + '\n' ;
+  }
+
+  addToMessage('target type', event.getTarget().getType());
+  addToMessage('currentTarget type', 
+               event.getCurrentTarget().getType());
+  addToMessage('button', event.getButton());
+  addToMessage('clientX', event.getClientX());
+  addToMessage('clientY', event.getClientY());
+  addToMessage('screenX', event.getScreenX());
+  addToMessage('screenY', event.getScreenY());
+  addToMessage('latitude', event.getLatitude());
+  addToMessage('longitude', event.getLongitude());
+  addToMessage('altitude', event.getAltitude());
+  addToMessage('didHitGlobe', event.getDidHitGlobe());
+  addToMessage('altKey', event.getAltKey());
+  addToMessage('ctrlKey', event.getCtrlKey());
+  addToMessage('shiftKey', event.getShiftKey());
+  addToMessage('timeStamp', event.getTimeStamp());
+
+  // Prevent default balloon from popping up for marker placemarks
+  event.preventDefault(); 
+
+  // wrap alerts in API callbacks and event handlers
+  // in a setTimeout to prevent deadlock in some browsers
+  setTimeout(function() {
+    alert(text);
+  }, 0);
+});
+  </pre></div>
+  </div>
+  <div id="resources">
+  <h2>Resources:</h2>
+  <ul>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/ScreenSpaceEventHandler.html" target="_blank" >ScreenSpaceEventHandler</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/ScreenSpaceEventType.html" target="_blank" >ScreenSpaceEventType</a> </li>
+  </ul>
+  </div>
+  </div>
+
+  <script>
+    var viewer = new Cesium.Viewer('cesiumContainer', {
+        selectionIndicator: false,
+        infoBox: false
+    });
+    var scene = viewer.scene;
+    var camera = viewer.camera;
+    var pinBuilder = new Cesium.PinBuilder();
+
+    var position = Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude);
+    var entity = viewer.entities.add({
+        position : position,
+        id : 'Pin1',
+        billboard :{
+            image : pinBuilder.fromColor(Cesium.Color.SALMON, 48),
+            verticalOrigin : Cesium.VerticalOrigin.BOTTOM
+        }
+    });
+
+    var globe = scene.globe;
+    globe.depthTestAgainstTerrain = true;
+    var cesiumTerrainProviderMeshes = new Cesium.CesiumTerrainProvider({
+        url : '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
+    });
+    viewer.terrainProvider = cesiumTerrainProviderMeshes;
+    
+    var alertText = '';
+    function addText(key, value) { 
+        alertText += key + ': ' + value+ '\n' ;
+    }
+    function showAlert() {
+        alert(alertText);
+        alertText = '';
+    }
+    function sampleTerrainSuccess() {
+        addText('height', terrainSamplePositions[0].height);
+        showAlert();
+    }
+    
+    var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+    handler.setInputAction(function (click) {
+        var pickedObject = scene.pick(click.position);
+        if (Cesium.defined(pickedObject) && (pickedObject.id === entity)) {
+            addText('target', pickedObject.id.id);
+            var position = viewer.camera.pickEllipsoid(click.position);
+            addText('screenX', click.position.x);
+            addText('screenY', click.position.y);
+            addText('didHitGlobe', Cesium.defined(position));
+            var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
+            addText('longitude', Cesium.Math.toDegrees(cartographicPosition.longitude));
+            addText('latitude', Cesium.Math.toDegrees(cartographicPosition.latitude));
+            terrainSamplePositions = [cartographicPosition];
+            Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess, showAlert);
+        }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+    // Comparable Google Earth API code:
+    //
+    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/event-placemark.html
+  </script>
+</body>
+</html>
