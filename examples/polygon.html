@@ -43,38 +43,26 @@ limitations under the License.
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
 var lon = -95.0;
 var lat = 20.0;
-var polygonHierarchy = {
-  positions : Cesium.Cartesian3.fromDegreesArray([
-      lon - 0.05, lat - 0.05,
-      lon + 0.05, lat - 0.05,
-      lon + 0.05, lat + 0.05,
-      lon - 0.05, lat + 0.05
-  ]),
-  holes : [{
-      positions : Cesium.Cartesian3.fromDegreesArray([
-          lon - 0.02, lat - 0.02,
-          lon + 0.02, lat - 0.02,
-          lon + 0.02, lat + 0.02,
-          lon - 0.02, lat + 0.02
-      ])
-  }]
-};
-
-var polygonInstance = new Cesium.GeometryInstance({
-  geometry : new Cesium.PolygonGeometry({
-      polygonHierarchy : polygonHierarchy,
-      vertexFormat : Cesium.PerInstanceColorAppearance.VERTEX_FORMAT
-  }),
-  attributes: {
-      color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.WHITE)
-  }
+viewer.entities.add({
+ polygon: {
+     hierarchy : {
+         positions : Cesium.Cartesian3.fromDegreesArray([
+             lon - 0.05, lat - 0.05,
+             lon + 0.05, lat - 0.05,
+             lon + 0.05, lat + 0.05,
+             lon - 0.05, lat + 0.05
+         ]),
+         holes : [{
+             positions : Cesium.Cartesian3.fromDegreesArray([
+                 lon - 0.02, lat - 0.02,
+                 lon + 0.02, lat - 0.02,
+                 lon + 0.02, lat + 0.02,
+                 lon - 0.02, lat + 0.02
+             ])
+         }]
+     }
+ }
 });
-
-scene.primitives.add(new Cesium.Primitive({
-  geometryInstances: polygonInstance,
-  appearance: new Cesium.PerInstanceColorAppearance()
-}));
-
 </pre></div>
     
   <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
@@ -122,41 +110,29 @@ ge.getFeatures().appendChild(polygonPlacemark);
   
   var lon = -95.0;
   var lat = 20.0;
-  
-  var polygonHierarchy = {
-      positions : Cesium.Cartesian3.fromDegreesArray([
-          lon - 0.05, lat - 0.05,
-          lon + 0.05, lat - 0.05,
-          lon + 0.05, lat + 0.05,
-          lon - 0.05, lat + 0.05
-      ]),
-      holes : [{
-          positions : Cesium.Cartesian3.fromDegreesArray([
-              lon - 0.02, lat - 0.02,
-              lon + 0.02, lat - 0.02,
-              lon + 0.02, lat + 0.02,
-              lon - 0.02, lat + 0.02
-          ])
-      }]
-  };
-
-  var polygonInstance = new Cesium.GeometryInstance({
-      geometry : new Cesium.PolygonGeometry({
-          polygonHierarchy : polygonHierarchy,
-          vertexFormat : Cesium.PerInstanceColorAppearance.VERTEX_FORMAT
-      }),
-      attributes: {
-          color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.WHITE)
-      }
+  viewer.entities.add({
+     polygon: {
+         hierarchy : {
+             positions : Cesium.Cartesian3.fromDegreesArray([
+                 lon - 0.05, lat - 0.05,
+                 lon + 0.05, lat - 0.05,
+                 lon + 0.05, lat + 0.05,
+                 lon - 0.05, lat + 0.05
+             ]),
+             holes : [{
+                 positions : Cesium.Cartesian3.fromDegreesArray([
+                     lon - 0.02, lat - 0.02,
+                     lon + 0.02, lat - 0.02,
+                     lon + 0.02, lat + 0.02,
+                     lon - 0.02, lat + 0.02
+                 ])
+             }]
+         }
+     }
   });
 
-  scene.primitives.add(new Cesium.Primitive({
-      geometryInstances: polygonInstance,
-      appearance: new Cesium.PerInstanceColorAppearance()
-  }));
-
   viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(-95.0, 20.0, 20000.0)
+      destination: Cesium.Cartesian3.fromDegrees(lon, lat, 20000.0)
   });
   
   // Comparable Google Earth API code:

@@ -41,35 +41,14 @@ limitations under the License.
   </div>
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-scene.primitives.add(new Cesium.Primitive({
-  geometryInstances: new Cesium.GeometryInstance({
-      geometry : new Cesium.PolygonGeometry({
-          polygonHierarchy : polygonHierarchy,
-          vertexFormat : Cesium.PerInstanceColorAppearance.VERTEX_FORMAT
-      }),
-      attributes: {
-          color: Cesium.ColorGeometryInstanceAttribute.fromColor(new Cesium.Color(1.0, 1.0, 0.0, 0.6))
-      }
-  }),
-  appearance: new Cesium.PerInstanceColorAppearance()
-}));
-
-scene.primitives.add(new Cesium.Primitive({
-  geometryInstances : new Cesium.GeometryInstance({
-      geometry : new Cesium.PolygonOutlineGeometry({
-          polygonHierarchy : polygonHierarchy
-      }),
-      attributes : {
-          color : Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.RED)
-      }
-  }),
-  appearance : new Cesium.PerInstanceColorAppearance({
-      flat : true,
-      renderState : {
-          lineWidth : Math.min(2.0, scene.maximumAliasedLineWidth)
-      }
-  })
-}));
+viewer.entities.add({
+ polygon: {
+     hierarchy : polygonHierarchy,
+     material : new Cesium.Color(1.0, 1.0, 0.0, 0.6),
+     outline : true,
+     outlineColor : Cesium.Color.RED
+ }
+});
 </pre></div>
     
   <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
@@ -112,7 +91,6 @@ polyColor.setR(255);
   
   var lon = -105.0;
   var lat = 20.0;
-  
   var polygonHierarchy = {
       positions : Cesium.Cartesian3.fromDegreesArray([
           lon - 0.05, lat - 0.05,
@@ -130,35 +108,14 @@ polyColor.setR(255);
       }]
   };
   
-  scene.primitives.add(new Cesium.Primitive({
-      geometryInstances: new Cesium.GeometryInstance({
-          geometry : new Cesium.PolygonGeometry({
-              polygonHierarchy : polygonHierarchy,
-              vertexFormat : Cesium.PerInstanceColorAppearance.VERTEX_FORMAT
-          }),
-          attributes: {
-              color: Cesium.ColorGeometryInstanceAttribute.fromColor(new Cesium.Color(1.0, 1.0, 0.0, 0.6))
-          }
-      }),
-      appearance: new Cesium.PerInstanceColorAppearance()
-  }));
-
-  scene.primitives.add(new Cesium.Primitive({
-      geometryInstances : new Cesium.GeometryInstance({
-          geometry : new Cesium.PolygonOutlineGeometry({
-              polygonHierarchy : polygonHierarchy
-          }),
-          attributes : {
-              color : Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.RED)
-          }
-      }),
-      appearance : new Cesium.PerInstanceColorAppearance({
-          flat : true,
-          renderState : {
-              lineWidth : Math.min(2.0, scene.maximumAliasedLineWidth)
-          }
-      })
-  }));
+  viewer.entities.add({
+     polygon: {
+         hierarchy : polygonHierarchy,
+         material : new Cesium.Color(1.0, 1.0, 0.0, 0.6),
+         outline : true,
+         outlineColor : Cesium.Color.RED
+     }
+  });
   
   viewer.camera.flyTo({
       destination: Cesium.Cartesian3.fromDegrees(lon, lat, 20000.0)
