@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->  
+<head>
+  <title>Creating Polygons</title>
+
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
+
+  <script src="../Cesium/Cesium.js"></script>
+  <style>
+    @import url(../Cesium/Widgets/widgets.css);
+  </style>
+  
+</head>
+<body onload="if(window.prettyPrint)prettyPrint();">
+  <h1>Cesium Examples - Creating Polygons</h1>
+  <div id="page">
+  <div id="preview">
+  <div id="cesiumContainer"></div>
+  </div>
+  <div id="source">
+  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+var lon = -95.0;
+var lat = 20.0;
+viewer.entities.add({
+ polygon: {
+     hierarchy : {
+         positions : Cesium.Cartesian3.fromDegreesArray([
+             lon - 0.05, lat - 0.05,
+             lon + 0.05, lat - 0.05,
+             lon + 0.05, lat + 0.05,
+             lon - 0.05, lat + 0.05
+         ]),
+         holes : [{
+             positions : Cesium.Cartesian3.fromDegreesArray([
+                 lon - 0.02, lat - 0.02,
+                 lon + 0.02, lat - 0.02,
+                 lon + 0.02, lat + 0.02,
+                 lon - 0.02, lat + 0.02
+             ])
+         }]
+     }
+ }
+});
+</pre></div>
+    
+  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+var polygonPlacemark = ge.createPlacemark('');
+var polygon = ge.createPolygon('');
+polygonPlacemark.setGeometry(polygon);
+var outer = ge.createLinearRing('');
+polygon.setOuterBoundary(outer);
+
+// Square outer boundary.
+var center = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
+var coords = outer.getCoordinates();
+var lat = center.getLatitude();
+var lon = center.getLongitude();
+coords.pushLatLngAlt(lat - .05, lon - .05, 0); 
+coords.pushLatLngAlt(lat - .05, lon + .05, 0); 
+coords.pushLatLngAlt(lat + .05, lon + .05, 0); 
+coords.pushLatLngAlt(lat + .05, lon - .05, 0); 
+
+// Another square as the inner boundary.  Note that we can create
+// any number of inner boundaries.
+var innerBoundary = ge.createLinearRing('');
+polygon.getInnerBoundaries().appendChild(innerBoundary);
+coords = innerBoundary.getCoordinates();
+coords.pushLatLngAlt(lat - .02, lon - .02, 0); 
+coords.pushLatLngAlt(lat - .02, lon + .02, 0); 
+coords.pushLatLngAlt(lat + .02, lon + .02, 0); 
+coords.pushLatLngAlt(lat + .02, lon - .02, 0); 
+
+ge.getFeatures().appendChild(polygonPlacemark);
+  </pre></div>
+  </div>
+  <div id="resources">
+  <h2>Resources:</h2>
+  <ul>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/PolygonGeometry.html" target="_blank">PolygonGeometry</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/GeometryInstance.html" target="_blank">GeometryInstance</a> </li>
+  </ul>
+  </div>
+  </div>
+
+  <script>
+  var viewer = new Cesium.Viewer('cesiumContainer');
+  var scene = viewer.scene;
+  
+  var lon = -95.0;
+  var lat = 20.0;
+  viewer.entities.add({
+     polygon: {
+         hierarchy : {
+             positions : Cesium.Cartesian3.fromDegreesArray([
+                 lon - 0.05, lat - 0.05,
+                 lon + 0.05, lat - 0.05,
+                 lon + 0.05, lat + 0.05,
+                 lon - 0.05, lat + 0.05
+             ]),
+             holes : [{
+                 positions : Cesium.Cartesian3.fromDegreesArray([
+                     lon - 0.02, lat - 0.02,
+                     lon + 0.02, lat - 0.02,
+                     lon + 0.02, lat + 0.02,
+                     lon - 0.02, lat + 0.02
+                 ])
+             }]
+         }
+     }
+  });
+
+  viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(lon, lat, 20000.0)
+  });
+  
+  // Comparable Google Earth API code:
+  //
+  // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/polygon.html
+  </script>
+</body>
+</html>

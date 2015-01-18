@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->  
+<head>
+  <title>Polygon Styling</title>
+
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
+
+  <script src="../Cesium/Cesium.js"></script>
+  <style>
+    @import url(../Cesium/Widgets/widgets.css);
+  </style>
+  
+</head>
+<body onload="if(window.prettyPrint)prettyPrint();">
+  <h1>Cesium Examples - Polygon Styling</h1>
+  <div id="page">
+  <div id="preview">
+  <div id="cesiumContainer"></div>
+  </div>
+  <div id="source">
+  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+viewer.entities.add({
+ polygon: {
+     hierarchy : polygonHierarchy,
+     material : new Cesium.Color(1.0, 1.0, 0.0, 0.6),
+     outline : true,
+     outlineColor : Cesium.Color.RED
+ }
+});
+</pre></div>
+    
+  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+// If polygonPlacemark doesn't already have a Style associated
+// with it, we create it now.
+if (!polygonPlacemark.getStyleSelector()) {
+  polygonPlacemark.setStyleSelector(ge.createStyle(''));
+}
+
+// The Style of a Feature is retrieved as
+// feature.getStyleSelector().  The Style itself contains a
+// LineStyle and a PolyStyle, which are what we manipulate to change
+// the line color, line width, and inner color of the polygon.
+var lineStyle = polygonPlacemark.getStyleSelector().getLineStyle();
+lineStyle.setWidth(lineStyle.getWidth() + 2);
+// Color is specified in 'aabbggrr' format.
+lineStyle.getColor().set('66ff0000');
+
+// Color can also be specified by individual color components.
+var polyColor = 
+  polygonPlacemark.getStyleSelector().getPolyStyle().getColor();
+polyColor.setA(200);
+polyColor.setB(0);
+polyColor.setG(255);
+polyColor.setR(255);
+  </pre></div>
+  </div>
+  <div id="resources">
+  <h2>Resources:</h2>
+  <ul>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/PolygonGeometry.html" target="_blank">PolygonGeometry</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/GeometryInstance.html" target="_blank">GeometryInstance</a> </li>
+  </ul>
+  </div>
+  </div>
+
+  <script>
+  var viewer = new Cesium.Viewer('cesiumContainer');
+  var scene = viewer.scene;
+  
+  var lon = -105.0;
+  var lat = 20.0;
+  var polygonHierarchy = {
+      positions : Cesium.Cartesian3.fromDegreesArray([
+          lon - 0.05, lat - 0.05,
+          lon + 0.05, lat - 0.05,
+          lon + 0.05, lat + 0.05,
+          lon - 0.05, lat + 0.05
+      ]),
+      holes : [{
+          positions : Cesium.Cartesian3.fromDegreesArray([
+              lon - 0.02, lat - 0.02,
+              lon + 0.02, lat - 0.02,
+              lon + 0.02, lat + 0.02,
+              lon - 0.02, lat + 0.02
+          ])
+      }]
+  };
+  
+  viewer.entities.add({
+     polygon: {
+         hierarchy : polygonHierarchy,
+         material : new Cesium.Color(1.0, 1.0, 0.0, 0.6),
+         outline : true,
+         outlineColor : Cesium.Color.RED
+     }
+  });
+  
+  viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(lon, lat, 20000.0)
+  });
+  
+  // Comparable Google Earth API code:
+  //
+  // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/polygon-style.html
+  </script>
+</body>
+</html>
