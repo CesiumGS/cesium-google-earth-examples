@@ -1,7 +1,7 @@
 /**
  * Cesium - https://github.com/AnalyticalGraphicsInc/cesium
  *
- * Copyright 2011-2014 Cesium Contributors
+ * Copyright 2011-2015 Cesium Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -9294,6 +9294,53 @@ define('Core/BoundingSphere',[
         return result;
     };
 
+    var fromBoundingSpheresScratch = new Cartesian3();
+
+    /**
+     * Computes a tight-fitting bounding sphere enclosing the provided array of bounding spheres.
+     *
+     * @param {BoundingSphere[]} boundingSpheres The array of bounding spheres.
+     * @param {BoundingSphere} [result] The object onto which to store the result.
+     * @returns {BoundingSphere} The modified result parameter or a new BoundingSphere instance if none was provided.
+     */
+    BoundingSphere.fromBoundingSpheres = function(boundingSpheres, result) {
+        if (!defined(result)) {
+            result = new BoundingSphere();
+        }
+
+        if (!defined(boundingSpheres) || boundingSpheres.length === 0) {
+            result.center = Cartesian3.clone(Cartesian3.ZERO, result.center);
+            result.radius = 0.0;
+            return result;
+        }
+
+        var length = boundingSpheres.length;
+        if (length === 1) {
+            return BoundingSphere.clone(boundingSpheres[0], result);
+        }
+
+        if (length === 2) {
+            return BoundingSphere.union(boundingSpheres[0], boundingSpheres[1], result);
+        }
+
+        var positions = [];
+        for (var i = 0; i < length; i++) {
+            positions.push(boundingSpheres[i].center);
+        }
+
+        result = BoundingSphere.fromPoints(positions, result);
+
+        var center = result.center;
+        var radius = result.radius;
+        for (i = 0; i < length; i++) {
+            var tmp = boundingSpheres[i];
+            radius = Math.max(radius, Cartesian3.distance(center, tmp.center, fromBoundingSpheresScratch) + tmp.radius);
+        }
+        result.radius = radius;
+
+        return result;
+    };
+
     /**
      * Duplicates a BoundingSphere instance.
      *
@@ -11332,6 +11379,38 @@ define('Core/Quaternion',[
         result.z = z;
         result.w = w;
         return result;
+    };
+
+    var scratchHPRQuaternion = new Quaternion();
+
+    /**
+     * Computes a rotation from the given heading, pitch and roll angles. Heading is the rotation about the
+     * negative z axis. Pitch is the rotation about the negative y axis. Roll is the rotation about
+     * the positive x axis.
+     *
+     * @param {Number} heading The heading angle in radians.
+     * @param {Number} pitch The pitch angle in radians.
+     * @param {Number} roll The roll angle in radians.
+     * @param {Quaternion} result The object onto which to store the result.
+     * @returns {Quaternion} The modified result parameter or a new Quaternion instance if none was provided.
+     */
+    Quaternion.fromHeadingPitchRoll = function(heading, pitch, roll, result) {
+                if (!defined(heading)) {
+            throw new DeveloperError('heading is required.');
+        }
+        if (!defined(pitch)) {
+            throw new DeveloperError('pitch is required.');
+        }
+        if (!defined(roll)) {
+            throw new DeveloperError('roll is required.');
+        }
+        
+        var headingQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_Z, -heading, result);
+        var pitchQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_Y, -pitch, scratchHPRQuaternion);
+        result = Quaternion.multiply(headingQuaternion, pitchQuaternion, headingQuaternion);
+
+        var rollQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_X, roll, scratchHPRQuaternion);
+        return Quaternion.multiply(rollQuaternion, result, result);
     };
 
     var sampledQuaternionAxis = new Cartesian3();
