@@ -64,6 +64,7 @@ function rotate(v, axis, radians) {
     return result;
 }
 
+/*
 function makeOrthonormalFrame(matrix, dir, up) {
 	var newRight = Cesium.Cartesian3.cross(dir, up, new Cesium.Cartesian3());
 	Cesium.Cartesian3.normalize(newRight, newRight);
@@ -77,6 +78,7 @@ function makeOrthonormalFrame(matrix, dir, up) {
 	Cesium.Matrix3.setColumn(matrix, 1, newDir, matrix);
 	Cesium.Matrix3.setColumn(matrix, 2, newUp, matrix);
 }
+*/
 
 function getHeading(matrix, ellipsoid) {
 	var position = Cesium.Matrix4.getTranslation(matrix, new Cesium.Cartesian3());
@@ -260,11 +262,11 @@ Truck.prototype.tick = function() {
 
   var c0 = 1;
   var c1 = 0;
-
-  var gpos = Cesium.Matrix3.multiplyByVector(this.localFrame, this.pos, new Cesium.Cartesian3());
-  Cesium.Cartesian3.add(this.localAnchorCartesian, gpos, gpos);
+  
+  var gpos = Cesium.Matrix4.getTranslation(this.model.modelMatrix, new Cesium.Cartesian3());
   var lla = this.ellipsoid.cartesianToCartographic(gpos);
 
+  /*
   var temp = Cesium.Cartesian2.clone(this.pos);
   if (Cesium.Cartesian2.magnitude(temp) > 100) {
     // Re-anchor our local coordinate frame whenever we've strayed a
@@ -272,18 +274,19 @@ Truck.prototype.tick = function() {
     // flat!
     this.adjustAnchor();
   }
+  */
 
-  var dir = Cesium.Matrix3.getColumn(this.modelFrame, 1, new Cesium.Cartesian3());
-  var up = Cesium.Matrix3.getColumn(this.modelFrame, 2, new Cesium.Cartesian3());
+  var dir = Cesium.Matrix3.getColumn(this.model.modelMatrix, 1, new Cesium.Cartesian3());
+  var up = Cesium.Matrix3.getColumn(this.model.modelMatrix, 2, new Cesium.Cartesian3());
 
-  var absSpeed = Cesium.Cartesian3(this.vel);
+  var absSpeed = Cesium.Cartesian3.magnitude(this.vel);
 
   var groundAlt = this.scene.globe.getHeight(lla);
   if (!Cesium.defined(groundAlt)) {
 	  return;
   }
   
-  var airborne = (groundAlt + 0.30 < this.pos.z);
+  var airborne = (groundAlt + 0.30 < lla.height);
   var steerAngle = 0;
   
   // Steering.
@@ -326,10 +329,16 @@ Truck.prototype.tick = function() {
   
   // Turn.
   var newdir = airborne ? dir : rotate(dir, up, steerAngle);
+  /*
   makeOrthonormalFrame(this.modelFrame, newdir, up);
   dir = Cesium.Matrix3.getColumn(this.modelFrame, 1, dir);
   up = Cesium.Matrix3.getColumn(this.modelFrame, 2, up);
-
+  */
+  
+  var right = Cesium.Cartesian3.cross(newdir, up, new Cesium.Cartesian3());
+  up = Cesium.Cartesian3.cross(right, newdir, new Cesium.Cartesian3());
+  dir = newdir;
+  
   var forwardSpeed = 0;
   
   if (!airborne) {
@@ -343,7 +352,7 @@ Truck.prototype.tick = function() {
     //
     // For a variable time step:
     // c0 = exp(-dt / TIME_CONSTANT)
-    var right = Cesium.Matrix3.getColumn(this.modelFrame, 0, new Cesium.Cartesian3());
+    //var right = Cesium.Matrix3.getColumn(this.modelFrame, 0, new Cesium.Cartesian3());
     var slip = Cesium.Cartesian3.dot(this.vel, right);
     c0 = Math.exp(-dt / 0.5);
     Cesium.Cartesian3.subtract(this.vel, Cesium.Cartesian3.multiplyByScalar(right, slip * (1 - c0), new Cesium.Cartesian3()), this.vel);
@@ -395,18 +404,26 @@ Truck.prototype.tick = function() {
 
   // Move.
   var deltaPos = Cesium.Cartesian3.multiplyByScalar(this.vel, dt, new Cesium.Cartesian3());
-  Cesium.Cartesian3.add(this.pos, deltaPos, this.pos);
+  //Cesium.Cartesian3.add(this.pos, deltaPos, this.pos);
 
+  /*
   Cesium.Cartesian3.add(this.localAnchorCartesian,
                 Cesium.Matrix3.multiplyByVector(this.localFrame, this.pos, new Cesium.Cartesian3()), gpos);
   this.ellipsoid.cartesianToCartographic(gpos, lla);
+  */
   
+  Cesium.Cartesian3.add(deltaPos, gpos, gpos);
+  this.ellipsoid.cartesianToCartographic(gpos, lla);
+  
+  /*
   // Don't go underground.
   groundAlt = this.scene.globe.getHeight(lla);
   if (this.pos.z < groundAlt) {
     this.pos.z = groundAlt;
   }
+  */
 
+  /*
   var normal = estimateGroundNormal(this.scene.globe, gpos, this.localFrame);
   
   if (!airborne) {
@@ -445,8 +462,15 @@ Truck.prototype.tick = function() {
 
   var orientation = Cesium.Matrix4.getRotation(this.model.modelMatrix, new Cesium.Matrix3());
   setLocalOrientationRoll(orientation, absRoll);
+  */
   
-  Cesium.Matrix4.fromRotationTranslation(orientation, gpos, this.model.modelMatrix);
+  Cesium.Cartesian3.negate(right, right);
+  var rotation = new Cesium.Matrix3();
+  Cesium.Matrix3.setColumn(rotation, 0, dir, rotation);
+  Cesium.Matrix3.setColumn(rotation, 1, right, rotation);
+  Cesium.Matrix3.setColumn(rotation, 2, up, rotation);
+  
+  Cesium.Matrix4.fromRotationTranslation(rotation, gpos, this.model.modelMatrix);
 
   /*
 	 * var latLonBox = me.shadow.getLatLonBox(); var radius = .00005;
@@ -455,9 +479,9 @@ Truck.prototype.tick = function() {
 	 * latLonBox.setRotation(-newhtr[0]);
 	 */
 
-  this.tickPopups(dt);
+  //this.tickPopups(dt);
   
-  this.cameraFollow(dt);
+  //this.cameraFollow(dt);
 };
 
 // TODO: would be nice to have globe.getGroundNormal() in the API.
@@ -629,7 +653,7 @@ Truck.prototype.teleportTo = function(lon, lat, heading) {
 	var location = this.ellipsoid.cartographicToCartesian(cart);
 	heading = Cesium.defaultValue(heading, 0.0);
 	
-	this.model.modelMatrix = Cesium.Transforms.fromHeadingPitchRollToFixedFrame(location, heading, 0.0, 0.0);
+	this.model.modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(location, heading, 0.0, 0.0);
 	
 	var camera = this.scene.camera;
 	camera.transform = this.model.modelMatrix;

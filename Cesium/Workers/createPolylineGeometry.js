@@ -1,7 +1,7 @@
 /**
  * Cesium - https://github.com/AnalyticalGraphicsInc/cesium
  *
- * Copyright 2011-2014 Cesium Contributors
+ * Copyright 2011-2015 Cesium Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -9294,6 +9294,53 @@ define('Core/BoundingSphere',[
         return result;
     };
 
+    var fromBoundingSpheresScratch = new Cartesian3();
+
+    /**
+     * Computes a tight-fitting bounding sphere enclosing the provided array of bounding spheres.
+     *
+     * @param {BoundingSphere[]} boundingSpheres The array of bounding spheres.
+     * @param {BoundingSphere} [result] The object onto which to store the result.
+     * @returns {BoundingSphere} The modified result parameter or a new BoundingSphere instance if none was provided.
+     */
+    BoundingSphere.fromBoundingSpheres = function(boundingSpheres, result) {
+        if (!defined(result)) {
+            result = new BoundingSphere();
+        }
+
+        if (!defined(boundingSpheres) || boundingSpheres.length === 0) {
+            result.center = Cartesian3.clone(Cartesian3.ZERO, result.center);
+            result.radius = 0.0;
+            return result;
+        }
+
+        var length = boundingSpheres.length;
+        if (length === 1) {
+            return BoundingSphere.clone(boundingSpheres[0], result);
+        }
+
+        if (length === 2) {
+            return BoundingSphere.union(boundingSpheres[0], boundingSpheres[1], result);
+        }
+
+        var positions = [];
+        for (var i = 0; i < length; i++) {
+            positions.push(boundingSpheres[i].center);
+        }
+
+        result = BoundingSphere.fromPoints(positions, result);
+
+        var center = result.center;
+        var radius = result.radius;
+        for (i = 0; i < length; i++) {
+            var tmp = boundingSpheres[i];
+            radius = Math.max(radius, Cartesian3.distance(center, tmp.center, fromBoundingSpheresScratch) + tmp.radius);
+        }
+        result.radius = radius;
+
+        return result;
+    };
+
     /**
      * Duplicates a BoundingSphere instance.
      *
@@ -13275,10 +13322,10 @@ define('Core/EllipsoidGeodesic',[
         vincentyInverseFormula(ellipsoidGeodesic, ellipsoid.maximumRadius, ellipsoid.minimumRadius,
                                start.longitude, start.latitude, end.longitude, end.latitude);
 
-        start.height = 0;
-        end.height = 0;
         ellipsoidGeodesic._start = Cartographic.clone(start, ellipsoidGeodesic._start);
         ellipsoidGeodesic._end = Cartographic.clone(end, ellipsoidGeodesic._end);
+        ellipsoidGeodesic._start.height = 0;
+        ellipsoidGeodesic._end.height = 0;
 
         setConstants(ellipsoidGeodesic);
     }
@@ -16209,10 +16256,7 @@ define('Core/PolylineGeometry',[
      * Computes the geometric representation of a polyline, including its vertices, indices, and a bounding sphere.
      *
      * @param {PolylineGeometry} polylineGeometry A description of the polyline.
-     * @returns {Geometry} The computed vertices and indices.
-     *
-     * @exception {DeveloperError} At least two unique positions are required.
-     *
+     * @returns {Geometry|undefined} The computed vertices and indices.
      */
     PolylineGeometry.createGeometry = function(polylineGeometry) {
         var width = polylineGeometry._width;
@@ -16233,12 +16277,12 @@ define('Core/PolylineGeometry',[
         if (!defined(positions)) {
             positions = polylineGeometry._positions;
         }
-        var positionsLength = positions.length;
 
-                if (positionsLength < 2) {
-            throw new DeveloperError('At least two unique positions are required.');
+        var positionsLength = positions.length;
+        if (positionsLength < 2) {
+            return undefined;
         }
-        
+
         if (followSurface) {
             var heights = PolylinePipeline.extractHeights(positions, ellipsoid);
 
