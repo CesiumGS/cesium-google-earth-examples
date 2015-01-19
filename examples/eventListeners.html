@@ -48,10 +48,9 @@ limitations under the License.
 var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
 function action (click) {
     var pickedObject = scene.pick(click.position);
-    if (Cesium.defined(pickedObject) && (pickedObject.primitive === pin)) {
+    if (Cesium.defined(pickedObject) && (pickedObject.id === pinEntity)) {
         alert('Pin Clicked!');
     }
-    
 }
 function enable(){
     handler.setInputAction(action, Cesium.ScreenSpaceEventType.LEFT_CLICK);
@@ -98,26 +97,27 @@ function myEventHandler(event) {
   </div>
 
   <script>
-    var viewer = new Cesium.Viewer('cesiumContainer');
+    var viewer = new Cesium.Viewer('cesiumContainer', {
+        infoBox: false,
+        selectionIndicator: false
+    });
     var scene = viewer.scene;
     var camera = viewer.camera;
     var pinBuilder = new Cesium.PinBuilder();
-    var billboards = scene.primitives.add(new Cesium.BillboardCollection());
-    var position = Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude);
-        
-    var pin = billboards.add({
-        image : pinBuilder.fromColor(Cesium.Color.SALMON, 48),
-        verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
-        position : position
+    var pinEntity = viewer.entities.add({
+        position : Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude),
+        billboard : {
+            image : pinBuilder.fromColor(Cesium.Color.SALMON, 48),
+            verticalOrigin : Cesium.VerticalOrigin.BOTTOM
+        }
     });
     
     var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
     function action (click) {
         var pickedObject = scene.pick(click.position);
-        if (Cesium.defined(pickedObject) && (pickedObject.primitive === pin)) {
+        if (Cesium.defined(pickedObject) && (pickedObject.id === pinEntity)) {
             alert('Pin Clicked!');
         }
-        
     }
     function enable(){
         handler.setInputAction(action, Cesium.ScreenSpaceEventType.LEFT_CLICK);
