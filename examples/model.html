@@ -41,21 +41,15 @@ limitations under the License.
   </div>
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-var position = Cesium.Ellipsoid.WGS84.scaleToGeodeticSurface(camera.position);
-var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(position);
-var model = scene.primitives.add(Cesium.Model.fromGltf({
-    url : './static/Cesium_Man.gltf',
-    modelMatrix : modelMatrix,
-    scale : 10.0
-}));
-
-model.readyToRender.addEventListener(function(model) {
-    // Zoom to model
-    var center = Cesium.Matrix4.multiplyByPoint(model.modelMatrix, model.boundingSphere.center, new Cesium.Cartesian3());
-    camera.transform = Cesium.Transforms.eastNorthUpToFixedFrame(center);
-    var r = 5.0 * Math.max(model.boundingSphere.radius, camera.frustum.near);
-    camera.lookAt(new Cesium.Cartesian3(r, r, r), Cesium.Cartesian3.ZERO, Cesium.Cartesian3.UNIT_Z);
+var entity = viewer.entities.add({
+    position : Cesium.Cartesian3.fromDegrees(-100, 40),
+    model : {
+        uri : './static/Cesium_Man.gltf',
+        scale : 10
+    },
+    viewFrom : new Cesium.Cartesian3(30, 30, 30)
 });
+viewer.trackedEntity = entity;
 </pre></div>
     
   <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
@@ -94,25 +88,17 @@ ge.getView().setAbstractView(la);
 
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
-    var scene = viewer.scene;
-    var camera = viewer.camera;
 
-    var position = Cesium.Ellipsoid.WGS84.scaleToGeodeticSurface(camera.position);
-    var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(position);
-    var model = scene.primitives.add(Cesium.Model.fromGltf({
-        url : './static/Cesium_Man.gltf',
-        modelMatrix : modelMatrix,
-        scale : 10
-    }));
-
-    model.readyToRender.addEventListener(function(model) {
-        // Zoom to model
-        var center = Cesium.Matrix4.multiplyByPoint(model.modelMatrix, model.boundingSphere.center, new Cesium.Cartesian3());
-        camera.transform = Cesium.Transforms.eastNorthUpToFixedFrame(center);
-        var r = 5.0 * Math.max(model.boundingSphere.radius, camera.frustum.near);
-        camera.lookAt(new Cesium.Cartesian3(r, r, r), Cesium.Cartesian3.ZERO, Cesium.Cartesian3.UNIT_Z);
+    var entity = viewer.entities.add({
+        position : Cesium.Cartesian3.fromDegrees(-100, 40),
+        model : {
+            uri : './static/Cesium_Man.gltf',
+            scale : 10
+        },
+        viewFrom : new Cesium.Cartesian3(30, 30, 30)
     });
-
+    viewer.trackedEntity = entity;
+    
     // Comparable Google Earth API code:
     //
     // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/model.html
