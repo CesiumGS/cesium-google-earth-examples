@@ -58,8 +58,7 @@ var positions = Cesium.Cartesian3.fromDegreesArray([
 
 var entity = viewer.entities.add({
     polyline : {
-        positions : positions,
-        material : new Cesium.ColorMaterialProperty(Cesium.Color.WHITE)
+        positions : positions
     }
 });
 </pre></div>
@@ -129,8 +128,7 @@ ge.getFeatures().appendChild(lineStringPlacemark);
     
     var entity = viewer.entities.add({
         polyline : {
-            positions : positions,
-            material : new Cesium.ColorMaterialProperty(Cesium.Color.WHITE)
+            positions : positions
         }
     });
 
