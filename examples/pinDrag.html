@@ -46,8 +46,8 @@ var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
 handler.setInputAction(
     function (click) {
         var pickedObject = scene.pick(click.position);
-        if (Cesium.defined(pickedObject) && (pickedObject.primitive === pin)) {
-            pin.scale = 1.2;
+        if (Cesium.defined(pickedObject) && (pickedObject.id === entity)) {
+            entity.billboard.scale = 1.2;
             dragging = true;
             scene.screenSpaceCameraController.enableRotate = false;
         }
@@ -55,20 +55,18 @@ handler.setInputAction(
     Cesium.ScreenSpaceEventType.LEFT_DOWN
 );
 
-var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
 handler.setInputAction(
     function (movement) {
         if (dragging) {
-            pin.position = viewer.camera.pickEllipsoid(movement.endPosition);
+            entity.position = camera.pickEllipsoid(movement.endPosition);
         }
     },
     Cesium.ScreenSpaceEventType.MOUSE_MOVE
 );
 
-handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
 handler.setInputAction(
     function () {
-        pin.scale = 1;
+        entity.billboard.scale = 1;
         dragging = false;
         scene.screenSpaceCameraController.enableRotate = true;
     },
@@ -126,18 +124,21 @@ google.earth.addEventListener(ge.getWindow(), 'mouseup', function(event) {
   </div>
 
   <script>
-    var viewer = new Cesium.Viewer('cesiumContainer');
+    var viewer = new Cesium.Viewer('cesiumContainer', {
+        infoBox: false,
+        selectionIndicator: false
+    });
     var scene = viewer.scene;
     var camera = viewer.camera;
     
     var pinBuilder = new Cesium.PinBuilder();
-    var billboards = scene.primitives.add(new Cesium.BillboardCollection());
     var position = Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude);
-        
-    var pin = billboards.add({
-        image : pinBuilder.fromColor(Cesium.Color.SALMON, 48),
-        verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
-        position : position
+    var entity = viewer.entities.add({
+        position : position,
+        billboard : {
+            image : pinBuilder.fromColor(Cesium.Color.SALMON, 48),
+            verticalOrigin : Cesium.VerticalOrigin.BOTTOM
+        }
     });
     
     var dragging = false;
@@ -145,8 +146,8 @@ google.earth.addEventListener(ge.getWindow(), 'mouseup', function(event) {
     handler.setInputAction(
         function (click) {
             var pickedObject = scene.pick(click.position);
-            if (Cesium.defined(pickedObject) && (pickedObject.primitive === pin)) {
-                pin.scale = 1.2;
+            if (Cesium.defined(pickedObject) && (pickedObject.id === entity)) {
+                entity.billboard.scale = 1.2;
                 dragging = true;
                 scene.screenSpaceCameraController.enableRotate = false;
             }
@@ -154,20 +155,18 @@ google.earth.addEventListener(ge.getWindow(), 'mouseup', function(event) {
         Cesium.ScreenSpaceEventType.LEFT_DOWN
     );
     
-    var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
     handler.setInputAction(
         function (movement) {
             if (dragging) {
-                pin.position = camera.pickEllipsoid(movement.endPosition);
+                entity.position = camera.pickEllipsoid(movement.endPosition);
             }
         },
         Cesium.ScreenSpaceEventType.MOUSE_MOVE
     );
     
-    handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
     handler.setInputAction(
         function () {
-            pin.scale = 1;
+            entity.billboard.scale = 1;
             dragging = false;
             scene.screenSpaceCameraController.enableRotate = true;
         },
