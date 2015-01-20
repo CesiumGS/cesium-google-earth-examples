@@ -44,9 +44,7 @@ limitations under the License.
 var pinBuilder = new Cesium.PinBuilder();
 var pin;
 function addPin(id, position){
-    if (Cesium.defined(pin)){
-        viewer.entities.remove(pin)
-    }
+    viewer.entities.remove(pin)
     pin = viewer.entities.add({
         position : position,
         billboard : {
@@ -136,10 +134,10 @@ function makePlacemark(lat, lng, alt, altMode, iconStr) {
   </div>
 
   <script>
-  var viewer = new Cesium.Viewer('cesiumContainer', {
-      selectionIndicator : false,
-      infoBox : false
-  });
+    var viewer = new Cesium.Viewer('cesiumContainer', {
+        selectionIndicator : false,
+        infoBox : false
+    });
 
     var scene = viewer.scene;
     var camera = viewer.camera;
@@ -153,7 +151,6 @@ function makePlacemark(lat, lng, alt, altMode, iconStr) {
         },
         id: 'R'
     });
-
     viewer.entities.add({
         position : Cesium.Cartesian3.fromDegrees(lon - 0.005, lat + 0.003),
         model : {
@@ -162,13 +159,12 @@ function makePlacemark(lat, lng, alt, altMode, iconStr) {
         },
         id: 'A'
     });
+    viewer.flyTo(viewer.entities);
     
     var pinBuilder = new Cesium.PinBuilder();
     var pin;
     function addPin(id, position){
-        if (Cesium.defined(pin)){
-            viewer.entities.remove(pin)
-        }
+        viewer.entities.remove(pin)
         pin = viewer.entities.add({
             position : position,
             billboard : {
@@ -188,8 +184,6 @@ function makePlacemark(lat, lng, alt, altMode, iconStr) {
             addPin('G', camera.pickEllipsoid(click.position));
         }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-
-    camera.setPositionCartographic(Cesium.Cartographic.fromDegrees(lon, lat, 1500));
 
     // Comparable Google Earth API code:
     //
