@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->  
+  <title>Draw</title>
+  <script src="../../Cesium/Cesium.js"></script>
+  <style>
+    @import url(../../Cesium/Widgets/widgets.css);
+    html, body, #cesiumContainer {
+        width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+  var viewer = new Cesium.Viewer('cesiumContainer');
+  var color;
+  var camera = viewer.camera;
+  var polyline;
+  var drawing = false;
+  var positions = [];
+  var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+  handler.setInputAction(
+      function (click) {
+          if (drawing) {
+              color.alpha = 0.6;
+              viewer.entities.add({
+                  polygon: {
+                      hierarchy : {
+                          positions : positions
+                      },
+                      material : color,
+                      outline : true
+                  }
+              });
+              viewer.entities.remove(polyline);
+              positions = [];
+          } else {
+              color = Cesium.Color.fromRandom({alpha : 1.0});
+              polyline = viewer.entities.add({
+                  polyline : {
+                    positions : [],
+                    material : color
+                  }
+              });
+          }
+          drawing = !drawing;
+      },
+      Cesium.ScreenSpaceEventType.LEFT_CLICK
+  );
+  
+  handler.setInputAction(
+      function (movement) {
+          if (drawing) {
+              positions.push(camera.pickEllipsoid(movement.endPosition));
+              polyline.polyline.positions = positions;
+          }
+      },
+      Cesium.ScreenSpaceEventType.MOUSE_MOVE
+  );
+  
+  camera.flyTo({destination: Cesium.Cartesian3.fromDegrees(-100, 40, 10000)});
+  
+    // Comparable Google Earth API code:
+    //
+    // https://code.google.com/p/earth-api-samples/source/browse/trunk/demos/draw/index.html
+
+  </script>
+</body>
+</html>
