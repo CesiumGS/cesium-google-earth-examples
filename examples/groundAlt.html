@@ -48,24 +48,15 @@ limitations under the License.
   </div>
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-function insideCanvas(point){
-    var rectangle = viewer.canvas.getBoundingClientRect();
-    return (point.x >= 0 &&
-            point.x <= rectangle.width &&
-            point.y >= 0 &&
-            point.y <= rectangle.height);
-}
-var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas, false);
 handler.setInputAction(
     function (movement) {
-        if (insideCanvas(movement.endPosition)){
-            var ray = viewer.camera.getPickRay(movement.endPosition);
-            var position = viewer.scene.globe.pick(ray, viewer.scene);
-            if (Cesium.defined(position)) {
-                var positionCartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-                var span = document.getElementById('altData');
-                span.textContent = positionCartographic.height.toFixed(2);
-            }
+        var ray = viewer.camera.getPickRay(movement.endPosition);
+        var position = viewer.scene.globe.pick(ray, viewer.scene);
+        if (Cesium.defined(position)) {
+            var positionCartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
+            var span = document.getElementById('altData');
+            span.textContent = positionCartographic.height.toFixed(2);
         }
     },
     Cesium.ScreenSpaceEventType.MOUSE_MOVE
@@ -112,24 +103,15 @@ google.earth.addEventListener(ge.getWindow(), 'mousemove', function(event) {
     });
     viewer.terrainProvider = cesiumTerrainProviderMeshes;
 
-    function insideCanvas(point){
-        var rectangle = viewer.canvas.getBoundingClientRect();
-        return (point.x >= 0 &&
-                point.x <= rectangle.width &&
-                point.y >= 0 &&
-                point.y <= rectangle.height);
-    }
-    var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+    var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas, false);
     handler.setInputAction(
         function (movement) {
-            if (insideCanvas(movement.endPosition)){
-                var ray = viewer.camera.getPickRay(movement.endPosition);
-                var position = viewer.scene.globe.pick(ray, viewer.scene);
-                if (Cesium.defined(position)) {
-                    var positionCartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-                    var span = document.getElementById('altData');
-                    span.textContent = positionCartographic.height.toFixed(2);
-                }
+            var ray = viewer.camera.getPickRay(movement.endPosition);
+            var position = viewer.scene.globe.pick(ray, viewer.scene);
+            if (Cesium.defined(position)) {
+                var positionCartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
+                var span = document.getElementById('altData');
+                span.textContent = positionCartographic.height.toFixed(2);
             }
         },
         Cesium.ScreenSpaceEventType.MOUSE_MOVE
