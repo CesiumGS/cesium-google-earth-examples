@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->  
+<head>
+  <title>Hit-Testing</title>
+
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
+
+  <script src="../Cesium/Cesium.js"></script>
+  <style>
+    @import url(../Cesium/Widgets/widgets.css);
+  </style>
+  
+</head>
+<body onload="if(window.prettyPrint)prettyPrint();">
+  <h1>Cesium Examples - Hit-Testing</h1>
+  <div id="page">
+  <div id="preview">
+  <div id="cesiumContainer"></div>
+  </div>
+  <div id="source">
+  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+var pinBuilder = new Cesium.PinBuilder();
+var pin;
+function addPin(id, position){
+    viewer.entities.remove(pin)
+    pin = viewer.entities.add({
+        position : position,
+        billboard : {
+            image : pinBuilder.fromText(id, Cesium.Color.SALMON, 48).toDataURL(),
+            verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+            eyeOffset : new Cesium.Cartesian3(0, 0, -1000)
+        }
+    });
+}
+
+var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+handler.setInputAction(function (click) {
+    var pickedObject = scene.pick(click.position);
+    if (Cesium.defined(pickedObject)) {
+        addPin(pickedObject.id.id, camera.pickEllipsoid(click.position));
+    } else {
+        addPin('G', camera.pickEllipsoid(click.position));
+    }
+}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+</pre></div>
+    
+  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+ge.getLayerRoot().enableLayerById(ge.LAYER_TERRAIN, true);
+ge.getLayerRoot().enableLayerById(ge.LAYER_BUILDINGS, true);
+
+google.earth.addEventListener(ge.getGlobe(), 'click', function(evt) {
+  if (evt.getButton() != 0)
+    return;
+  
+  // remove old placemarks
+  if (globePlacemark)
+    ge.getFeatures().removeChild(globePlacemark);  
+  if (terrainPlacemark)
+    ge.getFeatures().removeChild(terrainPlacemark);
+  if (buildingsPlacemark)
+    ge.getFeatures().removeChild(buildingsPlacemark);
+  
+  // hit test and create new placemarks
+  var hitTestResult = ge.getView().hitTest(evt.getClientX(), ge.UNITS_PIXELS, evt.getClientY(), ge.UNITS_PIXELS, ge.HIT_TEST_GLOBE);
+  if (hitTestResult) {
+    globePlacemark = makePlacemark(hitTestResult.getLatitude(), hitTestResult.getLongitude(),
+        hitTestResult.getAltitude(), ge.ALTITUDE_ABSOLUTE, 'G');
+    ge.getFeatures().appendChild(globePlacemark);
+  }
+  
+  hitTestResult = ge.getView().hitTest(evt.getClientX(), ge.UNITS_PIXELS, evt.getClientY(), ge.UNITS_PIXELS, ge.HIT_TEST_TERRAIN);
+  if (hitTestResult) {
+    terrainPlacemark = makePlacemark(hitTestResult.getLatitude(), hitTestResult.getLongitude(),
+        hitTestResult.getAltitude(), ge.ALTITUDE_ABSOLUTE, 'T');
+    ge.getFeatures().appendChild(terrainPlacemark);
+  }
+  
+  hitTestResult = ge.getView().hitTest(evt.getClientX(), ge.UNITS_PIXELS, evt.getClientY(), ge.UNITS_PIXELS, ge.HIT_TEST_BUILDINGS);
+  if (hitTestResult) {
+    buildingsPlacemark = makePlacemark(hitTestResult.getLatitude(), hitTestResult.getLongitude(),
+        hitTestResult.getAltitude(), ge.ALTITUDE_ABSOLUTE, 'B');
+    ge.getFeatures().appendChild(buildingsPlacemark);
+  }
+});
+
+function makePlacemark(lat, lng, alt, altMode, iconStr) {  
+  var icon = ge.createIcon('');
+  icon.setHref('http://maps.google.com/mapfiles/kml/paddle/' + iconStr + '.png');
+  
+  var style = ge.createStyle('');
+  style.getIconStyle().setIcon(icon);
+  style.getIconStyle().getHotSpot().set(0.5, ge.UNITS_FRACTION, 0, ge.UNITS_FRACTION);
+  
+  var pt = ge.createPoint('');
+  pt.set(lat, lng, alt, altMode, false, false);
+  
+  var pm = ge.createPlacemark('');
+  pm.setGeometry(pt);
+  pm.setStyleSelector(style);
+  
+  return pm;
+}
+  </pre></div>
+  </div>
+  <div id="resources">
+  <h2>Resources:</h2>
+  <ul>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/ScreenSpaceEventHandler.html" target="_blank" >ScreenSpaceEventHandler</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/PinBuilder.html" target="_blank" >PinBuilder</a> class in Cesium</li>
+  </ul>
+  </div>
+  </div>
+
+  <script>
+    var viewer = new Cesium.Viewer('cesiumContainer', {
+        selectionIndicator : false,
+        infoBox : false
+    });
+
+    var scene = viewer.scene;
+    var camera = viewer.camera;
+    var lat = 40;
+    var lon = -100;
+    
+    viewer.entities.add({
+        rectangle : {
+            coordinates : Cesium.Rectangle.fromDegrees(lon + .001, lat - .003, lon + .005, lat - .001),
+            material : './static/Cesium_Logo_Color.jpg',
+        },
+        id: 'R'
+    });
+    viewer.entities.add({
+        position : Cesium.Cartesian3.fromDegrees(lon - 0.005, lat + 0.003),
+        model : {
+            uri : './static/Cesium_Air.gltf',
+            scale : 10
+        },
+        id: 'A'
+    });
+    viewer.flyTo(viewer.entities);
+    
+    var pinBuilder = new Cesium.PinBuilder();
+    var pin;
+    function addPin(id, position){
+        viewer.entities.remove(pin)
+        pin = viewer.entities.add({
+            position : position,
+            billboard : {
+                image : pinBuilder.fromText(id, Cesium.Color.SALMON, 48).toDataURL(),
+                verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+                eyeOffset : new Cesium.Cartesian3(0, 0, -1000)
+            }
+        });
+    }
+    
+    var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+    handler.setInputAction(function (click) {
+        var pickedObject = scene.pick(click.position);
+        if (Cesium.defined(pickedObject)) {
+            addPin(pickedObject.id.id, camera.pickEllipsoid(click.position));
+        } else {
+            addPin('G', camera.pickEllipsoid(click.position));
+        }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+    // Comparable Google Earth API code:
+    //
+    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/hittest.html
+  </script>
+</body>
+</html>

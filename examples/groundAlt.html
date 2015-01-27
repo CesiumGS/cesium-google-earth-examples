@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->  
+<head>
+  <title>Retrieving Ground Altitude Data</title>
+
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <style type="text/css">@import "static/examples.css";</style>
+  <style type="text/css">@import "static/prettify/prettify.css";</style>
+  <script type="text/javascript" src="static/prettify/prettify.js"></script>
+
+  <script src="../Cesium/Cesium.js"></script>
+  <style>
+    @import url(../Cesium/Widgets/widgets.css);
+    #altContainer {
+        background-color: white;
+        padding: 3px;
+    }
+  </style>
+  
+</head>
+<body onload="if(window.prettyPrint)prettyPrint();">
+  <h1>Cesium Examples - Retrieving Ground Altitude Data</h1>
+  <div id="page">
+  <div id="preview">
+  <div id="buttonContainer">
+    <div id="altContainer"><label>Altitude: </label><span id="altData">0</span><span> meters</span></div>
+  </div>
+  <div id="cesiumContainer"></div>
+  </div>
+  <div id="source">
+  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas, false);
+handler.setInputAction(
+    function (movement) {
+        var ray = viewer.camera.getPickRay(movement.endPosition);
+        var position = viewer.scene.globe.pick(ray, viewer.scene);
+        if (Cesium.defined(position)) {
+            var positionCartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
+            var span = document.getElementById('altData');
+            span.textContent = positionCartographic.height.toFixed(2);
+        }
+    },
+    Cesium.ScreenSpaceEventType.MOUSE_MOVE
+);
+</pre></div>
+    
+  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+ge.getLayerRoot().enableLayerById(ge.LAYER_TERRAIN, true);
+
+// listen to the click event on the globe and window
+google.earth.addEventListener(ge.getWindow(), 'mousemove', function(event) {
+  var statusHTML = 'N/A';
+  if (event.getDidHitGlobe()) {
+    var latitude = event.getLatitude();
+    var longitude = event.getLongitude();
+    
+    var groundAltitude = ge.getGlobe().getGroundAltitude(latitude, longitude);
+    if (groundAltitude) {
+      statusHTML = '<span style="color:#000; font-weight:bold;">' +
+          groundAltitude.toFixed(2) + ' meters</span>';
+    }
+  }
+  
+  document.getElementById('ground-altitude').innerHTML = statusHTML;
+});
+  </pre></div>
+  </div>
+  <div id="resources">
+  <h2>Resources:</h2>
+  <ul>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/Camera.html#getPickRay" target="_blank" >Camera.getPickRay</a> </li>
+  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/Globe.html#pick" target="_blank" >Globe.pick</a> </li>
+  </ul>
+  </div>
+  </div>
+
+  <script>
+    var viewer = new Cesium.Viewer('cesiumContainer');
+    var scene = viewer.scene;
+    var globe = scene.globe;
+    globe.depthTestAgainstTerrain = true;
+    var cesiumTerrainProviderMeshes = new Cesium.CesiumTerrainProvider({
+        url : '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
+    });
+    viewer.terrainProvider = cesiumTerrainProviderMeshes;
+
+    var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas, false);
+    handler.setInputAction(
+        function (movement) {
+            var ray = viewer.camera.getPickRay(movement.endPosition);
+            var position = viewer.scene.globe.pick(ray, viewer.scene);
+            if (Cesium.defined(position)) {
+                var positionCartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
+                var span = document.getElementById('altData');
+                span.textContent = positionCartographic.height.toFixed(2);
+            }
+        },
+        Cesium.ScreenSpaceEventType.MOUSE_MOVE
+    );
+    
+    var camera = viewer.camera;
+    var up = new Cesium.Cartesian3(0.5750064471371926, -0.49317771760005985, 0.652796541514384);
+    camera.position = new Cesium.Cartesian3(-2502731.712225451, -4400808.7055832865, 3886464.808848288);
+    camera.direction = new Cesium.Cartesian3(0.799343276945862, 0.5087347504870063, -0.31974877521011524);
+    camera.right = Cesium.Cartesian3.normalize(Cesium.Cartesian3.cross(camera.direction, up, camera.right), camera.right);
+    camera.up = Cesium.Cartesian3.cross(camera.right, camera.direction, camera.up);
+
+    // Comparable Google Earth API code:
+    //
+    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/groundaltitude.html
+  </script>
+</body>
+</html>
