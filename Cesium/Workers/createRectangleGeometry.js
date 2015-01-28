@@ -22182,12 +22182,11 @@ define('Core/Quaternion',[
             throw new DeveloperError('roll is required.');
         }
         
-        var headingQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_Z, -heading, result);
-        var pitchQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_Y, -pitch, scratchHPRQuaternion);
-        result = Quaternion.multiply(headingQuaternion, pitchQuaternion, headingQuaternion);
-
         var rollQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_X, roll, scratchHPRQuaternion);
-        return Quaternion.multiply(rollQuaternion, result, result);
+        var pitchQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_Y, -pitch, result);
+        result = Quaternion.multiply(pitchQuaternion, rollQuaternion, pitchQuaternion);
+        var headingQuaternion = Quaternion.fromAxisAngle(Cartesian3.UNIT_Z, -heading, scratchHPRQuaternion);
+        return Quaternion.multiply(headingQuaternion, result, result);
     };
 
     var sampledQuaternionAxis = new Cartesian3();
@@ -23506,8 +23505,12 @@ define('Core/Transforms',[
      * @example
      * //Set the view to in the inertial frame.
      * scene.preRender.addEventListener(function(scene, time) {
-     *   var now = new Cesium.JulianDate();
-     *   viewer.camera.transform = Cesium.Matrix4.fromRotationTranslation(Cesium.Transforms.computeTemeToPseudoFixedMatrix(now));
+     *    var now = new Cesium.JulianDate();
+     *    var offset = Cesium.Matrix4.multiplyByPoint(camera.transform, camera.position, new Cesium.Cartesian3());
+     *    var transform = Cesium.Matrix4.fromRotationTranslation(Cesium.Transforms.computeTemeToPseudoFixedMatrix(now));
+     *    var inverseTransform = Cesium.Matrix4.inverseTransformation(transform, new Cesium.Matrix4());
+     *    Cesium.Matrix4.multiplyByPoint(inverseTransform, offset, offset);
+     *    camera.lookAtTransform(transform, offset);
      * });
      */
     Transforms.computeTemeToPseudoFixedMatrix = function (date, result) {
@@ -23634,7 +23637,11 @@ define('Core/Transforms',[
      * scene.preRender.addEventListener(function(scene, time) {
      *   var icrfToFixed = Cesium.Transforms.computeIcrfToFixedMatrix(time);
      *   if (Cesium.defined(icrfToFixed)) {
-     *     viewer.camera.transform = Cesium.Matrix4.fromRotationTranslation(icrfToFixed);
+     *     var offset = Cesium.Matrix4.multiplyByPoint(camera.transform, camera.position, new Cesium.Cartesian3());
+     *     var transform = Cesium.Matrix4.fromRotationTranslation(icrfToFixed)
+     *     var inverseTransform = Cesium.Matrix4.inverseTransformation(transform, new Cesium.Matrix4());
+     *     Cesium.Matrix4.multiplyByPoint(inverseTransform, offset, offset);
+     *     camera.lookAtTransform(transform, offset);
      *   }
      * });
      */
