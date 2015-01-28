@@ -181,9 +181,7 @@ function Truck(scene) {
 		 */
 
 	  // google.earth.addEventListener(ge, "frameend", function() { me.tick(); });
-	  that.scene.postRender.addEventListener(function() { that.tick(); });
-
-	  that.cameraCut();
+	  //that.scene.postRender.addEventListener(function() { that.tick(); });
 
 	  /*
 		 * // Make sure keyboard focus starts out on the page.
@@ -591,29 +589,6 @@ Truck.prototype.scheduleTick = function() {
 	}
 };
 
-// Cut the camera to look at me.
-Truck.prototype.cameraCut = function() {
-	var camera = this.scene.camera;
-	var heading = fixAngle(180 + Cesium.Math.toDegrees(getHeading(this.model.modelMatrix, this.ellipsoid)) + 45);
-	
-	Cesium.Cartesian3.clone(Cesium.Cartesian3.ZERO, camera.position);
-	
-	camera.setView({
-		heading : heading
-	});
-	
-	var offset = Cesium.Cartesian3.clone(camera.direction);
-	Cesium.Cartesian3.multiplyByScalar(offset, -50.0, offset);
-	Cesium.Cartesian3.add(camera.position, offset, camera.position);
-	
-	Cesium.Cartesian3.multiplyByScalar(camera.up, 10.0, offset);
-	Cesium.Cartesian3.add(camera.position, offset, camera.position);
-	
-	camera.setView({
-	    pitch : -Cesium.Math.toRadians(80.0)
-	});
-};
-
 Truck.prototype.cameraFollow = function(dt) {
   var c0 = Math.exp(-dt / 0.5);
   var c1 = 1 - c0;
@@ -646,23 +621,22 @@ Truck.prototype.cameraFollow = function(dt) {
 // heading is optional.
 Truck.prototype.teleportTo = function(lon, lat, heading) {
 	var cart = Cesium.Cartographic.fromDegrees(lon, lat);
-	cart.height = 0.0;
 	
 	//cart.height = this.scene.globe.getHeight(cart); // TODO
 	
 	var location = this.ellipsoid.cartographicToCartesian(cart);
-	heading = Cesium.defaultValue(heading, 0.0);
+	heading = Cesium.Math.toRadians(Cesium.defaultValue(heading, 0.0));
 	
 	this.model.modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(location, heading, 0.0, 0.0);
 	
-	var camera = this.scene.camera;
-	camera.transform = this.model.modelMatrix;
+	heading = Cesium.Math.negativePiToPi(Cesium.Math.PI + heading + Cesium.Math.PI_OVER_FOUR);
+	var pitch = -Cesium.Math.toRadians(10.0);
+	var range = 50.0;
+	this.scene.camera.lookAtTransform(this.model.modelMatrix, new Cesium.HeadingPitchRange(heading, pitch, range));
 	
 	Cesium.Cartesian3.clone(Cesium.Cartesian3.ZERO, this.vel);
 	Cesium.Cartographic.fromDegrees(lat, lon, 0.0, this.localAnchorLla);
 	this.ellipsoid.cartographicToCartesian(this.localAnchorLla, this.localAnchorCartesian);
-
-	this.cameraCut();
 
 	// make sure to not start airborne
 	/*
@@ -677,14 +651,3 @@ Truck.prototype.teleportTo = function(lon, lat, heading) {
 	}
 	*/
 };
-
-// Keep an angle in [-180,180]
-function fixAngle(a) {
-  while (a < -180) {
-    a += 360;
-  }
-  while (a > 180) {
-    a -= 360;
-  }
-  return a;
-}
