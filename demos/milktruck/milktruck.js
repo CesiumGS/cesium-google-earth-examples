@@ -82,13 +82,23 @@ function makeOrthonormalFrame(matrix, dir, up) {
 
 function getHeading(matrix, ellipsoid) {
 	var position = Cesium.Matrix4.getTranslation(matrix, new Cesium.Cartesian3());
-	var toFixedFrame = Cesium.Transforms.eastNorthUpToFixedFrame(position, ellipsoid, new Cesium.Matrix4());
-    var transform = Cesium.Matrix4.getRotation(toFixedFrame, new Cesium.Matrix3());
+    var transform = Cesium.Transforms.eastNorthUpToFixedFrame(position, ellipsoid);
     Cesium.Matrix3.transpose(transform, transform);
-
+    
     var right = Cesium.Matrix3.getColumn(matrix, 0, new Cesium.Cartesian3());
+    var direction = Cesium.Matrix3.getColumn(matrix, 1, new Cesium.Cartesian3());
+    
     Cesium.Matrix3.multiplyByVector(transform, right, right);
-    return Math.atan2(right.y, right.x);
+    Cesium.Matrix3.multiplyByVector(transform, direction, direction);
+
+    var heading;
+    if (Math.abs(direction.z) < Math.abs(right.z)) {
+        heading = Math.atan2(direction.y, direction.x) - Cesium.Math.PI_OVER_TWO;
+    } else {
+        heading = Math.atan2(right.y, right.x);
+    }
+
+    return Cesium.Math.TWO_PI - Cesium.Math.zeroToTwoPi(heading);
 }
 
 // TODO
@@ -181,7 +191,7 @@ function Truck(scene) {
 		 */
 
 	  // google.earth.addEventListener(ge, "frameend", function() { me.tick(); });
-	  //that.scene.postRender.addEventListener(function() { that.tick(); });
+	  that.scene.postRender.addEventListener(function() { that.tick(); });
 
 	  /*
 		 * // Make sure keyboard focus starts out on the page.
@@ -257,6 +267,9 @@ Truck.prototype.tick = function() {
     dt = 0.25;
   }
   this.lastMillis = now;
+  
+  this.cameraFollow(dt);
+  return;
 
   var c0 = 1;
   var c1 = 0;
@@ -589,33 +602,22 @@ Truck.prototype.scheduleTick = function() {
 	}
 };
 
+var PITCH = -Cesium.Math.toRadians(10.0);
+var RANGE = Cesium.Cartesian3.magnitude(new Cesium.Cartesian3(TRAILING_DISTANCE, 0.0, CAM_HEIGHT));
+
 Truck.prototype.cameraFollow = function(dt) {
+  var camera = this.scene.camera;
+  var camHeading = camera.heading - Cesium.Math.PI_OVER_TWO;
+  var truckHeading = getHeading(this.model.modelMatrix, this.ellipsoid);
+  
   var c0 = Math.exp(-dt / 0.5);
   var c1 = 1 - c0;
-
-  var camera = this.scene.camera;
-
-  var truckHeading = Cesium.Math.toDegrees(getHeading(this.model.modelMatrix, this.ellipsoid));
-  var camHeading = Cesium.Math.toDegrees(camera.heading);
   
-  var deltaHeading = fixAngle(truckHeading - camHeading);
+  var deltaHeading = truckHeading - camHeading;
   var heading = camHeading + c1 * deltaHeading;
-  heading = fixAngle(heading);
+  heading = Cesium.Math.zeroToTwoPi(heading);
   
-  Cesium.Cartesian3.clone(Cesium.Cartesian3.ZERO, camera.position);
-  camera.setView({
-	  heading : Cesium.Math.toRadians(heading),
-	  pitch : 0.0,
-	  roll : 0.0
-  });
-  
-  var offsetUp = Cesium.Cartesian3.multiplyByScalar(camera.up, CAM_HEIGHT, new Cesium.Cartesian3());
-  Cesium.Cartesian3.multiplyByScalar(camera.direction, -TRAILING_DISTANCE, camera.position);
-  Cesium.Cartesian3.add(camera.position, offsetUp, camera.position);
-  
-  camera.setView({
-	  pitch : -Cesium.Math.toRadians(80.0)
-  });
+  camera.lookAtTransform(this.model.modelMatrix, new Cesium.HeadingPitchRange(heading, PITCH, RANGE));
 };
 
 // heading is optional.
@@ -629,10 +631,8 @@ Truck.prototype.teleportTo = function(lon, lat, heading) {
 	
 	this.model.modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(location, heading, 0.0, 0.0);
 	
-	heading = Cesium.Math.negativePiToPi(Cesium.Math.PI + heading + Cesium.Math.PI_OVER_FOUR);
-	var pitch = -Cesium.Math.toRadians(10.0);
-	var range = 50.0;
-	this.scene.camera.lookAtTransform(this.model.modelMatrix, new Cesium.HeadingPitchRange(heading, pitch, range));
+	heading = Cesium.Math.zeroToTwoPi(Cesium.Math.PI + heading + Cesium.Math.PI_OVER_FOUR);
+	this.scene.camera.lookAtTransform(this.model.modelMatrix, new Cesium.HeadingPitchRange(heading, PITCH, RANGE));
 	
 	Cesium.Cartesian3.clone(Cesium.Cartesian3.ZERO, this.vel);
 	Cesium.Cartographic.fromDegrees(lat, lon, 0.0, this.localAnchorLla);
