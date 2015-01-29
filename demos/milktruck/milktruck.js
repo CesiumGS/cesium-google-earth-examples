@@ -47,21 +47,9 @@ var ROLL_SPRING = 0.5;
 var ROLL_DAMP = -0.16;
 
 function rotate(v, axis, radians) {
-	// TODO
-    var vDotAxis = Cesium.Cartesian3.dot(v, axis);
-    
-    var vPerpAxis = Cesium.Cartesian3.multiplyByScalar(axis, vDotAxis, new Cesium.Cartesian3());
-    Cesium.Cartesian3.subtract(v, vPerpAxis, vPerpAxis);
-    
-    var vPerpPerpAxis = Cesium.Cartesian3.cross(axis, vPerpAxis, new Cesium.Cartesian3());
-    
-    var r = Cesium.Cartesian3.multiplyByScalar(axis, vDotAxis, new Cesium.Cartesian3());
-    var s = Cesium.Cartesian3.multiplyByScalar(vPerpAxis, Math.cos(radians), new Cesium.Cartesian3());
-    var t = Cesium.Cartesian3.multiplyByScalar(vPerpPerpAxis, Math.sin(radians), new Cesium.Cartesian3());
-    
-    var result = Cesium.Cartesian3.add(s, t, t);
-    Cesium.Cartesian3.add(r, result, result);
-    return result;
+	var quaternion = Cesium.Quaternion.fromAxisAngle(axis, radians);
+	var rotMat = Cesium.Matrix3.fromQuaternion(quaternion);
+	return Cesium.Matrix3.multiplyByVector(rotMat, v, new Cesium.Cartesian3());
 }
 
 function makeOrthonormalFrame(matrix, dir, up) {
@@ -615,6 +603,8 @@ Truck.prototype.cameraFollow = function(dt) {
   var heading = camHeading + c1 * deltaHeading;
   heading = Cesium.Math.zeroToTwoPi(heading);
   
+  // TODO
+  heading = 0.0;
   camera.lookAtTransform(this.model.modelMatrix, new Cesium.HeadingPitchRange(heading, PITCH, RANGE));
 };
 
