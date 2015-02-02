@@ -279,16 +279,14 @@ Truck.prototype.tick = function() {
 
   var absSpeed = Cesium.Cartesian3.magnitude(this.vel);
 
-  /*
   var groundAlt = this.scene.globe.getHeight(lla);
   if (!Cesium.defined(groundAlt)) {
 	  return;
   }
-  */
   
-  var groundAlt = 0.0;
+  //var groundAlt = 0.0;
   
-  //var airborne = (groundAlt + 0.30 < lla.height);
+  var airborne = (groundAlt + 0.30 < lla.height);
   var airborne = false;
   var steerAngle = 0;
   
@@ -397,7 +395,7 @@ Truck.prototype.tick = function() {
   }
 
   // Gravity
-  //this.vel.z -= GRAVITY * dt;
+  this.vel.z -= GRAVITY * dt;
 
   // Move.
   var deltaPos = Cesium.Cartesian3.multiplyByScalar(this.vel, dt, new Cesium.Cartesian3());
@@ -412,13 +410,12 @@ Truck.prototype.tick = function() {
   Cesium.Cartesian3.add(deltaPos, gpos, gpos);
   this.ellipsoid.cartesianToCartographic(gpos, lla);
   
-  /*
   // Don't go underground.
   groundAlt = this.scene.globe.getHeight(lla);
-  if (this.pos.z < groundAlt) {
-    this.pos.z = groundAlt;
+  if (lla.height < groundAlt) {
+    lla.height = groundAlt;
+    this.ellipsoid.cartographicToCartesian(lla, gpos);
   }
-  */
 
   /*
   var normal = estimateGroundNormal(this.scene.globe, gpos, this.localFrame);
@@ -612,7 +609,10 @@ Truck.prototype.cameraFollow = function(dt) {
 Truck.prototype.teleportTo = function(lon, lat, heading) {
 	var cart = Cesium.Cartographic.fromDegrees(lon, lat);
 	
-	//cart.height = this.scene.globe.getHeight(cart); // TODO
+	cart.height = this.scene.globe.getHeight(cart); // TODO
+	if (!Cesium.defined(cart.height)) {
+		cart.height = 0.0;
+	}
 	
 	var location = this.ellipsoid.cartographicToCartesian(cart);
 	heading = Cesium.Math.toRadians(Cesium.defaultValue(heading, 0.0));
