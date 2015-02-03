@@ -264,16 +264,6 @@ Truck.prototype.tick = function() {
   var gpos = Cesium.Matrix4.getTranslation(this.model.modelMatrix, new Cesium.Cartesian3());
   var lla = this.ellipsoid.cartesianToCartographic(gpos);
 
-  /*
-  var temp = Cesium.Cartesian2.clone(this.pos);
-  if (Cesium.Cartesian2.magnitude(temp) > 100) {
-    // Re-anchor our local coordinate frame whenever we've strayed a
-    // bit away from it. This is necessary because the earth is not
-    // flat!
-    this.adjustAnchor();
-  }
-  */
-
   var dir = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(this.model.modelMatrix, 1, new Cesium.Cartesian4()));
   var up = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(this.model.modelMatrix, 2, new Cesium.Cartesian4()));
 
@@ -283,8 +273,6 @@ Truck.prototype.tick = function() {
   if (!Cesium.defined(groundAlt)) {
 	  return;
   }
-  
-  //var groundAlt = 0.0;
   
   var airborne = (groundAlt + 0.30 < lla.height);
   var airborne = false;
@@ -399,13 +387,6 @@ Truck.prototype.tick = function() {
 
   // Move.
   var deltaPos = Cesium.Cartesian3.multiplyByScalar(this.vel, dt, new Cesium.Cartesian3());
-  //Cesium.Cartesian3.add(this.pos, deltaPos, this.pos);
-
-  /*
-  Cesium.Cartesian3.add(this.localAnchorCartesian,
-                Cesium.Matrix3.multiplyByVector(this.localFrame, this.pos, new Cesium.Cartesian3()), gpos);
-  this.ellipsoid.cartesianToCartographic(gpos, lla);
-  */
   
   Cesium.Cartesian3.add(deltaPos, gpos, gpos);
   this.ellipsoid.cartesianToCartographic(gpos, lla);
@@ -418,7 +399,7 @@ Truck.prototype.tick = function() {
   }
 
   /*
-  var normal = estimateGroundNormal(this.scene.globe, gpos, this.localFrame);
+  var normal = estimateGroundNormal(this.scene.globe, gpos, this.model.modelMatrix);
   
   if (!airborne) {
     // Cancel velocity into the ground.
@@ -437,9 +418,11 @@ Truck.prototype.tick = function() {
     var scaledNormal = Cesium.Cartesian3.multiplyByScalar(normal, c1, new Cesium.Cartesian3());
     var blendedUp = Cesium.Cartesian3.add(scaledUp, scaledNormal, new Cesium.Cartesian3());
     Cesium.Cartesian3.normalize(blendedUp, blendedUp);
-    makeOrthonormalFrame(this.modelFrame, dir, blendedUp);
+    makeOrthonormalFrame(this.model.modelMatrix, dir, blendedUp);
   }
+  */
 
+  /*
   // Propagate our state into Earth.
   gpos = Cesium.Cartesian3.add(this.localAnchorCartesian,
                 Cesium.Matrix3.multiplyByVector(this.localFrame, this.pos, new Cesium.Cartesian3()), gpos);
@@ -458,7 +441,6 @@ Truck.prototype.tick = function() {
   setLocalOrientationRoll(orientation, absRoll);
   */
   
-  //Cesium.Cartesian3.negate(right, right);
   var rotation = new Cesium.Matrix3();
   Cesium.Matrix3.setColumn(rotation, 0, right, rotation);
   Cesium.Matrix3.setColumn(rotation, 1, dir, rotation);
@@ -482,14 +464,14 @@ Truck.prototype.tick = function() {
 function estimateGroundNormal(globe, pos, frame) {
   // Take four height samples around the given position, and use it to
   // estimate the ground normal at that position.
-  // (North)
-  // 0
-  // *
-  // 2* + *3
-  // *
-  // 1
-  var east = Cesium.Matrix3.getColumn(frame, 0, new Cesium.Cartesian3());
-  var north = Cesium.Matrix3.getColumn(frame, 1, new Cesium.Cartesian3());
+  //  (North)
+  //     0
+  //     *
+  //  2* + *3
+  //     *
+  //     1
+  var east = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(frame, 0, new Cesium.Cartesian4()));
+  var north = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(frame, 1, new Cesium.Cartesian4()));
   
   var pos0 = Cesium.Cartesian3.add(pos, east, new Cesium.Cartesian3());
   var pos1 = Cesium.Cartesian3.subtract(pos, east, new Cesium.Cartesian3());
@@ -498,7 +480,8 @@ function estimateGroundNormal(globe, pos, frame) {
   
   function getAlt(p) {
     var lla = globe.ellipsoid.cartesianToCartographic(p, new Cesium.Cartographic());
-    return globe.getHeight(lla);
+    var height = globe.getHeight(lla);
+    return Cesium.defaultValue(height, 0.0);
   }
   
   var dx = getAlt(pos1) - getAlt(pos0);
@@ -609,7 +592,7 @@ Truck.prototype.cameraFollow = function(dt) {
 Truck.prototype.teleportTo = function(lon, lat, heading) {
 	var cart = Cesium.Cartographic.fromDegrees(lon, lat);
 	
-	cart.height = this.scene.globe.getHeight(cart); // TODO
+	cart.height = this.scene.globe.getHeight(cart);
 	if (!Cesium.defined(cart.height)) {
 		cart.height = 0.0;
 	}
