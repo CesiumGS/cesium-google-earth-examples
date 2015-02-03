@@ -18,7 +18,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
--->  
+-->
 <head>
   <title>Creating 3D Models</title>
 
@@ -31,7 +31,7 @@ limitations under the License.
   <style>
     @import url(../Cesium/Widgets/widgets.css);
   </style>
-  
+
 </head>
 <body onload="if(window.prettyPrint)prettyPrint();">
   <h1>Cesium Examples - Creating 3D Models</h1>
@@ -46,12 +46,11 @@ var entity = viewer.entities.add({
     model : {
         uri : './static/Cesium_Man.gltf',
         scale : 10
-    },
-    viewFrom : new Cesium.Cartesian3(30, 30, 30)
+    }
 });
-viewer.trackedEntity = entity;
+viewer.zoomTo(entity, new Cesium.HeadingPitchRange(Cesium.Math.toRadians(-45), Cesium.Math.toRadians(-30)));
 </pre></div>
-    
+
   <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
 var placemark = ge.createPlacemark('');
 placemark.setName('model');
@@ -94,11 +93,10 @@ ge.getView().setAbstractView(la);
         model : {
             uri : './static/Cesium_Man.gltf',
             scale : 10
-        },
-        viewFrom : new Cesium.Cartesian3(30, 30, 30)
+        }
     });
-    viewer.trackedEntity = entity;
-    
+    viewer.zoomTo(entity, new Cesium.HeadingPitchRange(Cesium.Math.toRadians(-45), Cesium.Math.toRadians(-30)));
+
     // Comparable Google Earth API code:
     //
     // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/model.html
