@@ -91,14 +91,44 @@ function getHeading(matrix, ellipsoid) {
     return Cesium.Math.TWO_PI - Cesium.Math.zeroToTwoPi(heading);
 }
 
-// TODO
-function getRollFromLocalOrientation(orientation) {
-	// orientation is mat3
-	return 0.0;
+function getRollFromLocalOrientation(matrix, ellipsoid) {
+	var position = Cesium.Matrix4.getTranslation(matrix, new Cesium.Cartesian3());
+    var transform = Cesium.Transforms.eastNorthUpToFixedFrame(position, ellipsoid);
+    Cesium.Matrix3.transpose(transform, transform);
+    
+    var right = Cesium.Matrix3.getColumn(matrix, 0, new Cesium.Cartesian3());
+    var direction = Cesium.Matrix3.getColumn(matrix, 1, new Cesium.Cartesian3());
+    var up = Cesium.Matrix3.getColumn(matrix, 2, new Cesium.Cartesian3());
+    
+    Cesium.Matrix3.multiplyByVector(transform, right, right);
+    Cesium.Matrix3.multiplyByVector(transform, direction, direction);
+    Cesium.Matrix3.multiplyByVector(transform, up, up);
+
+    var roll = 0.0;
+    if (!Cesium.Math.equalsEpsilon(Math.abs(direction.z), 1.0, Cesium.Math.EPSILON3)) {
+        roll = Math.atan2(-right.z, up.z);
+        roll = Cesium.Math.zeroToTwoPi(roll + Cesium.Math.TWO_PI);
+    }
+
+    return roll;
 }
 
-function setLocalOrientationRoll(orientation, absRoll) {
-	// orientation is mat3
+function setOrientationRoll(dir, right, up, absRoll) {
+	var rotQuat = Cesium.Quaternion.fromAxisAngle(dir, absRoll);
+	var rotMat = Cesium.Matrix3.fromQuaternion(rotQuat);
+	
+	Cesium.Matrix3.multiplyByVector(rotMat, up, up);
+	Cesium.Matrix3.multiplyByVector(rotMat, right, right);
+}
+
+function setLocalOrientationRoll(matrix, absRoll) {
+	var position = Cesium.Matrix4.getTranslation(matrix, new Cesium.Cartesian3());
+    var transform = Cesium.Transforms.eastNorthUpToFixedFrame(position, ellipsoid);
+    Cesium.Matrix3.transpose(transform, transform);
+    
+    var right = Cesium.Matrix3.getColumn(matrix, 0, new Cesium.Cartesian3());
+    var direction = Cesium.Matrix3.getColumn(matrix, 1, new Cesium.Cartesian3());
+    var up = Cesium.Matrix3.getColumn(matrix, 2, new Cesium.Cartesian3());
 }
 
 function Truck(scene) {
@@ -240,15 +270,6 @@ function keyUp(event) {
   return false;
 }
 
-function clamp(val, min, max) {
-  if (val < min) {
-    return min;
-  } else if (val > max) {
-    return max;
-  }
-  return val;
-}
-
 Truck.prototype.tick = function() {
   var now = (new Date()).getTime();
   // dt is the delta-time since last tick, in seconds
@@ -269,10 +290,7 @@ Truck.prototype.tick = function() {
 
   var absSpeed = Cesium.Cartesian3.magnitude(this.vel);
 
-  var groundAlt = this.scene.globe.getHeight(lla);
-  if (!Cesium.defined(groundAlt)) {
-	  return;
-  }
+  var groundAlt = Cesium.defaultValue(this.scene.globe.getHeight(lla), 0.0);
   
   var airborne = (groundAlt + 0.30 < lla.height);
   var airborne = false;
@@ -319,6 +337,7 @@ Truck.prototype.tick = function() {
   // Turn.
   var newdir = airborne ? dir : rotate(dir, up, steerAngle);
   makeOrthonormalFrame(this.model.modelMatrix, newdir, up);
+  var right = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(this.model.modelMatrix, 0, new Cesium.Cartesian4()));
   var dir = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(this.model.modelMatrix, 1, new Cesium.Cartesian4()));
   var up = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(this.model.modelMatrix, 2, new Cesium.Cartesian4()));
   
@@ -335,20 +354,20 @@ Truck.prototype.tick = function() {
     //
     // For a variable time step:
     // c0 = exp(-dt / TIME_CONSTANT)
-	var right = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(this.model.modelMatrix, 0, new Cesium.Cartesian4()));
-    var slip = Cesium.Cartesian3.dot(this.vel, right);
-    c0 = Math.exp(-dt / 0.5);
-    Cesium.Cartesian3.subtract(this.vel, Cesium.Cartesian3.multiplyByScalar(right, slip * (1 - c0), new Cesium.Cartesian3()), this.vel);
+	  
+	var slip = Cesium.Cartesian3.dot(this.vel, dir);
+	c0 = Math.exp(-dt / 0.5);
+	Cesium.Cartesian3.subtract(this.vel, Cesium.Cartesian3.multiplyByScalar(dir, slip * (1 - c0), new Cesium.Cartesian3()), this.vel);
 
-    // Apply engine/reverse accelerations.
-    forwardSpeed = Cesium.Cartesian3.dot(dir, this.vel);
-    if (gasButtonDown) {
-      // Accelerate forwards.
-      Cesium.Cartesian3.add(this.vel, Cesium.Cartesian3.multiplyByScalar(dir, ACCEL * dt, new Cesium.Cartesian3()), this.vel);
-    } else if (reverseButtonDown) {
-      if (forwardSpeed > -MAX_REVERSE_SPEED)
-        Cesium.Cartesian3.add(this.vel, Cesium.Cartesian3.multiplyByScalar(dir, -DECEL * dt, new Cesium.Cartesian3()), this.vel);
-    }
+	// Apply engine/reverse accelerations.
+	forwardSpeed = Cesium.Cartesian3.dot(right, this.vel);
+	if (gasButtonDown) {
+	  // Accelerate forwards.
+	  Cesium.Cartesian3.add(this.vel, Cesium.Cartesian3.multiplyByScalar(right, ACCEL * dt, new Cesium.Cartesian3()), this.vel);
+	} else if (reverseButtonDown) {
+	  if (forwardSpeed > -MAX_REVERSE_SPEED)
+	    Cesium.Cartesian3.add(this.vel, Cesium.Cartesian3.multiplyByScalar(right, -DECEL * dt, new Cesium.Cartesian3()), this.vel);
+	}
   }
 
   // Air drag.
@@ -426,19 +445,21 @@ Truck.prototype.tick = function() {
   // Propagate our state into Earth.
   gpos = Cesium.Cartesian3.add(this.localAnchorCartesian,
                 Cesium.Matrix3.multiplyByVector(this.localFrame, this.pos, new Cesium.Cartesian3()), gpos);
+                */
 
+  /*
   // Compute roll according to steering.
   // TODO: this would be even more cool in 3d.
-  var absRoll = getRollFromLocalOrientation(this.modelFrame);
+  var absRoll = getRollFromLocalOrientation(this.model.modelMatrix, this.ellipsoid);
+  absRoll = Cesium.Math.toDegrees(absRoll);
   this.rollSpeed += steerAngle * forwardSpeed * STEER_ROLL;
   // Spring back to center, with damping.
   this.rollSpeed += (ROLL_SPRING * -this.roll + ROLL_DAMP * this.rollSpeed);
   this.roll += this.rollSpeed * dt;
-  this.roll = clamp(this.roll, -30, 30);
+  this.roll = Cesium.Math.clamp(this.roll, -30, 30);
   absRoll += this.roll;
 
-  var orientation = Cesium.Matrix4.getRotation(this.model.modelMatrix, new Cesium.Matrix3());
-  setLocalOrientationRoll(orientation, absRoll);
+  setOrientationRoll(dir, right, up, Cesium.Math.toRadians(absRoll));
   */
   
   var rotation = new Cesium.Matrix3();
@@ -573,6 +594,7 @@ var RANGE = Cesium.Cartesian3.magnitude(new Cesium.Cartesian3(TRAILING_DISTANCE,
 
 Truck.prototype.cameraFollow = function(dt) {
   var camera = this.scene.camera;
+  
   var camHeading = camera.heading - Cesium.Math.PI_OVER_TWO;
   var truckHeading = getHeading(this.model.modelMatrix, this.ellipsoid);
   
@@ -586,6 +608,12 @@ Truck.prototype.cameraFollow = function(dt) {
   // TODO
   heading = 0.0;
   camera.lookAtTransform(this.model.modelMatrix, new Cesium.HeadingPitchRange(heading, PITCH, RANGE));
+  
+  /*
+  var truckHeading = getHeading(this.model.modelMatrix, this.ellipsoid);
+  var truckPosition = Cesium.Matrix4.getTranslation(this.model.modelMatrix, new Cesium.Cartesian3());
+  camera.lookAt(truckPosition, new Cesium.HeadingPitchRange(truckHeading, PITCH, RANGE));
+  */
 };
 
 // heading is optional.
@@ -603,7 +631,7 @@ Truck.prototype.teleportTo = function(lon, lat, heading) {
 	this.model.modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(location, heading, 0.0, 0.0);
 	
 	heading = Cesium.Math.zeroToTwoPi(Cesium.Math.PI + heading + Cesium.Math.PI_OVER_FOUR);
-	this.scene.camera.lookAtTransform(this.model.modelMatrix, new Cesium.HeadingPitchRange(heading, PITCH, RANGE));
+	this.scene.camera.lookAt(location, new Cesium.HeadingPitchRange(heading, PITCH, RANGE));
 	
 	Cesium.Cartesian3.clone(Cesium.Cartesian3.ZERO, this.vel);
 	Cesium.Cartographic.fromDegrees(lat, lon, 0.0, this.localAnchorLla);
