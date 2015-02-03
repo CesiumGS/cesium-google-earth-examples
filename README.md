@@ -1,10 +1,10 @@
 <p align="center">
 <a href="http://cesiumjs.org/" target="_blank">
-<img src="https://github.com/AnalyticalGraphicsInc/cesium/wiki/logos/Cesium_Logo_Color.jpg" width="50%" />
+<img src="examples/static/Cesium_Logo_Color.jpg" width="50%" />
 </a>
 </p>
 <p>
-Google Earth plugin API samples ported to Cesium, an open-source WebGL virtual globe and map engine.
+Google Earth plugin API samples ported to Cesium, the open-source WebGL virtual globe and map engine.
 </p>
 <p>
 Click on any example below to run it.  To learn more about Cesium, check out the <a href="http://cesiumjs.org/2014/10/13/Cesium-for-Google-Earth-Developers-Part-I/" target="_blank">Cesium for Google Earth Developers</a> tutorial series.
