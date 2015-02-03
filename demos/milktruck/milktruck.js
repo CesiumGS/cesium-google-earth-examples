@@ -544,7 +544,7 @@ Truck.prototype.cameraFollow = function(dt) {
   var camera = this.scene.camera;
   
   var camHeading = camera.heading;
-  var truckHeading = getHeading(this.model.modelMatrix, this.ellipsoid) + Cesium.Math.PI_OVER_TWO;
+  var truckHeading = Cesium.Math.zeroToTwoPi(getHeading(this.model.modelMatrix, this.ellipsoid) + Cesium.Math.PI_OVER_TWO);
   
   var c0 = Math.exp(-dt / 0.5);
   var c1 = 1 - c0;
