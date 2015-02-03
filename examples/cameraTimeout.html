@@ -43,10 +43,12 @@ limitations under the License.
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
 var camera = viewer.camera;
 var moveCamera = function(count) {
-    var position = camera.positionCartographic;
+    var position = Cesium.Cartographic.clone(camera.positionCartographic);
     position.latitude += Cesium.Math.toRadians(0.1);
     position.longitude += Cesium.Math.toRadians(5.0);
-    camera.setPositionCartographic(position);
+    camera.setView({
+      positionCartographic : position
+    });
     if (count < 40) {
         setTimeout(function() {
             moveCamera(count + 1);
@@ -94,10 +96,12 @@ moveCamera(0);
     
     var camera = viewer.camera;
     var moveCamera = function(count) {
-        var position = camera.positionCartographic;
+        var position = Cesium.Cartographic.clone(camera.positionCartographic);
         position.latitude += Cesium.Math.toRadians(0.1);
         position.longitude += Cesium.Math.toRadians(5.0);
-        camera.setPositionCartographic(position);
+        camera.setView({
+          positionCartographic : position
+        });
         if (count < 40) {
             setTimeout(function() {
                 moveCamera(count + 1);
