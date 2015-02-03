@@ -42,10 +42,14 @@ limitations under the License.
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
 var camera = viewer.camera;
+camera.setView({ pitch : 0.0 });
+
 var tiltCamera = function(count) {
-  var idealTilt = Cesium.Math.toRadians(80);  // all angles in the API are in degrees.
+  var idealTilt = Cesium.Math.toRadians(-80);  // all angles in the API are in degrees.
   var c0 = 0.95;
-  camera.tilt = c0 * camera.tilt + (1 - c0) * idealTilt;
+  camera.setView({
+    pitch : c0 * camera.pitch + (1 - c0) * idealTilt
+  });
 
   if (count < 60) {
     setTimeout(function() {
@@ -90,19 +94,23 @@ tiltCamera(0);
     var viewer = new Cesium.Viewer('cesiumContainer');
     
     var camera = viewer.camera;
+    camera.setView({ pitch : 0.0 });
+    
     var tiltCamera = function(count) {
-        var idealTilt = Cesium.Math.toRadians(80);  // all angles in the API are in degrees.
-        var c0 = 0.95;
-        camera.tilt = c0 * camera.tilt + (1 - c0) * idealTilt;
+      var idealTilt = Cesium.Math.toRadians(-80);  // all angles in the API are in degrees.
+      var c0 = 0.95;
+      camera.setView({
+      	pitch : c0 * camera.pitch + (1 - c0) * idealTilt
+      });
 
-        if (count < 60) {
-          setTimeout(function() {
-            tiltCamera(count + 1);
-          }, 33);
-        }
+      if (count < 60) {
+        setTimeout(function() {
+          tiltCamera(count + 1);
+        }, 33);
       }
+    }
 
-      tiltCamera(0);
+    tiltCamera(0);
     
     // Comparable Google Earth API code:
     //

@@ -82,7 +82,7 @@ function onTick() {
     var lon = pos.longitude;
     var lat = pos.latitude;
     var dist = 1/63710; // angular dist;
-    var heading = -camera.heading;
+    var heading = camera.heading;
 
     var newLat = Math.asin(Math.sin(lat) * Math.cos(dist)
             + Math.cos(lat) * Math.sin(dist) * Math.cos(heading));
@@ -209,7 +209,7 @@ function destination(lat, lng, dist, heading) {
         var lon = pos.longitude;
         var lat = pos.latitude;
         var dist = 1/63710; // angular dist;
-        var heading = -camera.heading;
+        var heading = camera.heading;
 
         var newLat = Math.asin(Math.sin(lat) * Math.cos(dist)
                 + Math.cos(lat) * Math.sin(dist) * Math.cos(heading));
@@ -218,10 +218,10 @@ function destination(lat, lng, dist, heading) {
         sampleTerrain(newLon, newLat);
     }
     
-    var eye = new Cesium.Cartesian3(-2496304.1498512086, -4391818.97382059, 3884176.4503971986);
-    var target = Cesium.Cartesian3.add(eye, new Cesium.Cartesian3(-0.7643045598990259, 0.643704706480502, -0.03850701978089475), new Cesium.Cartesian3());
-    var up = new Cesium.Cartesian3(-0.11836693744723503, -0.8130611584421428, 0.5700182635106171);
-    camera.lookAt(eye, target, up);
+    var target = new Cesium.Cartesian3(-2500361.97644566, -4389389.73065392, 3884586.2291527484);
+    var offset = new Cesium.Cartesian3(4729.00787296053, -386.72026101499796, 802.2322768233716);
+    camera.lookAt(target, offset);
+    camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
     sampleTerrain(camera.positionCartographic.longitude, camera.positionCartographic.latitude);
 
 
