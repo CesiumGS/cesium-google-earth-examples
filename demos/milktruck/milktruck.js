@@ -75,8 +75,8 @@ function getHeading(matrix, ellipsoid) {
     var transform = Cesium.Transforms.eastNorthUpToFixedFrame(position, ellipsoid);
     Cesium.Matrix3.transpose(transform, transform);
     
-    var right = Cesium.Matrix3.getColumn(matrix, 0, new Cesium.Cartesian3());
-    var direction = Cesium.Matrix3.getColumn(matrix, 1, new Cesium.Cartesian3());
+    var right = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(matrix, 0, new Cesium.Cartesian4()));
+    var direction = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(matrix, 1, new Cesium.Cartesian4()));
     
     Cesium.Matrix3.multiplyByVector(transform, right, right);
     Cesium.Matrix3.multiplyByVector(transform, direction, direction);
@@ -595,8 +595,8 @@ var RANGE = Cesium.Cartesian3.magnitude(new Cesium.Cartesian3(TRAILING_DISTANCE,
 Truck.prototype.cameraFollow = function(dt) {
   var camera = this.scene.camera;
   
-  var camHeading = camera.heading - Cesium.Math.PI_OVER_TWO;
-  var truckHeading = getHeading(this.model.modelMatrix, this.ellipsoid);
+  var camHeading = camera.heading;
+  var truckHeading = getHeading(this.model.modelMatrix, this.ellipsoid) + Cesium.Math.PI_OVER_TWO;
   
   var c0 = Math.exp(-dt / 0.5);
   var c1 = 1 - c0;
@@ -605,15 +605,8 @@ Truck.prototype.cameraFollow = function(dt) {
   var heading = camHeading + c1 * deltaHeading;
   heading = Cesium.Math.zeroToTwoPi(heading);
   
-  // TODO
-  heading = 0.0;
-  camera.lookAtTransform(this.model.modelMatrix, new Cesium.HeadingPitchRange(heading, PITCH, RANGE));
-  
-  /*
-  var truckHeading = getHeading(this.model.modelMatrix, this.ellipsoid);
   var truckPosition = Cesium.Matrix4.getTranslation(this.model.modelMatrix, new Cesium.Cartesian3());
-  camera.lookAt(truckPosition, new Cesium.HeadingPitchRange(truckHeading, PITCH, RANGE));
-  */
+  camera.lookAt(truckPosition, new Cesium.HeadingPitchRange(heading, PITCH, RANGE));
 };
 
 // heading is optional.
