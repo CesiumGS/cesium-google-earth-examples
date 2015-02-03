@@ -21,15 +21,10 @@ window.truck = null;
 
 var MODEL_URL = 'model/Cesium_Ground.gltf';
 var INIT_LOC = {
-  //lat: 37.423501,
-  //lon: -122.086744,
 	lon : -123.0744619, 
 	lat : 44.0503706,
 	heading: 90
-}; // googleplex
-
-var PREVENT_START_AIRBORNE = true;
-var TICK_MS = 66;
+};
 
 var BALLOON_FG = '#000000';
 var BALLOON_BG = '#FFFFFF';
@@ -121,42 +116,12 @@ function setOrientationRoll(dir, right, up, absRoll) {
 	Cesium.Matrix3.multiplyByVector(rotMat, right, right);
 }
 
-function setLocalOrientationRoll(matrix, absRoll) {
-	var position = Cesium.Matrix4.getTranslation(matrix, new Cesium.Cartesian3());
-    var transform = Cesium.Transforms.eastNorthUpToFixedFrame(position, ellipsoid);
-    Cesium.Matrix3.transpose(transform, transform);
-    
-    var right = Cesium.Matrix3.getColumn(matrix, 0, new Cesium.Cartesian3());
-    var direction = Cesium.Matrix3.getColumn(matrix, 1, new Cesium.Cartesian3());
-    var up = Cesium.Matrix3.getColumn(matrix, 2, new Cesium.Cartesian3());
-}
-
 function Truck(scene) {
-  this.doTick = true;
-  
   this.scene = scene;
   this.ellipsoid = scene.globe.ellipsoid;
   
-  // We do all our motion relative to a local coordinate frame that is
-  // anchored not too far from us. In this frame, the x axis points
-  // east, the y axis points north, and the z axis points straight up
-  // towards the sky.
-  //
-  // We periodically change the anchor point of this frame and
-  // recompute the local coordinates.
-  this.localAnchorLla = new Cesium.Cartographic();
-  this.localAnchorCartesian = this.ellipsoid.cartographicToCartesian(this.localAnchorLla);
-  this.localFrame = Cesium.Matrix3.clone(Cesium.Matrix3.IDENTITY);
-
-  // Position, in local cartesian coords.
-  this.pos = new Cesium.Cartesian3();
-  
   // Velocity, in local cartesian coords.
   this.vel = new Cesium.Cartesian3();
-
-  // Orientation matrix, transforming model-relative coords into local
-  // coords.
-  this.modelFrame = Cesium.Matrix3.clone(Cesium.Matrix3.IDENTITY);
 
   this.roll = 0;
   this.rollSpeed = 0;
@@ -164,9 +129,6 @@ function Truck(scene) {
   this.idleTimer = 0;
   this.fastTimer = 0;
   this.popupTimer = 0;
-
-  // ge.getOptions().setMouseNavigationEnabled(false);
-  // ge.getOptions().setFlyToSpeed(100); // don't filter camera motion
   
   var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(Cesium.Cartesian3.fromDegrees(INIT_LOC.lon, INIT_LOC.lat));
   
@@ -210,7 +172,6 @@ function Truck(scene) {
 		 * me.shadow.setVisibility(true); ge.getFeatures().appendChild(me.shadow);
 		 */
 
-	  // google.earth.addEventListener(ge, "frameend", function() { me.tick(); });
 	  that.scene.postRender.addEventListener(function() { that.tick(); });
 
 	  /*
@@ -293,7 +254,6 @@ Truck.prototype.tick = function() {
   var groundAlt = Cesium.defaultValue(this.scene.globe.getHeight(lla), 0.0);
   
   var airborne = (groundAlt + 0.30 < lla.height);
-  var airborne = false;
   var steerAngle = 0;
   
   // Steering.
@@ -417,8 +377,8 @@ Truck.prototype.tick = function() {
     this.ellipsoid.cartographicToCartesian(lla, gpos);
   }
 
-  /*
-  var normal = estimateGroundNormal(this.scene.globe, gpos, this.model.modelMatrix);
+  //var normal = estimateGroundNormal(this.scene.globe, gpos, this.model.modelMatrix);
+  var normal = this.ellipsoid.geodeticSurfaceNormal(gpos);
   
   if (!airborne) {
     // Cancel velocity into the ground.
@@ -431,6 +391,7 @@ Truck.prototype.tick = function() {
     }
 
     // Make our orientation follow the ground.
+    /*
     c0 = Math.exp(-dt / 0.25);
     c1 = 1 - c0;
     var scaledUp = Cesium.Cartesian3.multiplyByScalar(up, c0, new Cesium.Cartesian3());
@@ -438,14 +399,8 @@ Truck.prototype.tick = function() {
     var blendedUp = Cesium.Cartesian3.add(scaledUp, scaledNormal, new Cesium.Cartesian3());
     Cesium.Cartesian3.normalize(blendedUp, blendedUp);
     makeOrthonormalFrame(this.model.modelMatrix, dir, blendedUp);
+    */
   }
-  */
-
-  /*
-  // Propagate our state into Earth.
-  gpos = Cesium.Cartesian3.add(this.localAnchorCartesian,
-                Cesium.Matrix3.multiplyByVector(this.localFrame, this.pos, new Cesium.Cartesian3()), gpos);
-                */
 
   /*
   // Compute roll according to steering.
@@ -582,13 +537,6 @@ Truck.prototype.showFastPopup = function() {
   // ge.setBalloon(me.balloon);
 };
 
-Truck.prototype.scheduleTick = function() {
-	if (this.doTick) {
-		var that = this;
-		setTimeout(function() { that.tick(); }, TICK_MS);
-	}
-};
-
 var PITCH = -Cesium.Math.toRadians(10.0);
 var RANGE = Cesium.Cartesian3.magnitude(new Cesium.Cartesian3(TRAILING_DISTANCE, 0.0, CAM_HEIGHT));
 
@@ -625,21 +573,4 @@ Truck.prototype.teleportTo = function(lon, lat, heading) {
 	
 	heading = Cesium.Math.zeroToTwoPi(Cesium.Math.PI + heading + Cesium.Math.PI_OVER_FOUR);
 	this.scene.camera.lookAt(location, new Cesium.HeadingPitchRange(heading, PITCH, RANGE));
-	
-	Cesium.Cartesian3.clone(Cesium.Cartesian3.ZERO, this.vel);
-	Cesium.Cartographic.fromDegrees(lat, lon, 0.0, this.localAnchorLla);
-	this.ellipsoid.cartographicToCartesian(this.localAnchorLla, this.localAnchorCartesian);
-
-	// make sure to not start airborne
-	/*
-	// TODO
-	if (PREVENT_START_AIRBORNE) {
-		window.setTimeout(function() {
-			var groundAlt = that.scene.globe.getHeight(Cesium.Cartographic.fromDegrees(lat, lon));
-			var airborne = groundAlt + 0.30 < that.pos.z;
-			if (airborne)
-				that.teleportTo(lon, lat, heading);
-		}, 500);
-	}
-	*/
 };
