@@ -362,7 +362,10 @@ Truck.prototype.tick = function() {
   }
 
   // Gravity
-  this.vel.z -= GRAVITY * dt;
+  //var normal = estimateGroundNormal(this.scene.globe, gpos, this.model.modelMatrix);
+  var normal = this.ellipsoid.geodeticSurfaceNormal(gpos);
+  var gravity = Cesium.Cartesian3.multiplyByScalar(normal, -GRAVITY * dt, new Cesium.Cartesian3());
+  Cesium.Cartesian3.add(this.vel, gravity, this.vel);
 
   // Move.
   var deltaPos = Cesium.Cartesian3.multiplyByScalar(this.vel, dt, new Cesium.Cartesian3());
@@ -376,9 +379,6 @@ Truck.prototype.tick = function() {
     lla.height = groundAlt;
     this.ellipsoid.cartographicToCartesian(lla, gpos);
   }
-
-  //var normal = estimateGroundNormal(this.scene.globe, gpos, this.model.modelMatrix);
-  var normal = this.ellipsoid.geodeticSurfaceNormal(gpos);
   
   if (!airborne) {
     // Cancel velocity into the ground.
