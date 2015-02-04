@@ -83,9 +83,10 @@ function getHeading(matrix, ellipsoid) {
     return Cesium.Math.TWO_PI - Cesium.Math.zeroToTwoPi(heading);
 }
 
-function Truck(scene) {
-  this.scene = scene;
-  this.ellipsoid = scene.globe.ellipsoid;
+function Truck(viewer) {
+  this.viewer = viewer;
+  this.scene = viewer.scene;
+  this.ellipsoid = this.scene.globe.ellipsoid;
   
   // Velocity, in local cartesian coords.
   this.vel = new Cesium.Cartesian3();
@@ -99,7 +100,7 @@ function Truck(scene) {
   
   var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(Cesium.Cartesian3.fromDegrees(INIT_LOC.lon, INIT_LOC.lat));
   
-  this.model = scene.primitives.add(Cesium.Model.fromGltf({
+  this.model = this.scene.primitives.add(Cesium.Model.fromGltf({
       url : MODEL_URL,
       modelMatrix : modelMatrix,
       minimumPixelSize : 128
@@ -339,7 +340,7 @@ Truck.prototype.tick = function() {
   
   Cesium.Matrix4.fromRotationTranslation(rotation, gpos, this.model.modelMatrix);
 
-  //this.tickPopups(dt);
+  this.tickPopups(dt);
   
   this.cameraFollow(dt);
 };
@@ -387,8 +388,7 @@ Truck.prototype.tickPopups = function(dt) {
 	  this.fastTimer = 0;
     if (this.popupTimer <= 0) {
     	this.popupTimer = 0;
-    	// TODO
-      // ge.setBalloon(null);
+    	this.viewer.selectedEntity = undefined;
     }
   } else {
     if (speed < 20) {
@@ -426,9 +426,11 @@ Truck.prototype.showIdlePopup = function() {
   var index = Math.floor(rand * IDLE_MESSAGES.length)
     % IDLE_MESSAGES.length;
   var message = "<center>" + IDLE_MESSAGES[index] + "</center>";
-  // TODO
-  // me.balloon.setContentString(message);
-  // ge.setBalloon(me.balloon);
+
+  this.viewer.selectedEntity = new Cesium.Entity({
+	  name : 'Milk-person',
+	  description : message
+  });
 };
 
 var FAST_MESSAGES = [
@@ -443,9 +445,11 @@ Truck.prototype.showFastPopup = function() {
   var index = Math.floor(rand * FAST_MESSAGES.length)
     % FAST_MESSAGES.length;
   var message = "<center>" + FAST_MESSAGES[index] + "</center>";
-  // TODO
-  // me.balloon.setContentString(message);
-  // ge.setBalloon(me.balloon);
+  
+  this.viewer.selectedEntity = new Cesium.Entity({
+	  name : 'Milk-person',
+	  description : message
+  });
 };
 
 var PITCH = -Cesium.Math.toRadians(10.0);
