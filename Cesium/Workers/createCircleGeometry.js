@@ -10889,6 +10889,15 @@ define('Core/FeatureDetection',[
         return isFirefoxResult;
     }
 
+    var isWindowsResult;
+    function isWindows() {
+        if (!defined(isWindowsResult)) {
+            isWindowsResult = /Windows/i.test(navigator.appVersion);
+        }
+        return isWindowsResult;
+    }
+
+
     function firefoxVersion() {
         return isFirefox() && firefoxVersionResult;
     }
@@ -10911,6 +10920,7 @@ define('Core/FeatureDetection',[
         internetExplorerVersion : internetExplorerVersion,
         isFirefox : isFirefox,
         firefoxVersion : firefoxVersion,
+        isWindows : isWindows,
         hardwareConcurrency : defaultValue(navigator.hardwareConcurrency, 3)
     };
 
@@ -13616,9 +13626,6 @@ define('Core/EncodedCartesian3',[
     var EncodedCartesian3 = function() {
         /**
          * The high bits for each component.  Bits 0 to 22 store the whole value.  Bits 23 to 31 are not used.
-         * <p>
-         * The default is {@link Cartesian3.ZERO}.
-         * </p>
          *
          * @type {Cartesian3}
          * @default {@link Cartesian3.ZERO}
@@ -13627,9 +13634,6 @@ define('Core/EncodedCartesian3',[
 
         /**
          * The low bits for each component.  Bits 7 to 22 store the whole value, and bits 0 to 6 store the fraction.  Bits 23 to 31 are not used.
-         * <p>
-         * The default is {@link Cartesian3.ZERO}.
-         * </p>
          *
          * @type {Cartesian3}
          * @default {@link Cartesian3.ZERO}
@@ -19239,7 +19243,7 @@ define('Core/EllipseGeometry',[
      * @param {Ellipsoid} [options.ellipsoid=Ellipsoid.WGS84] The ellipsoid the ellipse will be on.
      * @param {Number} [options.height=0.0] The height above the ellipsoid.
      * @param {Number} [options.extrudedHeight] The height of the extrusion.
-     * @param {Number} [options.rotation=0.0] The angle from north (clockwise) in radians. The default is zero.
+     * @param {Number} [options.rotation=0.0] The angle from north (clockwise) in radians.
      * @param {Number} [options.stRotation=0.0] The rotation of the texture coordinates, in radians. A positive rotation is counter-clockwise.
      * @param {Number} [options.granularity=CesiumMath.RADIANS_PER_DEGREE] The angular distance between points on the ellipse in radians.
      * @param {VertexFormat} [options.vertexFormat=VertexFormat.DEFAULT] The vertex attributes to be computed.

@@ -19,7 +19,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
--->  
+-->
   <title>Draw</title>
   <script src="../../Cesium/Cesium.js"></script>
   <style>
@@ -32,7 +32,7 @@ limitations under the License.
 <body>
   <div id="cesiumContainer"></div>
   <script>
-  var viewer = new Cesium.Viewer('cesiumContainer');
+  var viewer = new Cesium.Viewer('cesiumContainer', {infoBox : false, selectionIndicator : false });
   var color;
   var camera = viewer.camera;
   var polyline;
@@ -58,7 +58,9 @@ limitations under the License.
               color = Cesium.Color.fromRandom({alpha : 1.0});
               polyline = viewer.entities.add({
                   polyline : {
-                    positions : [],
+                    positions : new Cesium.CallbackProperty(function(){
+                      return positions;
+                    }, false),
                     material : color
                   }
               });
@@ -67,12 +69,12 @@ limitations under the License.
       },
       Cesium.ScreenSpaceEventType.LEFT_CLICK
   );
-  
+
   handler.setInputAction(
       function (movement) {
-          if (drawing) {
-              positions.push(camera.pickEllipsoid(movement.endPosition));
-              polyline.polyline.positions = positions;
+          var surfacePosition = camera.pickEllipsoid(movement.endPosition);
+          if (drawing && Cesium.defined(surfacePosition)) {
+              positions.push(surfacePosition);
           }
       },
       Cesium.ScreenSpaceEventType.MOUSE_MOVE
