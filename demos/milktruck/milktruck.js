@@ -452,6 +452,64 @@ Truck.prototype.showFastPopup = function() {
   });
 };
 
+var MIN_ZOOM_DISTANCE = 5.0;
+
+function adjustHeightForTerrain(truck) {
+    var scene = truck.scene;
+    var mode = scene.mode;
+    var globe = scene.globe;
+    var controller = scene.screenSpaceCameraController;
+
+    if (!Cesium.defined(globe) || mode === Cesium.SceneMode.SCENE2D || mode === Cesium.SceneMode.MORPHING) {
+        return;
+    }
+
+    var camera = scene.camera;
+    var ellipsoid = globe.ellipsoid;
+    var projection = scene.mapProjection;
+
+    var transform;
+    var mag;
+    if (!Cesium.Matrix4.equals(camera.transform, Cesium.Matrix4.IDENTITY)) {
+        transform = Cesium.Matrix4.clone(camera.transform);
+        mag = Cesium.Cartesian3.magnitude(camera.position);
+        camera._setTransform(Cesium.Matrix4.IDENTITY);
+    }
+
+    var cartographic = new Cesium.Cartographic();
+    if (mode === Cesium.SceneMode.SCENE3D) {
+        ellipsoid.cartesianToCartographic(camera.position, cartographic);
+    } else {
+        projection.unproject(camera.position, cartographic);
+    }
+
+    //if (cartographic.height < controller.minimumCollisionTerrainHeight) {
+        var height = globe.getHeight(cartographic);
+        if (Cesium.defined(height)) {
+            //height += controller.minimumZoomDistance;
+        	height += MIN_ZOOM_DISTANCE;
+            if (cartographic.height < height) {
+                cartographic.height = height;
+                if (mode === Cesium.SceneMode.SCENE3D) {
+                    ellipsoid.cartographicToCartesian(cartographic, camera.position);
+                } else {
+                    projection.project(cartographic, camera.position);
+                }
+            }
+        }
+    //}
+
+    if (Cesium.defined(transform)) {
+        camera._setTransform(transform);
+        Cesium.Cartesian3.normalize(camera.position, camera.position);
+        Cesium.Cartesian3.negate(camera.position, camera.direction);
+        Cesium.Cartesian3.multiplyByScalar(camera.position, mag, camera.position);
+        Cesium.Cartesian3.normalize(camera.direction, camera.direction);
+        Cesium.Cartesian3.cross(camera.direction, camera.up, camera.right);
+        Cesium.Cartesian3.cross(camera.right, camera.direction, camera.up);
+    }
+}
+
 var PITCH = -Cesium.Math.toRadians(10.0);
 var RANGE = Cesium.Cartesian3.magnitude(new Cesium.Cartesian3(TRAILING_DISTANCE, 0.0, CAM_HEIGHT));
 
@@ -470,6 +528,8 @@ Truck.prototype.cameraFollow = function(dt) {
   
   var truckPosition = Cesium.Matrix4.getTranslation(this.model.modelMatrix, new Cesium.Cartesian3());
   camera.lookAt(truckPosition, new Cesium.HeadingPitchRange(heading, PITCH, RANGE));
+  
+  adjustHeightForTerrain(truck);
 };
 
 // heading is optional.
