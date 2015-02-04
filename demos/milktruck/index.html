@@ -48,6 +48,65 @@ limitations under the License.
     viewer.scene.screenSpaceCameraController.enableInputs = false;
     
     var truck = new Truck(viewer);
+    
+    var bingKey = Cesium.BingMapsApi.getKey();
+    
+    function geocode(element) {
+    	var query = element.value;
+    	
+        if (/^\s*$/.test(query)) {
+            return;
+        }
+        
+    	var promise = Cesium.jsonp('//dev.virtualearth.net/REST/v1/Locations', {
+            parameters : {
+                query : query,
+                key : bingKey
+
+            },
+            callbackParameterName : 'jsonp'
+        });
+
+        var geocodeInProgress = Cesium.when(promise, function(result) {
+            if (geocodeInProgress.cancel) {
+                return;
+            }
+
+            if (result.resourceSets.length === 0) {
+                element.value = query + ' (not found)';
+                return;
+            }
+
+            var resourceSet = result.resourceSets[0];
+            if (resourceSet.resources.length === 0) {
+            	element.value = query + ' (not found)';
+                return;
+            }
+
+            var resource = resourceSet.resources[0];
+
+            element.value = resource.name;
+            var bbox = resource.bbox;
+            var south = bbox[0];
+            var west = bbox[1];
+            var north = bbox[2];
+            var east = bbox[3];
+            var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
+
+            var camera = viewer.camera;
+            var position = camera.getRectangleCameraCoordinates(rectangle);
+            if (!Cesium.defined(position)) {
+                return;
+            }
+            
+            var cartographic = viewer.scene.globe.ellipsoid.cartesianToCartographic(position);
+            truck.teleportTo(Cesium.Math.toDegrees(cartographic.longitude), Cesium.Math.toDegrees(cartographic.latitude));
+        });
+    }
+    
+    function submitLocation() {
+    	geocode(document.getElementById('address'));
+    }
   </script>
 
   <table>
