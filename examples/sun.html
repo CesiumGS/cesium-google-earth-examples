@@ -46,11 +46,11 @@ limitations under the License.
   <div id="source">
   <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
 function showSun(){
-    scene.globe.enableLighting = true;
+    viewer.scene.globe.enableLighting = true;
 }
 
 function hideSun() {
-    scene.globe.enableLighting = false;
+    viewer.scene.globe.enableLighting = false;
 }
   </pre></div>
     
@@ -75,14 +75,13 @@ function hideSun() {
 
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
-    var scene = viewer.scene;
     
     function showSun(){
-        scene.globe.enableLighting = true;
+        viewer.scene.globe.enableLighting = true;
     }
     
     function hideSun() {
-        scene.globe.enableLighting = false;
+        viewer.scene.globe.enableLighting = false;
     }
 
     showSun();
