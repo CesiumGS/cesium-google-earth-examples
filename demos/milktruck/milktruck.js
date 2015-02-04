@@ -362,7 +362,7 @@ Truck.prototype.tick = function() {
   }
 
   // Gravity
-  var normal = estimateGroundNormal(this.scene.globe, gpos, this.model.modelMatrix, this.ellipsoid);
+  var normal = estimateGroundNormal(this.scene.globe, gpos, this.ellipsoid);
   var gravity = Cesium.Cartesian3.multiplyByScalar(normal, -GRAVITY * dt, new Cesium.Cartesian3());
   Cesium.Cartesian3.add(this.vel, gravity, this.vel);
 
@@ -390,7 +390,6 @@ Truck.prototype.tick = function() {
     }
 
     // Make our orientation follow the ground.
-    /*
     c0 = Math.exp(-dt / 0.25);
     c1 = 1 - c0;
     var scaledUp = Cesium.Cartesian3.multiplyByScalar(up, c0, new Cesium.Cartesian3());
@@ -398,7 +397,10 @@ Truck.prototype.tick = function() {
     var blendedUp = Cesium.Cartesian3.add(scaledUp, scaledNormal, new Cesium.Cartesian3());
     Cesium.Cartesian3.normalize(blendedUp, blendedUp);
     makeOrthonormalFrame(this.model.modelMatrix, dir, blendedUp);
-    */
+    
+    right = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(this.model.modelMatrix, 0, new Cesium.Cartesian4()));
+    dir = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(this.model.modelMatrix, 1, new Cesium.Cartesian4()));
+    up = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(this.model.modelMatrix, 2, new Cesium.Cartesian4()));
   }
 
   /*
@@ -436,7 +438,7 @@ Truck.prototype.tick = function() {
 };
 
 // TODO: would be nice to have globe.getGroundNormal() in the API.
-function estimateGroundNormal(globe, pos, frame, ellipsoid) {
+function estimateGroundNormal(globe, pos, ellipsoid) {
   // Take four height samples around the given position, and use it to
   // estimate the ground normal at that position.
   //  (North)
@@ -445,6 +447,7 @@ function estimateGroundNormal(globe, pos, frame, ellipsoid) {
   //  2* + *3
   //     *
   //     1
+  var frame = Cesium.Transforms.eastNorthUpToFixedFrame(pos, ellipsoid);
   var east = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(frame, 0, new Cesium.Cartesian4()));
   var north = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(frame, 1, new Cesium.Cartesian4()));
   
@@ -464,8 +467,7 @@ function estimateGroundNormal(globe, pos, frame, ellipsoid) {
   var normal = new Cesium.Cartesian3(dx, dy, 2);
   Cesium.Cartesian3.normalize(normal, normal);
   
-  var transform = Cesium.Transforms.eastNorthUpToFixedFrame(pos, ellipsoid);
-  Cesium.Matrix4.multiplyByPointAsVector(transform, normal, normal);
+  Cesium.Matrix4.multiplyByPointAsVector(frame, normal, normal);
   return normal;
 }
 
