@@ -31,10 +31,21 @@ limitations under the License.
   
   <div id="cesiumContainer"></div>
   <script>
-    var viewer = new Cesium.Viewer('cesiumContainer');
+    var viewer = new Cesium.Viewer('cesiumContainer', {
+    	animation : false,
+    	geocoder : false,
+    	homeButton : false,
+    	sceneModePicker : false,
+    	timeline : false,
+    	navigationHelpButton : false,
+    	navigationInstructionsInitiallyVisible : false,
+    	fullscreenButton : false,
+    	baseLayerPicker : false
+    });
     viewer.scene.terrainProvider = new Cesium.CesiumTerrainProvider({
       url : '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
     });
+    viewer.scene.screenSpaceCameraController.enableInputs = false;
     
     var truck = new Truck(viewer.scene);
   </script>
@@ -51,12 +62,11 @@ limitations under the License.
       </form>
 
       Presets:
-      <input type=button value="Th' Plex" onclick="truck.teleportTo(37.423501,-122.086744,90);">
-      <!-- <input type=button value="San Francisco" onclick="doGeocode('San Francisco');"> -->
-      <input type=button value="Whistler" onclick="truck.teleportTo(50.085734,-122.855824,220);">
-      <input type=button value="Pismo" onclick="truck.teleportTo(35.040675,-120.629513,170);">
-      <input type=button value="Tokyo" onclick="truck.teleportTo(35.668607,139.822026,180);">
-      <input type=button value="Everest" onclick="truck.teleportTo(27.991283,86.924340,70);">
+      <input type=button value="Th' Plex" onclick="truck.teleportTo(-122.086744,37.423501,90);">
+      <input type=button value="Whistler" onclick="truck.teleportTo(-122.855824,50.085734,220);">
+      <input type=button value="Pismo" onclick="truck.teleportTo(-120.629513,35.040675,170);">
+      <input type=button value="Tokyo" onclick="truck.teleportTo(139.822026,35.668607,180);">
+      <input type=button value="Everest" onclick="truck.teleportTo(86.924340,27.991283,70);">
     </div>
 
 
