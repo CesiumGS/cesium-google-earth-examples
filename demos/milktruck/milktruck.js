@@ -26,9 +26,6 @@ var INIT_LOC = {
 	heading: 90
 };
 
-var BALLOON_FG = '#000000';
-var BALLOON_BG = '#FFFFFF';
-
 var GRAVITY = 9.8;
 var CAM_HEIGHT = 10;
 var TRAILING_DISTANCE = 50;
@@ -110,47 +107,9 @@ function Truck(scene) {
 
   var that = this;
   Cesium.when(this.model.readyPromise).then(function(model) {
-	  /*
-	  walkKmlDom(kml, function() {
-	      if (this.getType() == 'KmlPlacemark' && this.getGeometry()
-	          && this.getGeometry().getType() == 'KmlModel')
-	          me.placemark = this;
-	  });
-	  */
-
-	  /*
-		 * ge.getFeatures().appendChild(me.placemark);
-		 * 
-		 * me.balloon = ge.createHtmlStringBalloon('');
-		 * me.balloon.setFeature(me.placemark); me.balloon.setMaxWidth(350);
-		 * me.balloon.setForegroundColor(BALLOON_FG);
-		 * me.balloon.setBackgroundColor(BALLOON_BG);
-		 */
-
 	  that.teleportTo(INIT_LOC.lon, INIT_LOC.lat, INIT_LOC.heading);
-
 	  that.lastMillis = (new Date()).getTime();
-
-	  /*
-		 * var href = window.location.href;
-		 * 
-		 * me.shadow = ge.createGroundOverlay(''); me.shadow.setVisibility(false);
-		 * me.shadow.setIcon(ge.createIcon(''));
-		 * me.shadow.setLatLonBox(ge.createLatLonBox(''));
-		 * me.shadow.setAltitudeMode(ge.ALTITUDE_CLAMP_TO_SEA_FLOOR);
-		 * me.shadow.getIcon().setHref(PAGE_PATH + 'shadowrect.png');
-		 * me.shadow.setVisibility(true); ge.getFeatures().appendChild(me.shadow);
-		 */
-
 	  that.scene.postRender.addEventListener(function() { that.tick(); });
-
-	  /*
-		 * // Make sure keyboard focus starts out on the page.
-		 * ge.getWindow().blur(); // If the user clicks on the Earth window, try to
-		 * restore keyboard // focus back to the page.
-		 * google.earth.addEventListener(ge.getWindow(), "mouseup", function(event) {
-		 * ge.getWindow().blur(); });
-		 */
   });
 }
 
@@ -379,13 +338,6 @@ Truck.prototype.tick = function() {
   Cesium.Matrix3.setColumn(rotation, 2, up, rotation);
   
   Cesium.Matrix4.fromRotationTranslation(rotation, gpos, this.model.modelMatrix);
-
-  /*
-	 * var latLonBox = me.shadow.getLatLonBox(); var radius = .00005;
-	 * latLonBox.setNorth(lla[0] - radius); latLonBox.setSouth(lla[0] + radius);
-	 * latLonBox.setEast(lla[1] - radius); latLonBox.setWest(lla[1] + radius);
-	 * latLonBox.setRotation(-newhtr[0]);
-	 */
 
   //this.tickPopups(dt);
   
