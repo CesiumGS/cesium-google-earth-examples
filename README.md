@@ -7,7 +7,7 @@
 Google Earth plugin API samples ported to Cesium, the open-source WebGL virtual globe and map engine.
 </p>
 <p>
-Click on any example below to run it.  To learn more about Cesium, check out the <a href="http://cesiumjs.org/2014/10/13/Cesium-for-Google-Earth-Developers-Part-I/" target="_blank">Cesium for Google Earth Developers</a> tutorial series.
+Click on any example below to run it.  To learn more about Cesium, check out the <a href="http://cesiumjs.org/for-google-earth-developers.html" target="_blank">Cesium for Google Earth Developers</a> tutorial series.
 </p>
 <p>
 <table>
