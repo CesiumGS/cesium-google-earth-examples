@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html>
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html lang="en-us">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <!--
@@ -22,6 +22,7 @@ limitations under the License.
   <script type="text/javascript" src="milktruck.js"></script>
 </head>
 <body onKeyDown="return keyDown(event);" onKeyUp="return keyUp(event);">
+    <div id="cesiumContainer"></div>
 <center>
   <div class="title">
     <center>
@@ -29,7 +30,6 @@ limitations under the License.
     </center>
   </div>
   
-  <div id="cesiumContainer"></div>
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer', {
     	animation : false,
@@ -109,48 +109,48 @@ limitations under the License.
     }
   </script>
 
-  <table>
-    <tr>
-      <td>
-    To drive: use the buttons, or keyboard arrows (with focus on page).
+    <table class="bottomControls">
+        <tr>
+            <td>
+                To drive: use the buttons, or keyboard arrows (with focus on page).
 
-    <div>
-      <form name='searchform' id='searchform' action='javascript:submitLocation();void(0);'>
-        <input type=text size=60 id='address' value='(enter a location to go there)'></input>
-        <input type=submit value='Teleport!'>
-      </form>
+                <div>
+                    <form name='searchform' id='searchform' action='javascript:submitLocation();void(0);'>
+                        <input type="text" size="58" id='address' placeholder='(enter a location to go there)' />
+                        <input type="submit" class="cesium-button" value='Teleport!'>
+                    </form>
 
-      Presets:
-      <input type=button value="Th' Plex" onclick="truck.teleportTo(-122.086744,37.423501,90);">
-      <input type=button value="Whistler" onclick="truck.teleportTo(-122.855824,50.085734,220);">
-      <input type=button value="Pismo" onclick="truck.teleportTo(-120.629513,35.040675,170);">
-      <input type=button value="Tokyo" onclick="truck.teleportTo(139.822026,35.668607,180);">
-      <input type=button value="Everest" onclick="truck.teleportTo(86.924340,27.991283,70);">
-    </div>
+                    Presets:
+                    <input type="button" class="cesium-button" value="Th' Plex" onclick="truck.teleportTo(-122.086744,37.423501,90);">
+                    <input type="button" class="cesium-button" value="Whistler" onclick="truck.teleportTo(-122.855824,50.085734,220);">
+                    <input type="button" class="cesium-button" value="Pismo" onclick="truck.teleportTo(-120.629513,35.040675,170);">
+                    <input type="button" class="cesium-button" value="Tokyo" onclick="truck.teleportTo(139.822026,35.668607,180);">
+                    <input type="button" class="cesium-button" value="Everest" onclick="truck.teleportTo(86.924340,27.991283,70);">
+                </div>
 
 
-      </td>
-      <td>
-        <table>
-      <tr>
-        <td></td>
-        <td><input type=button class="button medw" onmousedown="gasButtonDown=true;" onmouseup="gasButtonDown = false;" value="gas"></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><input type=button class="button medw" onmousedown="leftButtonDown=true;" onmouseup="leftButtonDown=false;" value="left"></td>
-        <td></td>
-        <td><input type=button class="button medw" onmousedown="rightButtonDown=true;" onmouseup="rightButtonDown=false;" value="right"></td>
-      </tr>
-      <tr>
-        <td></td>
-        <td><input type=button class="button medw" onmousedown="reverseButtonDown=true;" onmouseup="reverseButtonDown=false;" value="reverse"></td>
-        <td></td>
-      </tr>
+            </td>
+            <td>
+                <table>
+                    <tr>
+                        <td></td>
+                        <td><input type=button class="cesium-button medw" onmousedown="gasButtonDown=true;" onmouseup="gasButtonDown = false;" value="gas"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><input type=button class="cesium-button medw" onmousedown="leftButtonDown=true;" onmouseup="leftButtonDown=false;" value="left"></td>
+                        <td></td>
+                        <td><input type=button class="cesium-button medw" onmousedown="rightButtonDown=true;" onmouseup="rightButtonDown=false;" value="right"></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><input type=button class="cesium-button medw" onmousedown="reverseButtonDown=true;" onmouseup="reverseButtonDown=false;" value="reverse"></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
     </table>
-      </td>
-    </tr>
-  </table>
 </center>
 </body>
 </html>
