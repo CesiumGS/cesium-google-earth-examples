@@ -45,6 +45,7 @@ limitations under the License.
     viewer.scene.terrainProvider = new Cesium.CesiumTerrainProvider({
       url : '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
     });
+    viewer.scene.globe.depthTestAgainstTerrain = true;
     viewer.scene.screenSpaceCameraController.enableInputs = false;
     
     var truck = new Truck(viewer);
