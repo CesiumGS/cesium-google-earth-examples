@@ -362,8 +362,7 @@ Truck.prototype.tick = function() {
   }
 
   // Gravity
-  //var normal = estimateGroundNormal(this.scene.globe, gpos, this.model.modelMatrix);
-  var normal = this.ellipsoid.geodeticSurfaceNormal(gpos);
+  var normal = estimateGroundNormal(this.scene.globe, gpos, this.model.modelMatrix, this.ellipsoid);
   var gravity = Cesium.Cartesian3.multiplyByScalar(normal, -GRAVITY * dt, new Cesium.Cartesian3());
   Cesium.Cartesian3.add(this.vel, gravity, this.vel);
 
@@ -437,7 +436,7 @@ Truck.prototype.tick = function() {
 };
 
 // TODO: would be nice to have globe.getGroundNormal() in the API.
-function estimateGroundNormal(globe, pos, frame) {
+function estimateGroundNormal(globe, pos, frame, ellipsoid) {
   // Take four height samples around the given position, and use it to
   // estimate the ground normal at that position.
   //  (North)
@@ -464,6 +463,9 @@ function estimateGroundNormal(globe, pos, frame) {
   var dy = getAlt(pos3) - getAlt(pos2);
   var normal = new Cesium.Cartesian3(dx, dy, 2);
   Cesium.Cartesian3.normalize(normal, normal);
+  
+  var transform = Cesium.Transforms.eastNorthUpToFixedFrame(pos, ellipsoid);
+  Cesium.Matrix4.multiplyByPointAsVector(transform, normal, normal);
   return normal;
 }
 
