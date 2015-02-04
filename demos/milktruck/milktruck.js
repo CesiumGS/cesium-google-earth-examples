@@ -86,36 +86,6 @@ function getHeading(matrix, ellipsoid) {
     return Cesium.Math.TWO_PI - Cesium.Math.zeroToTwoPi(heading);
 }
 
-function getRollFromLocalOrientation(matrix, ellipsoid) {
-	var position = Cesium.Matrix4.getTranslation(matrix, new Cesium.Cartesian3());
-    var transform = Cesium.Transforms.eastNorthUpToFixedFrame(position, ellipsoid);
-    Cesium.Matrix3.transpose(transform, transform);
-    
-    var right = Cesium.Matrix3.getColumn(matrix, 0, new Cesium.Cartesian3());
-    var direction = Cesium.Matrix3.getColumn(matrix, 1, new Cesium.Cartesian3());
-    var up = Cesium.Matrix3.getColumn(matrix, 2, new Cesium.Cartesian3());
-    
-    Cesium.Matrix3.multiplyByVector(transform, right, right);
-    Cesium.Matrix3.multiplyByVector(transform, direction, direction);
-    Cesium.Matrix3.multiplyByVector(transform, up, up);
-
-    var roll = 0.0;
-    if (!Cesium.Math.equalsEpsilon(Math.abs(direction.z), 1.0, Cesium.Math.EPSILON3)) {
-        roll = Math.atan2(-right.z, up.z);
-        roll = Cesium.Math.zeroToTwoPi(roll + Cesium.Math.TWO_PI);
-    }
-
-    return roll;
-}
-
-function setOrientationRoll(dir, right, up, absRoll) {
-	var rotQuat = Cesium.Quaternion.fromAxisAngle(dir, absRoll);
-	var rotMat = Cesium.Matrix3.fromQuaternion(rotQuat);
-	
-	Cesium.Matrix3.multiplyByVector(rotMat, up, up);
-	Cesium.Matrix3.multiplyByVector(rotMat, right, right);
-}
-
 function Truck(scene) {
   this.scene = scene;
   this.ellipsoid = scene.globe.ellipsoid;
@@ -139,7 +109,7 @@ function Truck(scene) {
   }));
 
   var that = this;
-  this.model.readyToRender.addEventListener(function(model) {
+  Cesium.when(this.model.readyPromise).then(function(model) {
 	  /*
 	  walkKmlDom(kml, function() {
 	      if (this.getType() == 'KmlPlacemark' && this.getGeometry()
@@ -402,21 +372,6 @@ Truck.prototype.tick = function() {
     dir = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(this.model.modelMatrix, 1, new Cesium.Cartesian4()));
     up = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(this.model.modelMatrix, 2, new Cesium.Cartesian4()));
   }
-
-  /*
-  // Compute roll according to steering.
-  // TODO: this would be even more cool in 3d.
-  var absRoll = getRollFromLocalOrientation(this.model.modelMatrix, this.ellipsoid);
-  absRoll = Cesium.Math.toDegrees(absRoll);
-  this.rollSpeed += steerAngle * forwardSpeed * STEER_ROLL;
-  // Spring back to center, with damping.
-  this.rollSpeed += (ROLL_SPRING * -this.roll + ROLL_DAMP * this.rollSpeed);
-  this.roll += this.rollSpeed * dt;
-  this.roll = Cesium.Math.clamp(this.roll, -30, 30);
-  absRoll += this.roll;
-
-  setOrientationRoll(dir, right, up, Cesium.Math.toRadians(absRoll));
-  */
   
   var rotation = new Cesium.Matrix3();
   Cesium.Matrix3.setColumn(rotation, 0, right, rotation);
