@@ -15,12 +15,32 @@ textarea {
 
 .medw { width: 70px; }
 
+@-webkit-keyframes title-color-cycle {
+    0% { text-shadow: 0 0 14px #E4DB85; }  /* Yellow */
+   20% { text-shadow: 0 0 14px #F28181; }  /* Red */
+   40% { text-shadow: 0 0 14px #E281F2; }  /* Purple */
+   60% { text-shadow: 0 0 14px #81CBF2; }  /* Cyan */
+   80% { text-shadow: 0 0 14px #95F281; }  /* Green */
+  100% { text-shadow: 0 0 14px #E4DB85; }  /* Yellow (return to original) */
+}
+
+@keyframes title-color-cycle {
+    0% { text-shadow: 0 0 14px #E4DB85; }  /* Yellow */
+   20% { text-shadow: 0 0 14px #F28181; }  /* Red */
+   40% { text-shadow: 0 0 14px #E281F2; }  /* Purple */
+   60% { text-shadow: 0 0 14px #81CBF2; }  /* Cyan */
+   80% { text-shadow: 0 0 14px #95F281; }  /* Green */
+  100% { text-shadow: 0 0 14px #E4DB85; }  /* Yellow (return to original) */
+}
+
 .title {
     position: relative;
     font-family: Impact;
     font-size: 50pt;
     color: #edffff;
     text-shadow: 0 0 14px #E4DB85;
+    -webkit-animation: title-color-cycle 5s infinite;
+    animation: title-color-cycle 5s infinite;
 }
 
 .bottomControls {
