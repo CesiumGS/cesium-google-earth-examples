@@ -55,3 +55,17 @@ textarea {
     padding: 5px 8px;
     border-radius: 10px;
 }
+
+.loadingIndicator {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -33px;
+    margin-left: -33px;
+    width: 66px;
+    height: 66px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url(ajax-loader.gif);
+}
