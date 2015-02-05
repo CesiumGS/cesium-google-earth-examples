@@ -19,6 +19,7 @@ limitations under the License.
   <title>Monster Milktruck!</title>
   <link rel=stylesheet href='milktruck.css' type='text/css' />
   <script src="../../Cesium/Cesium.js"></script>
+  <script type="text/javascript" src="shadow.js"></script>
   <script type="text/javascript" src="milktruck.js"></script>
 </head>
 <body onKeyDown="return keyDown(event);" onKeyUp="return keyUp(event);">
@@ -41,7 +42,8 @@ limitations under the License.
     	navigationHelpButton : false,
     	navigationInstructionsInitiallyVisible : false,
     	fullscreenButton : false,
-    	baseLayerPicker : false
+    	baseLayerPicker : false,
+    	scene3DOnly : true
     });
     viewer.scene.terrainProvider = new Cesium.CesiumTerrainProvider({
       url : '//cesiumjs.org/stk-terrain/tilesets/world/tiles'

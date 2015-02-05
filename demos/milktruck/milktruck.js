@@ -17,8 +17,6 @@ limitations under the License.
 
 // Code for Monster Milktruck demo, using Earth Plugin.
 
-window.truck = null;
-
 var MODEL_URL = 'model/Cesium_Ground.gltf';
 var INIT_LOC = {
 	lon : -123.0744619, 
@@ -98,20 +96,16 @@ function Truck(viewer) {
   this.fastTimer = 0;
   this.popupTimer = 0;
   
+  var width = 7.0;
+  var height = 3.5;
+  this.shadow = this.scene.primitives.add(new Shadow(width, height));
+  
   var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(Cesium.Cartesian3.fromDegrees(INIT_LOC.lon, INIT_LOC.lat));
   
   this.model = this.scene.primitives.add(Cesium.Model.fromGltf({
       url : MODEL_URL,
-      modelMatrix : modelMatrix,
-      minimumPixelSize : 128
+      modelMatrix : modelMatrix
   }));
-
-  var that = this;
-  Cesium.when(this.model.readyPromise).then(function(model) {
-	  //that.teleportTo(INIT_LOC.lon, INIT_LOC.lat, INIT_LOC.heading);
-	  //that.lastMillis = (new Date()).getTime();
-	  //that.scene.postRender.addEventListener(function() { that.tick(); });
-  });
 }
 
 leftButtonDown = false;
@@ -343,6 +337,8 @@ Truck.prototype.tick = function() {
   this.tickPopups(dt);
   
   this.cameraFollow(dt);
+  
+  this.shadow.updatePositions(gpos, this.model.modelMatrix, this.scene, this.scene.globe, this.ellipsoid);
 };
 
 // TODO: would be nice to have globe.getGroundNormal() in the API.
