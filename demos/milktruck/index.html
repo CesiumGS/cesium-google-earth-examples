@@ -108,6 +108,67 @@ limitations under the License.
     function submitLocation() {
     	geocode(document.getElementById('address'));
     }
+    
+    function truckTick() {
+    	truck.tick();
+    }
+    
+    function findHeight(lon, lat, level, height) {
+        var position = [Cesium.Cartographic.fromDegrees(lon, lat)];
+        var positionPromise = Cesium.sampleTerrain(viewer.scene.terrainProvider, level, position);
+        
+        Cesium.when(positionPromise, function() {
+        	if (Cesium.defined(position[0].height)) {
+        		viewer.scene.camera.setView({
+                    positionCartographic : Cesium.Cartographic.fromDegrees(lon, lat, height + 1)
+                });
+        		findHeight(lon, lat, level + 1, position[0].height);
+        	} else {
+        		viewer.scene.camera.setView({
+                    positionCartographic : Cesium.Cartographic.fromDegrees(lon, lat, height + 1)
+                });
+        		
+        		Cesium.when(truck.model.readyPromise).then(function(model) {
+                    var deferred = Cesium.when.defer();
+                    
+                    function waitForTerrain() {
+                    	var cart = Cesium.Cartographic.fromDegrees(lon, lat);
+                        
+                        var pickedHeight = viewer.scene.globe.getHeight(cart);
+                    	if (Cesium.defined(pickedHeight) && Math.abs(pickedHeight - height) < 1.0) {
+                    		deferred.resolve();
+                    	} else {
+                    		setTimeout(waitForTerrain, 10);
+                    	}
+                    }
+
+                    setTimeout(waitForTerrain, 10);
+                    
+                    Cesium.when(deferred.promise, function() {
+                        truck.teleportTo(lon, lat, height);
+                        truck.lastMillis = (new Date()).getTime();
+                        viewer.scene.postRender.addEventListener(truckTick);
+                        viewer.scene.debugCommandFilter = undefined;
+                    });
+              });
+        	}
+        });
+    }
+    
+    function teleportTo(lon, lat) {
+        viewer.scene.postRender.removeEventListener(truckTick);
+    	viewer.scene.debugCommandFilter = function() {
+    		return false;
+    	};
+    	
+    	var height = 10000.0;
+    	viewer.scene.camera.setView({
+            positionCartographic : Cesium.Cartographic.fromDegrees(lon, lat, height)
+        });
+    	findHeight(lon, lat, 9, height);
+    }
+    
+    teleportTo(-123.0744619, 44.0503706);
   </script>
 
     <table class="bottomControls">
@@ -122,10 +183,10 @@ limitations under the License.
                     </form>
 
                     Presets:
-                    <input type="button" class="cesium-button" value="Whistler" onclick="truck.teleportTo(-122.855824,50.085734);">
-                    <input type="button" class="cesium-button" value="Grand Canyon" onclick="truck.teleportTo(-112.75049677437019,36.1558069186536);">
-                    <input type="button" class="cesium-button" value="Meteor Crater" onclick="truck.teleportTo(-111.02255803482507,35.03285647546941);">
-                    <input type="button" class="cesium-button" value="El Capitan" onclick="truck.teleportTo(-119.63751256720771,37.733875309213396);">
+                    <input type="button" class="cesium-button" value="Whistler" onclick="teleportTo(-122.855824,50.085734);">
+                    <input type="button" class="cesium-button" value="Grand Canyon" onclick="teleportTo(-112.75049677437019,36.1558069186536);">
+                    <input type="button" class="cesium-button" value="Meteor Crater" onclick="teleportTo(-111.02255803482507,35.03285647546941);">
+                    <input type="button" class="cesium-button" value="El Capitan" onclick="teleportTo(-119.63751256720771,37.733875309213396);">
                 </div>
 
 

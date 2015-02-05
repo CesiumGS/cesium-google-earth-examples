@@ -108,9 +108,9 @@ function Truck(viewer) {
 
   var that = this;
   Cesium.when(this.model.readyPromise).then(function(model) {
-	  that.teleportTo(INIT_LOC.lon, INIT_LOC.lat, INIT_LOC.heading);
-	  that.lastMillis = (new Date()).getTime();
-	  that.scene.postRender.addEventListener(function() { that.tick(); });
+	  //that.teleportTo(INIT_LOC.lon, INIT_LOC.lat, INIT_LOC.heading);
+	  //that.lastMillis = (new Date()).getTime();
+	  //that.scene.postRender.addEventListener(function() { that.tick(); });
   });
 }
 
@@ -452,7 +452,7 @@ Truck.prototype.showFastPopup = function() {
   });
 };
 
-var MIN_ZOOM_DISTANCE = 20.0;
+var MIN_ZOOM_DISTANCE = 50.0;
 
 function adjustHeightForTerrain(truck) {
     var scene = truck.scene;
@@ -533,13 +533,13 @@ Truck.prototype.cameraFollow = function(dt) {
 };
 
 // heading is optional.
-Truck.prototype.teleportTo = function(lon, lat, heading) {
-	var cart = Cesium.Cartographic.fromDegrees(lon, lat);
+Truck.prototype.teleportTo = function(lon, lat, height, heading) {
+	var cart = Cesium.Cartographic.fromDegrees(lon, lat, height);
 	
-	cart.height = this.scene.globe.getHeight(cart);
-	if (!Cesium.defined(cart.height)) {
-		cart.height = 0.0;
-	}
+	//cart.height = this.scene.globe.getHeight(cart);
+	//if (!Cesium.defined(cart.height)) {
+	//	cart.height = 0.0;
+	//}
 	
 	var location = this.ellipsoid.cartographicToCartesian(cart);
 	heading = Cesium.Math.toRadians(Cesium.defaultValue(heading, 0.0));
