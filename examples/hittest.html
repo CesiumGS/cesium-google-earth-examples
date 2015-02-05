@@ -58,7 +58,7 @@ function addPin(id, position){
 var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
 handler.setInputAction(function (click) {
     var pickedObject = scene.pick(click.position);
-    if (Cesium.defined(pickedObject)) {
+	if (Cesium.defined(pickedObject) && pickedObject.id !== pin) {
         addPin(pickedObject.id.id, camera.pickEllipsoid(click.position));
     } else {
         addPin('G', camera.pickEllipsoid(click.position));
@@ -178,7 +178,7 @@ function makePlacemark(lat, lng, alt, altMode, iconStr) {
     var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
     handler.setInputAction(function (click) {
         var pickedObject = scene.pick(click.position);
-        if (Cesium.defined(pickedObject)) {
+        if (Cesium.defined(pickedObject) && pickedObject.id !== pin) {
             addPin(pickedObject.id.id, camera.pickEllipsoid(click.position));
         } else {
             addPin('G', camera.pickEllipsoid(click.position));
