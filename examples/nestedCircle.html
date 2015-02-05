@@ -41,28 +41,8 @@ limitations under the License.
   <div id="cesiumContainer"></div>
   </div>
   <div id="source">
-  <h2>Relevant Cesium Source</h2><pre id="cesiumSource" class="prettyprint lang-js"></pre>
-function circle(radius, center) {
-  return {
-    position : center,
-    ellipse : {
-        semiMajorAxis : radius,
-        semiMinorAxis : radius,
-        fill: false,
-        outline: true,
-        outlineColor: Cesium.Color.WHITE
-    }
-  };  
-}
-
-var center = Cesium.Cartesian3.fromDegrees(-85.0, 20.0);
-
-viewer.entities.add(circle(500, center));
-viewer.entities.add(circle(1000, center));
-viewer.entities.add(circle(1500, center));
-viewer.entities.add(circle(2000, center));</pre>
-    
-  <h2>Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/camera-move.html">link</a>)</h2><pre class="prettyprint lang-js">
+  <h2>Relevant Cesium Source</h2><pre id="cesiumSource" class="prettyprint lang-js"></pre>    
+  <h2>Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/multigeometry.html">link</a>)</h2><pre class="prettyprint lang-js">
 function makeCircle(radius, x, y) {
   var center = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
   var ring = ge.createLinearRing('');
@@ -95,35 +75,35 @@ ge.getFeatures().appendChild(multGeoPlacemark);</pre>
   </div>
   
   <script>
-  var viewer = new Cesium.Viewer('cesiumContainer');
+    var viewer = new Cesium.Viewer('cesiumContainer');
 
-  function circle(radius, center) {
-      return {
-          position : center,
-          ellipse : {
-              semiMajorAxis : radius,
-              semiMinorAxis : radius,
-              fill: false,
-              outline: true,
-              outlineColor: Cesium.Color.WHITE
-          }
-      };  
-  }
-  
-  var center = Cesium.Cartesian3.fromDegrees(-85.0, 20.0);
+    function relevantSource() {
+        function circle(radius, center) {
+            return {
+                position: center,
+                ellipse: {
+                    semiMajorAxis: radius,
+                    semiMinorAxis: radius,
+                    fill: false,
+                    outline: true,
+                    outlineColor: Cesium.Color.WHITE
+                }
+            };
+        }
 
-  viewer.entities.add(circle(500, center));
-  viewer.entities.add(circle(1000, center));
-  viewer.entities.add(circle(1500, center));
-  viewer.entities.add(circle(2000, center));
-  
-  viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(-85.0, 20.0, 5500.0)
-  });
-  
-  // Comparable Google Earth API code:
-  //
-  // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/multigeometry.html
+        var center = Cesium.Cartesian3.fromDegrees(-85.0, 20.0);
+
+        viewer.entities.add(circle(500, center));
+        viewer.entities.add(circle(1000, center));
+        viewer.entities.add(circle(1500, center));
+        viewer.entities.add(circle(2000, center));
+    }
+
+    relevantSource();
+    showSource('cesiumSource', relevantSource);
+    viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(-85.0, 20.0, 5500.0)
+    });
   </script>
 </body>
 </html>
