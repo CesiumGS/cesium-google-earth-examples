@@ -452,7 +452,7 @@ Truck.prototype.showFastPopup = function() {
   });
 };
 
-var MIN_ZOOM_DISTANCE = 50.0;
+var MIN_ZOOM_DISTANCE = 10.0;
 
 function adjustHeightForTerrain(truck) {
     var scene = truck.scene;
@@ -483,21 +483,18 @@ function adjustHeightForTerrain(truck) {
         projection.unproject(camera.position, cartographic);
     }
 
-    //if (cartographic.height < controller.minimumCollisionTerrainHeight) {
-        var height = globe.getHeight(cartographic);
-        if (Cesium.defined(height)) {
-            //height += controller.minimumZoomDistance;
-        	height += MIN_ZOOM_DISTANCE;
-            if (cartographic.height < height) {
-                cartographic.height = height;
-                if (mode === Cesium.SceneMode.SCENE3D) {
-                    ellipsoid.cartographicToCartesian(cartographic, camera.position);
-                } else {
-                    projection.project(cartographic, camera.position);
-                }
+    var height = globe.getHeight(cartographic);
+    if (Cesium.defined(height)) {
+    	height += MIN_ZOOM_DISTANCE;
+        if (cartographic.height < height) {
+            cartographic.height = height;
+            if (mode === Cesium.SceneMode.SCENE3D) {
+                ellipsoid.cartographicToCartesian(cartographic, camera.position);
+            } else {
+                projection.project(cartographic, camera.position);
             }
         }
-    //}
+    }
 
     if (Cesium.defined(transform)) {
         camera._setTransform(transform);

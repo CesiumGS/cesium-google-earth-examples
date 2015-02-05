@@ -23,6 +23,7 @@ limitations under the License.
 </head>
 <body onKeyDown="return keyDown(event);" onKeyUp="return keyUp(event);">
     <div id="cesiumContainer"></div>
+    <div id="loadingIndicator" class="loadingIndicator"></div>
 <center>
   <div class="title">
     <center>
@@ -51,6 +52,8 @@ limitations under the License.
     var truck = new Truck(viewer);
     
     var bingKey = Cesium.BingMapsApi.getKey();
+    
+    var loadingIndicator = document.getElementById('loadingIndicator');
     
     function geocode(element) {
     	var query = element.value;
@@ -135,7 +138,7 @@ limitations under the License.
                     	var cart = Cesium.Cartographic.fromDegrees(lon, lat);
                         
                         var pickedHeight = viewer.scene.globe.getHeight(cart);
-                    	if (Cesium.defined(pickedHeight) && Math.abs(pickedHeight - height) < 1.0) {
+                    	if (Cesium.defined(pickedHeight) && Math.abs(pickedHeight - height) < 5.0) {
                     		deferred.resolve();
                     	} else {
                     		setTimeout(waitForTerrain, 10);
@@ -145,6 +148,7 @@ limitations under the License.
                     setTimeout(waitForTerrain, 10);
                     
                     Cesium.when(deferred.promise, function() {
+                        loadingIndicator.style.display = 'none';
                         truck.teleportTo(lon, lat, height);
                         truck.lastMillis = (new Date()).getTime();
                         viewer.scene.postRender.addEventListener(truckTick);
@@ -160,6 +164,8 @@ limitations under the License.
     	viewer.scene.debugCommandFilter = function() {
     		return false;
     	};
+    	
+        loadingIndicator.style.display = 'block';
     	
     	var height = 10000.0;
     	viewer.scene.camera.setView({
@@ -195,7 +201,7 @@ limitations under the License.
                 <table>
                     <tr>
                         <td></td>
-                        <td><input type=button class="cesium-button medw" onmousedown="gasButtonDown=true;" onmouseup="gasButtonDown = false;" value="gas"></td>
+                        <td><input type=button class="cesium-button medw" onmousedown="gasButtonDown=true;" onmouseup="gasButtonDown=false;" value="gas"></td>
                         <td></td>
                     </tr>
                     <tr>
