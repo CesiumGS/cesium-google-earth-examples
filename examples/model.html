@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <!--
 See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
@@ -26,6 +26,7 @@ limitations under the License.
   <style type="text/css">@import "static/examples.css";</style>
   <style type="text/css">@import "static/prettify/prettify.css";</style>
   <script type="text/javascript" src="static/prettify/prettify.js"></script>
+  <script type="text/javascript" src="static/showSource.js"></script>
 
   <script src="../Cesium/Cesium.js"></script>
   <style>
@@ -40,18 +41,8 @@ limitations under the License.
   <div id="cesiumContainer"></div>
   </div>
   <div id="source">
-  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-var entity = viewer.entities.add({
-    position : Cesium.Cartesian3.fromDegrees(-100, 40),
-    model : {
-        uri : './static/Cesium_Man.gltf',
-        scale : 10
-    }
-});
-viewer.zoomTo(entity, new Cesium.HeadingPitchRange(Cesium.Math.toRadians(-45), Cesium.Math.toRadians(-30)));
-</pre></div>
-
-  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+  <h2>Relevant Cesium Source</h2><pre id="cesiumSource" class="prettyprint lang-js"></pre>
+  <h2>Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/model.html">link</a>)</h2><pre class="prettyprint lang-js">
 var placemark = ge.createPlacemark('');
 placemark.setName('model');
 var model = ge.createModel('');
@@ -72,8 +63,7 @@ placemark.setGeometry(model);
 
 la.setRange(300);
 la.setTilt(45);
-ge.getView().setAbstractView(la);
-  </pre></div>
+ge.getView().setAbstractView(la);</pre>
   </div>
   <div id="resources">
   <h2>Resources:</h2>
@@ -88,18 +78,19 @@ ge.getView().setAbstractView(la);
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
 
-    var entity = viewer.entities.add({
-        position : Cesium.Cartesian3.fromDegrees(-100, 40),
-        model : {
-            uri : './static/Cesium_Man.gltf',
-            scale : 10
-        }
-    });
-    viewer.zoomTo(entity, new Cesium.HeadingPitchRange(Cesium.Math.toRadians(-45), Cesium.Math.toRadians(-30)));
-
-    // Comparable Google Earth API code:
-    //
-    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/model.html
+    function relevantSource() {
+        var entity = viewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(-100, 40),
+            model: {
+                uri: './static/Cesium_Man.gltf'
+            }
+        });
+        viewer.zoomTo(entity,
+                      new Cesium.HeadingPitchRange(Cesium.Math.toRadians(-45),
+                                                   Cesium.Math.toRadians(-30)));
+    }
+    relevantSource();
+    showSource('cesiumSource', relevantSource);
   </script>
 </body>
 </html>

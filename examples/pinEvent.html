@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <!--
 See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
@@ -26,6 +26,7 @@ limitations under the License.
   <style type="text/css">@import "static/examples.css";</style>
   <style type="text/css">@import "static/prettify/prettify.css";</style>
   <script type="text/javascript" src="static/prettify/prettify.js"></script>
+  <script type="text/javascript" src="static/showSource.js"></script>
 
   <script src="../Cesium/Cesium.js"></script>
   <style>
@@ -40,39 +41,8 @@ limitations under the License.
   <div id="cesiumContainer"></div>
   </div>
   <div id="source">
-  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-var alertText = '';
-function addText(key, value) { 
-    alertText += key + ': ' + value+ '\n' ;
-}
-function showAlert() {
-    alert(alertText);
-    alertText = '';
-}
-function sampleTerrainSuccess() {
-    addText('height', terrainSamplePositions[0].height);
-    showAlert();
-}
-
-var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
-handler.setInputAction(function (click) {
-    var pickedObject = scene.pick(click.position);
-    if (Cesium.defined(pickedObject) && (pickedObject.id === entity)) {
-        addText('target', pickedObject.id.id);
-        var position = viewer.camera.pickEllipsoid(click.position);
-        addText('screenX', click.position.x);
-        addText('screenY', click.position.y);
-        addText('didHitGlobe', Cesium.defined(position));
-        var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-        addText('longitude', Cesium.Math.toDegrees(cartographicPosition.longitude));
-        addText('latitude', Cesium.Math.toDegrees(cartographicPosition.latitude));
-        terrainSamplePositions = [cartographicPosition];
-        Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess, showAlert);
-    }
-}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-</pre></div>
-    
-  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+  <h2>Relevant Cesium Source</h2><pre id="cesiumSource" class="prettyprint lang-js"></pre>
+  <h2>Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/event-placemark.html">link</a>)</h2><pre class="prettyprint lang-js">
 google.earth.addEventListener(placemark, 'click', function(event) {
   var text = 'Click:';
 
@@ -105,8 +75,7 @@ google.earth.addEventListener(placemark, 'click', function(event) {
   setTimeout(function() {
     alert(text);
   }, 0);
-});
-  </pre></div>
+});</pre>
   </div>
   <div id="resources">
   <h2>Resources:</h2>
@@ -128,54 +97,50 @@ google.earth.addEventListener(placemark, 'click', function(event) {
 
     var position = Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude);
     var entity = viewer.entities.add({
-        position : position,
-        id : 'Pin1',
-        billboard :{
-            image : pinBuilder.fromColor(Cesium.Color.SALMON, 48),
-            verticalOrigin : Cesium.VerticalOrigin.BOTTOM
+        position: position,
+        id: 'Pin1',
+        billboard: {
+            image: pinBuilder.fromColor(Cesium.Color.SALMON, 48),
+            verticalOrigin: Cesium.VerticalOrigin.BOTTOM
         }
     });
 
     var globe = scene.globe;
     globe.depthTestAgainstTerrain = true;
     var cesiumTerrainProviderMeshes = new Cesium.CesiumTerrainProvider({
-        url : '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
+        url: '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
     });
     viewer.terrainProvider = cesiumTerrainProviderMeshes;
-    
-    var alertText = '';
-    function addText(key, value) { 
-        alertText += key + ': ' + value+ '\n' ;
-    }
-    function showAlert() {
-        alert(alertText);
-        alertText = '';
-    }
-    function sampleTerrainSuccess() {
-        addText('height', terrainSamplePositions[0].height);
-        showAlert();
-    }
-    
-    var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
-    handler.setInputAction(function (click) {
-        var pickedObject = scene.pick(click.position);
-        if (Cesium.defined(pickedObject) && (pickedObject.id === entity)) {
-            addText('target', pickedObject.id.id);
-            var position = viewer.camera.pickEllipsoid(click.position);
-            addText('screenX', click.position.x);
-            addText('screenY', click.position.y);
-            addText('didHitGlobe', Cesium.defined(position));
-            var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-            addText('longitude', Cesium.Math.toDegrees(cartographicPosition.longitude));
-            addText('latitude', Cesium.Math.toDegrees(cartographicPosition.latitude));
-            terrainSamplePositions = [cartographicPosition];
-            Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess, showAlert);
-        }
-    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
-    // Comparable Google Earth API code:
-    //
-    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/event-placemark.html
+    function relevantSource() {
+        var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+        handler.setInputAction(function(click) {
+            var alertText = '';
+            function addToMessage(key, value) {
+                alertText += key + ': ' + value + '\n';
+            }
+
+            var pickedObject = scene.pick(click.position);
+            if (Cesium.defined(pickedObject) && (pickedObject.id === entity)) {
+                addToMessage('target', pickedObject.id.id);
+                var position = viewer.camera.pickEllipsoid(click.position);
+                addToMessage('screenX', click.position.x);
+                addToMessage('screenY', click.position.y);
+                addToMessage('didHitGlobe', Cesium.defined(position));
+                var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
+                addToMessage('longitude', Cesium.Math.toDegrees(cartographicPosition.longitude));
+                addToMessage('latitude', Cesium.Math.toDegrees(cartographicPosition.latitude));
+                terrainSamplePositions = [cartographicPosition];
+                Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions).then(function() {
+                    addToMessage('height', terrainSamplePositions[0].height);
+                }).always(function() {
+                    alert(alertText);
+                });
+            }
+        }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+    }
+    relevantSource();
+    showSource('cesiumSource', relevantSource);
   </script>
 </body>
 </html>

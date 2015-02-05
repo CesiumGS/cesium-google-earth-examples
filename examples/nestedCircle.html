@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <!--
 See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
@@ -26,6 +26,7 @@ limitations under the License.
   <style type="text/css">@import "static/examples.css";</style>
   <style type="text/css">@import "static/prettify/prettify.css";</style>
   <script type="text/javascript" src="static/prettify/prettify.js"></script>
+  <script type="text/javascript" src="static/showSource.js"></script>
 
   <script src="../Cesium/Cesium.js"></script>
   <style>
@@ -40,7 +41,7 @@ limitations under the License.
   <div id="cesiumContainer"></div>
   </div>
   <div id="source">
-  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
+  <h2>Relevant Cesium Source</h2><pre id="cesiumSource" class="prettyprint lang-js"></pre>
 function circle(radius, center) {
   return {
     position : center,
@@ -59,10 +60,9 @@ var center = Cesium.Cartesian3.fromDegrees(-85.0, 20.0);
 viewer.entities.add(circle(500, center));
 viewer.entities.add(circle(1000, center));
 viewer.entities.add(circle(1500, center));
-viewer.entities.add(circle(2000, center));
-</pre></div>
+viewer.entities.add(circle(2000, center));</pre>
     
-  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+  <h2>Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/camera-move.html">link</a>)</h2><pre class="prettyprint lang-js">
 function makeCircle(radius, x, y) {
   var center = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
   var ring = ge.createLinearRing('');
@@ -83,8 +83,7 @@ geoms.appendChild(makeCircle(.25, 0, 0));
 geoms.appendChild(makeCircle(.55, 0, 0));
 geoms.appendChild(makeCircle(.85, 0, 0));
 geoms.appendChild(makeCircle(1.15, 0, 0));
-ge.getFeatures().appendChild(multGeoPlacemark);
-  </pre></div>
+ge.getFeatures().appendChild(multGeoPlacemark);</pre>
   </div>
   <div id="resources">
   <h2>Resources:</h2>
