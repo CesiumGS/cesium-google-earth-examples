@@ -452,7 +452,7 @@ Truck.prototype.showFastPopup = function() {
   });
 };
 
-var MIN_ZOOM_DISTANCE = 10.0;
+var MIN_ZOOM_DISTANCE = 20.0;
 
 function adjustHeightForTerrain(truck) {
     var scene = truck.scene;
