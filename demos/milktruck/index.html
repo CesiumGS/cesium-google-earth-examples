@@ -132,28 +132,18 @@ limitations under the License.
                 });
         		
         		Cesium.when(truck.model.readyPromise).then(function(model) {
-                    var deferred = Cesium.when.defer();
-                    
-                    function waitForTerrain() {
+					var removeEvent = viewer.scene.postRender.addEventListener(function(){
                     	var cart = Cesium.Cartographic.fromDegrees(lon, lat);
-                        
                         var pickedHeight = viewer.scene.globe.getHeight(cart);
                     	if (Cesium.defined(pickedHeight) && Math.abs(pickedHeight - height) < 5.0) {
-                    		deferred.resolve();
-                    	} else {
-                    		setTimeout(waitForTerrain, 10);
-                    	}
-                    }
-
-                    setTimeout(waitForTerrain, 10);
-                    
-                    Cesium.when(deferred.promise, function() {
-                        loadingIndicator.style.display = 'none';
-                        truck.teleportTo(lon, lat, height);
-                        truck.lastMillis = (new Date()).getTime();
-                        viewer.scene.postRender.addEventListener(truckTick);
-                        viewer.scene.debugCommandFilter = undefined;
-                    });
+                    	    removeEvent();
+                    	    loadingIndicator.style.display = 'none';
+                    	    truck.teleportTo(lon, lat, height);
+                    	    truck.lastMillis = (new Date()).getTime();
+                    	    viewer.scene.postRender.addEventListener(truckTick);
+                    	    viewer.scene.debugCommandFilter = undefined;
+                    	} 					
+					});
               });
         	}
         });
