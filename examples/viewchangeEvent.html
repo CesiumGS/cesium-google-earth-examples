@@ -130,12 +130,12 @@ google.earth.addEventListener(ge.getView(), 'viewchangeend', function() {
         }, 250);
     }
 
-    var oldCamera = camera.clone();
+    var lastPosition = camera.position.clone();
     function preRender() {
-        if (!Cesium.Cartesian3.equalsEpsilon(oldCamera.position, camera.position, Cesium.Math.EPSILON4)){
+        if (!Cesium.Cartesian3.equalsEpsilon(lastPosition, camera.position, Cesium.Math.EPSILON4)){
             viewEvent.raiseEvent();
         }
-        oldCamera = camera.clone();
+        lastPosition = camera.position.clone();
     }
 
     scene.preRender.addEventListener(preRender);
