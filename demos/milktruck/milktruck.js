@@ -17,7 +17,7 @@ limitations under the License.
 
 // Code for Monster Milktruck demo, using Earth Plugin.
 
-var MODEL_URL = 'model/Cesium_Ground.gltf';
+var MODEL_URL = 'model/Cesium Milk Truck.gltf';
 var INIT_LOC = {
 	lon : -123.0744619, 
 	lat : 44.0503706,
