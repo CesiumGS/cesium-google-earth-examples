@@ -279,7 +279,7 @@ Truck.prototype.tick = function() {
   }
 
   // Gravity
-  var normal = estimateGroundNormal(this.scene.globe, gpos, this.ellipsoid);
+  var normal = this.ellipsoid.geodeticSurfaceNormal(gpos);
   var gravity = Cesium.Cartesian3.multiplyByScalar(normal, -GRAVITY * dt, new Cesium.Cartesian3());
   Cesium.Cartesian3.add(this.vel, gravity, this.vel);
 
@@ -301,6 +301,7 @@ Truck.prototype.tick = function() {
     //
     // TODO: would be fun to add a springy suspension here so
     // the truck bobs & bounces a little.
+	normal = estimateGroundNormal(this.scene.globe, gpos, this.ellipsoid);
     var speedOutOfGround = Cesium.Cartesian3.dot(normal, this.vel);
     if (speedOutOfGround < 0) {
       Cesium.Cartesian3.add(this.vel, Cesium.Cartesian3.multiplyByScalar(normal, -speedOutOfGround, new Cesium.Cartesian3()), this.vel);
