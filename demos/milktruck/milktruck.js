@@ -32,10 +32,6 @@ var ACCEL = 50.0;
 var DECEL = 80.0;
 var MAX_REVERSE_SPEED = 40.0;
 
-var STEER_ROLL = -1.0;
-var ROLL_SPRING = 0.5;
-var ROLL_DAMP = -0.16;
-
 function rotate(v, axis, radians) {
 	var quaternion = Cesium.Quaternion.fromAxisAngle(axis, radians);
 	var rotMat = Cesium.Matrix3.fromQuaternion(quaternion);
@@ -200,13 +196,10 @@ Truck.prototype.tick = function() {
     var SPEED_MAX_TURN = 25.0;
     var SPEED_MIN_TURN = 120.0;
     if (absSpeed < SPEED_MAX_TURN) {
-      turnSpeed = TURN_SPEED_MIN + (TURN_SPEED_MAX - TURN_SPEED_MIN)
-                   * (SPEED_MAX_TURN - absSpeed) / SPEED_MAX_TURN;
+      turnSpeed = TURN_SPEED_MIN + (TURN_SPEED_MAX - TURN_SPEED_MIN) * (SPEED_MAX_TURN - absSpeed) / SPEED_MAX_TURN;
       turnSpeed *= (absSpeed / SPEED_MAX_TURN);  // Less turn as truck slows
     } else if (absSpeed < SPEED_MIN_TURN) {
-      turnSpeed = TURN_SPEED_MIN + (TURN_SPEED_MAX - TURN_SPEED_MIN)
-                  * (SPEED_MIN_TURN - absSpeed)
-                  / (SPEED_MIN_TURN - SPEED_MAX_TURN);
+      turnSpeed = TURN_SPEED_MIN + (TURN_SPEED_MAX - TURN_SPEED_MIN) * (SPEED_MIN_TURN - absSpeed) / (SPEED_MIN_TURN - SPEED_MAX_TURN);
     } else {
       turnSpeed = TURN_SPEED_MIN;
     }
@@ -222,8 +215,8 @@ Truck.prototype.tick = function() {
   var newdir = airborne ? dir : rotate(dir, up, steerAngle);
   makeOrthonormalFrame(this.model.modelMatrix, newdir, up);
   var right = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(this.model.modelMatrix, 0, new Cesium.Cartesian4()));
-  var dir = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(this.model.modelMatrix, 1, new Cesium.Cartesian4()));
-  var up = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(this.model.modelMatrix, 2, new Cesium.Cartesian4()));
+  dir = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(this.model.modelMatrix, 1, new Cesium.Cartesian4()));
+  up = Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(this.model.modelMatrix, 2, new Cesium.Cartesian4()));
   
   var forwardSpeed = 0;
   
@@ -419,8 +412,7 @@ var IDLE_MESSAGES = [
 Truck.prototype.showIdlePopup = function() {
   this.popupTimer = 2.0;
   var rand = Math.random();
-  var index = Math.floor(rand * IDLE_MESSAGES.length)
-    % IDLE_MESSAGES.length;
+  var index = Math.floor(rand * IDLE_MESSAGES.length) % IDLE_MESSAGES.length;
   var message = "<center>" + IDLE_MESSAGES[index] + "</center>";
 
   this.viewer.selectedEntity = new Cesium.Entity({
@@ -438,8 +430,7 @@ var FAST_MESSAGES = [
 Truck.prototype.showFastPopup = function() {
   this.popupTimer = 2.0;
   var rand = Math.random();
-  var index = Math.floor(rand * FAST_MESSAGES.length)
-    % FAST_MESSAGES.length;
+  var index = Math.floor(rand * FAST_MESSAGES.length) % FAST_MESSAGES.length;
   var message = "<center>" + FAST_MESSAGES[index] + "</center>";
   
   this.viewer.selectedEntity = new Cesium.Entity({
@@ -454,7 +445,6 @@ function adjustHeightForTerrain(truck) {
     var scene = truck.scene;
     var mode = scene.mode;
     var globe = scene.globe;
-    var controller = scene.screenSpaceCameraController;
 
     if (!Cesium.defined(globe) || mode === Cesium.SceneMode.SCENE2D || mode === Cesium.SceneMode.MORPHING) {
         return;
@@ -522,17 +512,12 @@ Truck.prototype.cameraFollow = function(dt) {
   var truckPosition = Cesium.Matrix4.getTranslation(this.model.modelMatrix, new Cesium.Cartesian3());
   camera.lookAt(truckPosition, new Cesium.HeadingPitchRange(heading, PITCH, RANGE));
   
-  adjustHeightForTerrain(truck);
+  adjustHeightForTerrain(this);
 };
 
 // heading is optional.
 Truck.prototype.teleportTo = function(lon, lat, height, heading) {
 	var cart = Cesium.Cartographic.fromDegrees(lon, lat, height);
-	
-	//cart.height = this.scene.globe.getHeight(cart);
-	//if (!Cesium.defined(cart.height)) {
-	//	cart.height = 0.0;
-	//}
 	
 	var location = this.ellipsoid.cartographicToCartesian(cart);
 	heading = Cesium.Math.toRadians(Cesium.defaultValue(heading, 0.0));
