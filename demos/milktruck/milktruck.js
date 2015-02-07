@@ -110,29 +110,41 @@ var gasButtonDown = false;
 var reverseButtonDown = false;
 var addressElement;
 
+function setHoverClass(name, isDown) {
+    document.getElementById(name).className = 'cesium-button medw' + (isDown ? ' cesium-button-hover' : '');
+}
+
 function setKey(event, isDown) {
     // WASD keys only work outside the address bar.
     if (event.target !== addressElement) {
         if (event.keyCode == 65) {  // A
             leftButtonDown = isDown;
+            setHoverClass('buttonLeft', isDown);
         } else if (event.keyCode == 68) {  // D
             rightButtonDown = isDown;
+            setHoverClass('buttonRight', isDown);
         } else if (event.keyCode == 87) {  // W
             gasButtonDown = isDown;
+            setHoverClass('buttonGas', isDown);
         } else if (event.keyCode == 83) {  // S
             reverseButtonDown = isDown;
+            setHoverClass('buttonReverse', isDown);
         }
     }
 
     // Arrow keys always work, possibly moving the address bar cursor and the truck.
     if (event.keyCode == 37) {  // Left.
         leftButtonDown = isDown;
+        setHoverClass('buttonLeft', isDown);
     } else if (event.keyCode == 39) {  // Right.
         rightButtonDown = isDown;
+        setHoverClass('buttonRight', isDown);
     } else if (event.keyCode == 38) {  // Up.
         gasButtonDown = isDown;
+        setHoverClass('buttonGas', isDown);
     } else if (event.keyCode == 40) {  // Down.
         reverseButtonDown = isDown;
+        setHoverClass('buttonReverse', isDown);
     } else {
         // Any non-arrow-key events, including WASD: allow the default behavior.
         return true;

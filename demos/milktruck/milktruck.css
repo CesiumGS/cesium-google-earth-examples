@@ -15,6 +15,14 @@ textarea {
 
 .medw { width: 70px; }
 
+.cesium-button-hover {
+    color: #FFF;
+    fill: #FFF;
+    background: #48B;
+    border-color: #AEF;
+    box-shadow: 0 0 8px #FFF;
+}
+
 @-webkit-keyframes title-color-cycle {
     0% { text-shadow: 0 0 14px #E4DB85; }  /* Yellow */
    20% { text-shadow: 0 0 14px #F28181; }  /* Red */
