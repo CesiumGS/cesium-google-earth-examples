@@ -26,6 +26,7 @@ limitations under the License.
   <style type="text/css">@import "static/examples.css";</style>
   <style type="text/css">@import "static/prettify/prettify.css";</style>
   <script type="text/javascript" src="static/prettify/prettify.js"></script>
+  <script type="text/javascript" src="static/showSource.js"></script>
 
   <script src="../Cesium/Cesium.js"></script>
   <style>
@@ -40,44 +41,8 @@ limitations under the License.
   <div id="cesiumContainer"></div>
   </div>
   <div id="source">
-  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-var alertText = '';
-function addText(key, value) { 
-    alertText += key + ': ' + value+ '\n' ;
-}
-function showAlert() {
-    alert(alertText);
-    alertText = '';
-}
-function sampleTerrainSuccess() {
-    console.log('success');
-    addText('height', terrainSamplePositions[0].height);
-    showAlert();
-}
-var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
-handler.setInputAction(
-    function (click) {
-        var position = viewer.camera.pickEllipsoid(click.position);
-
-        addText('screenX', click.position.x);
-        addText('screenY', click.position.y);
-        addText('didHitGlobe', Cesium.defined(position));
-        
-        if (Cesium.defined(position)){
-            var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-            addText('longitude', Cesium.Math.toDegrees(cartographicPosition.longitude));
-            addText('latitude', Cesium.Math.toDegrees(cartographicPosition.latitude));
-            terrainSamplePositions = [cartographicPosition];
-            Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess, showAlert);
-        } else {
-            showAlert();
-        }
-    },
-    Cesium.ScreenSpaceEventType.LEFT_CLICK
-);
-</pre></div>
-    
-  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+  <h2>Relevant Cesium Source</h2><pre id="cesiumSource" class="prettyprint lang-js"></pre>
+  <h2>Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/event-globe.html">link</a>)</h2><pre class="prettyprint lang-js">
 function eventHandler(event) {
   var text = 'Click:';
 
@@ -113,8 +78,7 @@ function eventHandler(event) {
 }
 // listen to the click event on the globe and window
 google.earth.addEventListener(ge.getGlobe(), 'click', eventHandler);
-google.earth.addEventListener(ge.getWindow(), 'click', eventHandler);
-  </pre></div>
+google.earth.addEventListener(ge.getWindow(), 'click', eventHandler);</pre>
   </div>
   <div id="resources">
   <h2>Resources:</h2>
@@ -128,51 +92,49 @@ google.earth.addEventListener(ge.getWindow(), 'click', eventHandler);
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
     var scene = viewer.scene;
-    
+
     var globe = scene.globe;
     globe.depthTestAgainstTerrain = true;
     var cesiumTerrainProviderMeshes = new Cesium.CesiumTerrainProvider({
-        url : '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
+        url: '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
     });
     viewer.terrainProvider = cesiumTerrainProviderMeshes;
-    
-    var alertText = '';
-    function addText(key, value) { 
-        alertText += key + ': ' + value+ '\n' ;
-    }
-    function showAlert() {
-        alert(alertText);
-        alertText = '';
-    }
-    function sampleTerrainSuccess() {
-        addText('height', terrainSamplePositions[0].height);
-        showAlert();
-    }
-    var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
-    handler.setInputAction(
-        function (click) {
-            var position = viewer.camera.pickEllipsoid(click.position);
 
-            addText('screenX', click.position.x);
-            addText('screenY', click.position.y);
-            addText('didHitGlobe', Cesium.defined(position));
-            
-            if (Cesium.defined(position)){
-                var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
-                addText('longitude', Cesium.Math.toDegrees(cartographicPosition.longitude));
-                addText('latitude', Cesium.Math.toDegrees(cartographicPosition.latitude));
-                terrainSamplePositions = [cartographicPosition];
-                Cesium.when(Cesium.sampleTerrain(viewer.terrainProvider, 9, terrainSamplePositions), sampleTerrainSuccess, showAlert);
-            } else {
-                showAlert();
+    function relevantSource() {
+        function eventHandler(event) {
+            var text = 'Click:\n';
+
+            function addToMessage(append1, append2) {
+                text += append1 + ': ' + append2 + '\n';
             }
-        },
-        Cesium.ScreenSpaceEventType.LEFT_CLICK
-    );
-    
-    // Comparable Google Earth API code:
-    //
-    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/event-globe.html
+
+            addToMessage('screenX', event.position.x);
+            addToMessage('screenY', event.position.y);
+
+            var position = viewer.camera.pickEllipsoid(event.position);
+            var didHitGlobe = Cesium.defined(position);
+            addToMessage('didHitGlobe', didHitGlobe);
+
+            if (didHitGlobe) {
+                //Picked on globe
+                var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
+                addToMessage('longitude', Cesium.Math.toDegrees(cartographicPosition.longitude));
+                addToMessage('latitude', Cesium.Math.toDegrees(cartographicPosition.latitude));
+                Cesium.sampleTerrain(viewer.terrainProvider, 9, [cartographicPosition]).then(function() {
+                    addToMessage('height', cartographicPosition.height);
+                }).always(function() {
+                    alert(text);
+                });
+            } else {
+                //Picked off globe
+                alert(text);
+            }
+        }
+        var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+        handler.setInputAction(eventHandler, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+    }
+    relevantSource();
+    showSource('cesiumSource', relevantSource);
   </script>
 </body>
 </html>

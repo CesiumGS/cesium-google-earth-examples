@@ -26,6 +26,7 @@ limitations under the License.
   <style type="text/css">@import "static/examples.css";</style>
   <style type="text/css">@import "static/prettify/prettify.css";</style>
   <script type="text/javascript" src="static/prettify/prettify.js"></script>
+  <script type="text/javascript" src="static/showSource.js"></script>
 
   <script src="../Cesium/Cesium.js"></script>
   <style>
@@ -40,24 +41,8 @@ limitations under the License.
   <div id="cesiumContainer"></div>
   </div>
   <div id="source">
-  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-var latitude = 40.0;
-var longitude = -100.0;
-var north = latitude + .35;
-var south = latitude - .35;
-var east = longitude + 1.55;
-var west = longitude - 1.55;
-var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
-
-var entity = viewer.entities.add({
-    rectangle : {
-        coordinates : rectangle,
-        material : './static/Cesium_Logo_Color.jpg'
-    }
-});
-  </pre></div>
-    
-  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+  <h2>Relevant Cesium Source</h2><pre id="cesiumSource" class="prettyprint lang-js"></pre>
+  <h2>Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/groundoverlay.html">link</a>)</h2><pre class="prettyprint lang-js">
 var groundOverlay = ge.createGroundOverlay('');
 groundOverlay.setIcon(ge.createIcon(''))
 groundOverlay.getIcon().setHref(&quot;http://www.google.com/intl/en_ALL/images/logo.gif&quot;);
@@ -72,8 +57,7 @@ var rotation = 0;
 var latLonBox = groundOverlay.getLatLonBox();
 latLonBox.setBox(north, south, east, west, rotation);
 
-ge.getFeatures().appendChild(groundOverlay);
-  </pre></div>
+ge.getFeatures().appendChild(groundOverlay);</pre>
   </div>
   <div id="resources">
   <h2>Resources:</h2>
@@ -87,28 +71,28 @@ ge.getFeatures().appendChild(groundOverlay);
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
 
-    var latitude = 40.0;
-    var longitude = -100.0;
-    var north = latitude + .35;
-    var south = latitude - .35;
-    var east = longitude + 1.55;
-    var west = longitude - 1.55;
-    var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
+    function relevantSource() {
+        var latitude = 40.0;
+        var longitude = -100.0;
+        var north = latitude + .35;
+        var south = latitude - .35;
+        var east = longitude + 1.55;
+        var west = longitude - 1.55;
+        var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
 
-    var entity = viewer.entities.add({
-        rectangle : {
-            coordinates : rectangle,
-            material : './static/Cesium_Logo_Color.jpg'
-        }
-    });
+        var entity = viewer.entities.add({
+            rectangle : {
+                coordinates : rectangle,
+                material : './static/Cesium_Logo_Color.jpg'
+            }
+        });
 
-    viewer.camera.flyToRectangle({
-        destination : rectangle
-    });
-
-    // Comparable Google Earth API code:
-    //
-    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/groundoverlay.html
+        viewer.camera.flyToRectangle({
+            destination: rectangle
+        });
+    }
+    relevantSource();
+    showSource('cesiumSource', relevantSource, 3);
   </script>
 </body>
 </html>

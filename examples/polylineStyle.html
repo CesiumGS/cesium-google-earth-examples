@@ -26,6 +26,7 @@ limitations under the License.
   <style type="text/css">@import "static/examples.css";</style>
   <style type="text/css">@import "static/prettify/prettify.css";</style>
   <script type="text/javascript" src="static/prettify/prettify.js"></script>
+  <script type="text/javascript" src="static/showSource.js"></script>
 
   <script src="../Cesium/Cesium.js"></script>
   <style>
@@ -40,17 +41,8 @@ limitations under the License.
   <div id="cesiumContainer"></div>
   </div>
   <div id="source">
-  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-var entity = viewer.entities.add({
-    polyline : {
-        positions : positions,
-        width: 8.0,
-        material : new Cesium.ColorMaterialProperty(new Cesium.Color(1.0, 1.0, 0.0, 0.8))
-    }
-});
-</pre></div>
-    
-  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+  <h2>Relevant Cesium Source</h2><pre id="cesiumSource" class="prettyprint lang-js"></pre>
+  <h2>Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/linestring-style.html">link</a>)</h2><pre class="prettyprint lang-js">
 // If lineStringPlacemark doesn't already have a Style associated
 // with it, we create it now.
 if (!lineStringPlacemark.getStyleSelector()) {
@@ -62,8 +54,7 @@ if (!lineStringPlacemark.getStyleSelector()) {
 // to change the color and width of the line.
 var lineStyle = lineStringPlacemark.getStyleSelector().getLineStyle();
 lineStyle.setWidth(lineStyle.getWidth() + 2);
-lineStyle.getColor().set('6600ffff');  // aabbggrr format
-  </pre></div>
+lineStyle.getColor().set('6600ffff');  // aabbggrr format</pre>
   </div>
   <div id="resources">
   <h2>Resources:</h2>
@@ -77,7 +68,7 @@ lineStyle.getColor().set('6600ffff');  // aabbggrr format
 
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
-    
+
     var lat = 25.0;
     var lon = -90.0;
     var positions = Cesium.Cartesian3.fromDegreesArray([
@@ -92,23 +83,25 @@ lineStyle.getColor().set('6600ffff');  // aabbggrr format
         lon + 4.0, lat,
         lon + 4.5, lat + 1.5
     ]);
-    
+
     var entity = viewer.entities.add({
-        polyline : {
-            positions : positions,
-            width: 8.0,
-            material : new Cesium.ColorMaterialProperty(new Cesium.Color(1.0, 1.0, 0.0, 0.8))
+        polyline: {
+            positions: positions,
+            width: 6.0
         }
     });
+
+    function relevantSource() {
+        var polyline = entity.polyline;
+        polyline.width = polyline.width.getValue() + 2;
+        polyline.material = Cesium.Color.YELLOW.withAlpha(0.8)
+    }
+    relevantSource();
+    showSource('cesiumSource', relevantSource);
 
     viewer.camera.flyToRectangle({
         destination: Cesium.Rectangle.fromDegrees(lon, lat, lon + 4.5, lat + 1.5)
     });
-    
-    
-    // Comparable Google Earth API code:
-    //
-    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/linestring-style.html
   </script>
 </body>
 </html>

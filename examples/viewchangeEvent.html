@@ -26,6 +26,7 @@ limitations under the License.
   <style type="text/css">@import "static/examples.css";</style>
   <style type="text/css">@import "static/prettify/prettify.css";</style>
   <script type="text/javascript" src="static/prettify/prettify.js"></script>
+  <script type="text/javascript" src="static/showSource.js"></script>
 
   <script src="../Cesium/Cesium.js"></script>
   <style>
@@ -50,34 +51,8 @@ limitations under the License.
   <div id="cesiumContainer"></div>
   </div>
   <div id="source">
-  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-var viewEvent = new Cesium.Event();
-var eventHelper = new Cesium.EventHelper();
-eventHelper.add(viewEvent, viewChanged);
-var viewTimeout;
-function viewChanged(){
-    document.getElementById('viewChanged').style.display = 'block';
-    
-    if (viewTimeout !== null)
-      window.clearTimeout(viewTimeout);
-
-    viewTimeout = window.setTimeout(function() {
-      document.getElementById('viewChanged').style.display = 'none';
-      viewTimeout = null;
-    }, 250);
-}
-
-var oldCamera = camera.clone();
-function preRender() {
-    if (!Cesium.Cartesian3.equalsEpsilon(oldCamera.position, camera.position, Cesium.Math.EPSILON4)){
-        viewEvent.raiseEvent();
-    }
-    oldCamera = camera.clone();
-}
-
-scene.preRender.addEventListener(preRender);</pre></div>
-    
-  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+  <h2>Relevant Cesium Source</h2><pre id="cesiumSource" class="prettyprint lang-js"></pre>
+  <h2>Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/event-viewchange.html">link</a>)</h2><pre class="prettyprint lang-js">
 var vcTimeout = null;
 
 google.earth.addEventListener(ge.getView(), 'viewchange', function() {
@@ -97,8 +72,7 @@ google.earth.addEventListener(ge.getView(), 'viewchange', function() {
 google.earth.addEventListener(ge.getView(), 'viewchangeend', function() {
   vceCount++;
   document.getElementById('vce-counter').innerHTML = vceCount;
-});
-  </pre></div>
+});</pre>
   </div>
   <div id="resources">
   <h2>Resources:</h2>
@@ -111,38 +85,29 @@ google.earth.addEventListener(ge.getView(), 'viewchangeend', function() {
 
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
-    var camera = viewer.camera;
-    var scene = viewer.scene;
-    
-    var viewEvent = new Cesium.Event();
-    var eventHelper = new Cesium.EventHelper();
-    eventHelper.add(viewEvent, viewChanged);
-    var viewTimeout;
-    function viewChanged(){
-        document.getElementById('viewChanged').style.display = 'block';
-        
-        if (viewTimeout !== null)
-          window.clearTimeout(viewTimeout);
 
-        viewTimeout = window.setTimeout(function() {
-          document.getElementById('viewChanged').style.display = 'none';
-          viewTimeout = null;
-        }, 250);
-    }
+    function relevantSource() {
+        var lastTime = Cesium.getTimestamp();
+        var lastPosition = viewer.scene.camera.position.clone();
 
-    var lastPosition = camera.position.clone();
-    function preRender() {
-        if (!Cesium.Cartesian3.equalsEpsilon(lastPosition, camera.position, Cesium.Math.EPSILON4)){
-            viewEvent.raiseEvent();
+        function preRender(scene) {
+            var time = Cesium.getTimestamp();
+            var position = scene.camera.position;
+            if (!Cesium.Cartesian3.equalsEpsilon(lastPosition, position, Cesium.Math.EPSILON4)) {
+                document.getElementById('viewChanged').style.display = 'block';
+                lastTime = time;
+            } else if (time - lastTime > 250) {
+                //hide the 'view changed' message after 250 ms of inactivity
+                lastTime = time;
+                document.getElementById('viewChanged').style.display = 'none';
+            }
+            lastPosition = position.clone();
         }
-        lastPosition = camera.position.clone();
+
+        viewer.scene.preRender.addEventListener(preRender);
     }
-
-    scene.preRender.addEventListener(preRender);
-
-    // Comparable Google Earth API code:
-    //
-    // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/event-viewchange.html
+    relevantSource();
+    showSource('cesiumSource', relevantSource);
   </script>
 </body>
 </html>

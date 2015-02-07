@@ -26,6 +26,7 @@ limitations under the License.
   <style type="text/css">@import "static/examples.css";</style>
   <style type="text/css">@import "static/prettify/prettify.css";</style>
   <script type="text/javascript" src="static/prettify/prettify.js"></script>
+  <script type="text/javascript" src="static/showSource.js"></script>
 
   <script src="../Cesium/Cesium.js"></script>
   <style>
@@ -40,18 +41,8 @@ limitations under the License.
   <div id="cesiumContainer"></div>
   </div>
   <div id="source">
-  <div id="cesiumSource"><h2>Relevant Cesium Source</h1><pre class="prettyprint lang-js">
-  var entity = viewer.entities.add({
-      position : Cesium.Cartesian3.fromDegrees(-95.0, 40.0),
-      ellipse : {
-          semiMajorAxis : 500.0,
-          semiMinorAxis : 500.0,
-          material : Cesium.Color.WHITE
-      }
-  });
-</pre></div>
-    
-  <div id="geSource"><h2>Relevant Google Earth Source</h1><pre class="prettyprint lang-js">
+  <h2>Relevant Cesium Source</h2><pre id="cesiumSource" class="prettyprint lang-js"></pre>
+  <h2>Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/polygon-circle.html">link</a>)</h2><pre class="prettyprint lang-js">
 function makeCircle(radius, x, y) {
   var center = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
 
@@ -70,8 +61,7 @@ var polygonPlacemark = ge.createPlacemark('');
 polygonPlacemark.setGeometry(ge.createPolygon(''));
 var outer = ge.createLinearRing('');
 polygonPlacemark.getGeometry().setOuterBoundary(makeCircle(.05, 0, 0));
-ge.getFeatures().appendChild(polygonPlacemark);
-  </pre></div>
+ge.getFeatures().appendChild(polygonPlacemark);</pre>
   </div>
   <div id="resources">
   <h2>Resources:</h2>
@@ -83,24 +73,23 @@ ge.getFeatures().appendChild(polygonPlacemark);
   </div>
   
   <script>
-  var viewer = new Cesium.Viewer('cesiumContainer');
+    var viewer = new Cesium.Viewer('cesiumContainer');
 
-  var entity = viewer.entities.add({
-      position : Cesium.Cartesian3.fromDegrees(-95.0, 40.0),
-      ellipse : {
-          semiMajorAxis : 500.0,
-          semiMinorAxis : 500.0,
-          material : Cesium.Color.WHITE
-      }
-  });
+    function relevantSource() {
+        var entity = viewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(-95.0, 40.0),
+            ellipse: {
+                semiMajorAxis: 500.0,
+                semiMinorAxis: 500.0
+            }
+        });
+    }
+    relevantSource();
+    showSource('cesiumSource', relevantSource);
 
-  viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(-95.0, 40.0, 2000.0)
-  });
-  
-  // Comparable Google Earth API code:
-  //
-  // https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/polygon-circle.html
+    viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(-95.0, 40.0, 2000.0)
+    });
   </script>
 </body>
 </html>
