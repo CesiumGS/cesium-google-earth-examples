@@ -104,51 +104,53 @@ function Truck(viewer) {
   }));
 }
 
-leftButtonDown = false;
-rightButtonDown = false;
-gasButtonDown = false;
-reverseButtonDown = false;
+var leftButtonDown = false;
+var rightButtonDown = false;
+var gasButtonDown = false;
+var reverseButtonDown = false;
+var addressElement;
+
+function setKey(event, isDown) {
+    // WASD keys only work outside the address bar.
+    if (event.target !== addressElement) {
+        if (event.keyCode == 65) {  // A
+            leftButtonDown = isDown;
+        } else if (event.keyCode == 68) {  // D
+            rightButtonDown = isDown;
+        } else if (event.keyCode == 87) {  // W
+            gasButtonDown = isDown;
+        } else if (event.keyCode == 83) {  // S
+            reverseButtonDown = isDown;
+        }
+    }
+
+    // Arrow keys always work, possibly moving the address bar cursor and the truck.
+    if (event.keyCode == 37) {  // Left.
+        leftButtonDown = isDown;
+    } else if (event.keyCode == 39) {  // Right.
+        rightButtonDown = isDown;
+    } else if (event.keyCode == 38) {  // Up.
+        gasButtonDown = isDown;
+    } else if (event.keyCode == 40) {  // Down.
+        reverseButtonDown = isDown;
+    } else {
+        // Any non-arrow-key events, including WASD: allow the default behavior.
+        return true;
+    }
+    // Any arrow-key events (not including WASD):
+    // Allow the arrow keys within the address entry box.
+    return event.target === addressElement;
+}
 
 function keyDown(event) {
-  if (!event) {
-    event = window.event;
-  }
-  if (event.keyCode == 37) {  // Left.
-    leftButtonDown = true;
-    event.returnValue = false;
-  } else if (event.keyCode == 39) {  // Right.
-    rightButtonDown = true;
-    event.returnValue = false;
-  } else if (event.keyCode == 38) {  // Up.
-    gasButtonDown = true;
-    event.returnValue = false;
-  } else if (event.keyCode == 40) {  // Down.
-    reverseButtonDown = true;
-    event.returnValue = false;
-  } else {
-    return true;
-  }
-  return false;
+    if (!addressElement) {
+        addressElement = document.getElementById('address');
+    }
+    return setKey(event, true);
 }
 
 function keyUp(event) {
-  if (!event) {
-    event = window.event;
-  }
-  if (event.keyCode == 37) {  // Left.
-    leftButtonDown = false;
-    event.returnValue = false;
-  } else if (event.keyCode == 39) {  // Right.
-    rightButtonDown = false;
-    event.returnValue = false;
-  } else if (event.keyCode == 38) {  // Up.
-    gasButtonDown = false;
-    event.returnValue = false;
-  } else if (event.keyCode == 40) {  // Down.
-    reverseButtonDown = false;
-    event.returnValue = false;
-  }
-  return false;
+    return setKey(event, false);
 }
 
 Truck.prototype.tick = function() {
