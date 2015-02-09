@@ -23,6 +23,14 @@ textarea {
     box-shadow: 0 0 8px #FFF;
 }
 
+.cesium-viewer-infoBoxContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+}
+
 @-webkit-keyframes title-color-cycle {
     0% { text-shadow: 0 0 14px #E4DB85; }  /* Yellow */
    20% { text-shadow: 0 0 14px #F28181; }  /* Red */
@@ -46,13 +54,53 @@ textarea {
     top: 0;
     left: 0;
     right: 0;
-    font-family: Impact;
-    font-size: 50pt;
     text-align: center;
     color: #edffff;
+}
+
+.title i {
+    font-family: Impact;
+    font-size: 50pt;
+    font-style: italic;
     text-shadow: 0 0 14px #E4DB85;
     -webkit-animation: title-color-cycle 5s infinite;
     animation: title-color-cycle 5s infinite;
+}
+
+.ported {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 10px;
+}
+
+.ported img {
+    border: none;
+    vertical-align: middle;
+    padding-bottom: 6px;
+}
+
+.ported a,
+.ported a:visited {
+    color: #edffff;
+    text-decoration: none;
+}
+
+.ported a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.ribbon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: 0;
+    margin: 0;
+}
+
+.ribbon img {
+    border: none;
 }
 
 .bottomControls {
