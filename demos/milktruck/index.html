@@ -61,6 +61,7 @@
         });
         viewer.scene.globe.depthTestAgainstTerrain = true;
         viewer.scene.screenSpaceCameraController.enableInputs = false;
+        viewer.scene.screenSpaceCameraController.minimumZoomDistance = 0.0;
 
         var truck = new Truck(viewer);
 
