@@ -520,7 +520,7 @@ Truck.prototype.cameraFollow = function(dt) {
   var c0 = Math.exp(-dt / 0.5);
   var c1 = 1 - c0;
   
-  var deltaHeading = truckHeading - camHeading;
+  var deltaHeading = Cesium.Math.negativePiToPi(truckHeading - camHeading);
   var heading = camHeading + c1 * deltaHeading;
   heading = Cesium.Math.zeroToTwoPi(heading);
   
