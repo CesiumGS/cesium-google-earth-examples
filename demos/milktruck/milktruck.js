@@ -26,7 +26,7 @@ var INIT_LOC = {
 
 var GRAVITY = 9.8;
 var CAM_HEIGHT = 10;
-var TRAILING_DISTANCE = 50;
+var TRAILING_DISTANCE = 30;
 
 var ACCEL = 50.0;
 var DECEL = 80.0;
