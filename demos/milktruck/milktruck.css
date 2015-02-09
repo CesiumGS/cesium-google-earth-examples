@@ -42,9 +42,13 @@ textarea {
 }
 
 .title {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
     font-family: Impact;
     font-size: 50pt;
+    text-align: center;
     color: #edffff;
     text-shadow: 0 0 14px #E4DB85;
     -webkit-animation: title-color-cycle 5s infinite;

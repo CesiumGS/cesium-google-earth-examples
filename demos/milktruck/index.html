@@ -1,173 +1,174 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html lang="en-us">
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en-us">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<!--
-Copyright 2008 Google Inc.
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+    <!--
+    Copyright 2008 Google Inc.
 
-     http://www.apache.org/licenses/LICENSE-2.0
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
--->
-  <title>Monster Milktruck!</title>
-  <link rel=stylesheet href='milktruck.css' type='text/css' />
-  <script src="../../Cesium/Cesium.js"></script>
-  <script type="text/javascript" src="shadow.js"></script>
-  <script type="text/javascript" src="milktruck.js"></script>
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+    -->
+    <title>Monster Milktruck!</title>
+    <link rel=stylesheet href='milktruck.css' type='text/css' />
+    <script src="../../Cesium/Cesium.js"></script>
+    <script type="text/javascript" src="shadow.js"></script>
+    <script type="text/javascript" src="milktruck.js"></script>
 </head>
-<body onKeyDown="return keyDown(event);" onKeyUp="return keyUp(event);">
+<body onkeydown="return keyDown(event);" onkeyup="return keyUp(event);">
     <div id="cesiumContainer"></div>
     <div id="loadingIndicator" class="loadingIndicator"></div>
-<center>
-  <div class="title">
-    <center>
-      <i>MONSTER MILKTRUCK!</i>
-    </center>
-  </div>
-  
-  <script>
-    var viewer = new Cesium.Viewer('cesiumContainer', {
-    	animation : false,
-    	geocoder : false,
-    	homeButton : false,
-    	sceneModePicker : false,
-    	timeline : false,
-    	navigationHelpButton : false,
-    	navigationInstructionsInitiallyVisible : false,
-    	fullscreenButton : true,
-    	baseLayerPicker : false,
-    	scene3DOnly : true
-    });
-    viewer.scene.terrainProvider = new Cesium.CesiumTerrainProvider({
-      url : '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
-    });
-    viewer.scene.globe.depthTestAgainstTerrain = true;
-    viewer.scene.screenSpaceCameraController.enableInputs = false;
-    
-    var truck = new Truck(viewer);
-    
-    var bingKey = Cesium.BingMapsApi.getKey();
-    
-    var loadingIndicator = document.getElementById('loadingIndicator');
-    
-    function geocode(element) {
-    	var query = element.value;
-    	
-        if (/^\s*$/.test(query)) {
-            return;
+    <div class="title">
+        <i>MONSTER MILKTRUCK!</i>
+    </div>
+
+    <script>
+        var viewer = new Cesium.Viewer('cesiumContainer', {
+            animation: false,
+            geocoder: false,
+            homeButton: false,
+            sceneModePicker: false,
+            timeline: false,
+            navigationHelpButton: false,
+            navigationInstructionsInitiallyVisible: false,
+            fullscreenButton: true,
+            baseLayerPicker: false,
+            scene3DOnly: true
+        });
+        viewer.scene.terrainProvider = new Cesium.CesiumTerrainProvider({
+            url: '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
+        });
+        viewer.scene.globe.depthTestAgainstTerrain = true;
+        viewer.scene.screenSpaceCameraController.enableInputs = false;
+
+        var truck = new Truck(viewer);
+
+        var bingKey = Cesium.BingMapsApi.getKey();
+
+        var loadingIndicator = document.getElementById('loadingIndicator');
+
+        function geocode(element) {
+            var query = element.value;
+
+            if (/^\s*$/.test(query)) {
+                return;
+            }
+
+            var promise = Cesium.jsonp('//dev.virtualearth.net/REST/v1/Locations', {
+                parameters: {
+                    query: query,
+                    key: bingKey
+
+                },
+                callbackParameterName: 'jsonp'
+            });
+
+            var geocodeInProgress = Cesium.when(promise, function (result) {
+                if (geocodeInProgress.cancel) {
+                    return;
+                }
+
+                if (result.resourceSets.length === 0) {
+                    element.value = query + ' (not found)';
+                    return;
+                }
+
+                var resourceSet = result.resourceSets[0];
+                if (resourceSet.resources.length === 0) {
+                    element.value = query + ' (not found)';
+                    return;
+                }
+
+                var resource = resourceSet.resources[0];
+
+                element.value = resource.name;
+                var bbox = resource.bbox;
+                var south = bbox[0];
+                var west = bbox[1];
+                var north = bbox[2];
+                var east = bbox[3];
+                var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
+
+                var camera = viewer.camera;
+                var position = camera.getRectangleCameraCoordinates(rectangle);
+                if (!Cesium.defined(position)) {
+                    return;
+                }
+
+                var cartographic = viewer.scene.globe.ellipsoid.cartesianToCartographic(position);
+                truck.teleportTo(Cesium.Math.toDegrees(cartographic.longitude), Cesium.Math.toDegrees(cartographic.latitude));
+            });
         }
-        
-    	var promise = Cesium.jsonp('//dev.virtualearth.net/REST/v1/Locations', {
-            parameters : {
-                query : query,
-                key : bingKey
 
-            },
-            callbackParameterName : 'jsonp'
-        });
+        function submitLocation() {
+            geocode(document.getElementById('address'));
+        }
 
-        var geocodeInProgress = Cesium.when(promise, function(result) {
-            if (geocodeInProgress.cancel) {
-                return;
-            }
+        function truckTick() {
+            truck.tick();
+        }
 
-            if (result.resourceSets.length === 0) {
-                element.value = query + ' (not found)';
-                return;
-            }
+        function findHeight(lon, lat, level, height) {
+            var position = [Cesium.Cartographic.fromDegrees(lon, lat)];
+            var positionPromise = Cesium.sampleTerrain(viewer.scene.terrainProvider, level, position);
 
-            var resourceSet = result.resourceSets[0];
-            if (resourceSet.resources.length === 0) {
-            	element.value = query + ' (not found)';
-                return;
-            }
+            Cesium.when(positionPromise, function () {
+                if (Cesium.defined(position[0].height)) {
+                    viewer.scene.camera.setView({
+                        positionCartographic: Cesium.Cartographic.fromDegrees(lon, lat, height + 1)
+                    });
+                    findHeight(lon, lat, level + 1, position[0].height);
+                } else {
+                    viewer.scene.camera.setView({
+                        positionCartographic: Cesium.Cartographic.fromDegrees(lon, lat, height + 1)
+                    });
 
-            var resource = resourceSet.resources[0];
+                    Cesium.when(truck.model.readyPromise).then(function (model) {
+                        var removeEvent = viewer.scene.postRender.addEventListener(function () {
+                            var cart = Cesium.Cartographic.fromDegrees(lon, lat);
+                            var pickedHeight = viewer.scene.globe.getHeight(cart);
+                            if (Cesium.defined(pickedHeight) && Math.abs(pickedHeight - height) < 5.0) {
+                                removeEvent();
+                                loadingIndicator.style.display = 'none';
+                                truck.teleportTo(lon, lat, height);
+                                truck.lastMillis = (new Date()).getTime();
+                                viewer.scene.postRender.addEventListener(truckTick);
+                                viewer.scene.debugCommandFilter = undefined;
+                            }
+                        });
+                    });
+                }
+            });
+        }
 
-            element.value = resource.name;
-            var bbox = resource.bbox;
-            var south = bbox[0];
-            var west = bbox[1];
-            var north = bbox[2];
-            var east = bbox[3];
-            var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
+        function teleportTo(lon, lat) {
+            viewer.scene.postRender.removeEventListener(truckTick);
+            viewer.scene.debugCommandFilter = function () {
+                return false;
+            };
 
-            var camera = viewer.camera;
-            var position = camera.getRectangleCameraCoordinates(rectangle);
-            if (!Cesium.defined(position)) {
-                return;
-            }
-            
-            var cartographic = viewer.scene.globe.ellipsoid.cartesianToCartographic(position);
-            truck.teleportTo(Cesium.Math.toDegrees(cartographic.longitude), Cesium.Math.toDegrees(cartographic.latitude));
-        });
-    }
-    
-    function submitLocation() {
-    	geocode(document.getElementById('address'));
-    }
-    
-    function truckTick() {
-    	truck.tick();
-    }
-    
-    function findHeight(lon, lat, level, height) {
-        var position = [Cesium.Cartographic.fromDegrees(lon, lat)];
-        var positionPromise = Cesium.sampleTerrain(viewer.scene.terrainProvider, level, position);
-        
-        Cesium.when(positionPromise, function() {
-        	if (Cesium.defined(position[0].height)) {
-        		viewer.scene.camera.setView({
-                    positionCartographic : Cesium.Cartographic.fromDegrees(lon, lat, height + 1)
-                });
-        		findHeight(lon, lat, level + 1, position[0].height);
-        	} else {
-        		viewer.scene.camera.setView({
-                    positionCartographic : Cesium.Cartographic.fromDegrees(lon, lat, height + 1)
-                });
-        		
-        		Cesium.when(truck.model.readyPromise).then(function(model) {
-					var removeEvent = viewer.scene.postRender.addEventListener(function(){
-                    	var cart = Cesium.Cartographic.fromDegrees(lon, lat);
-                        var pickedHeight = viewer.scene.globe.getHeight(cart);
-                    	if (Cesium.defined(pickedHeight) && Math.abs(pickedHeight - height) < 5.0) {
-                    	    removeEvent();
-                    	    loadingIndicator.style.display = 'none';
-                    	    truck.teleportTo(lon, lat, height);
-                    	    truck.lastMillis = (new Date()).getTime();
-                    	    viewer.scene.postRender.addEventListener(truckTick);
-                    	    viewer.scene.debugCommandFilter = undefined;
-                    	} 					
-					});
-              });
-        	}
-        });
-    }
-    
-    function teleportTo(lon, lat) {
-        viewer.scene.postRender.removeEventListener(truckTick);
-    	viewer.scene.debugCommandFilter = function() {
-    		return false;
-    	};
-    	
-        loadingIndicator.style.display = 'block';
-    	
-    	var height = 10000.0;
-    	viewer.scene.camera.setView({
-            positionCartographic : Cesium.Cartographic.fromDegrees(lon, lat, height)
-        });
-    	findHeight(lon, lat, 9, height);
-    }
-    
-    teleportTo(-123.0744619, 44.0503706);
-  </script>
+            loadingIndicator.style.display = 'block';
+
+            var height = 10000.0;
+            viewer.scene.camera.setView({
+                positionCartographic: Cesium.Cartographic.fromDegrees(lon, lat, height)
+            });
+            findHeight(lon, lat, 9, height);
+        }
+
+        teleportTo(-123.0744619, 44.0503706);
+    </script>
 
     <table class="bottomControls">
         <tr>
@@ -210,6 +211,6 @@ limitations under the License.
             </td>
         </tr>
     </table>
-</center>
+
 </body>
 </html>
