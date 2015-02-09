@@ -34,6 +34,8 @@
     </div>
 
     <script>
+        var currentTime = new Cesium.JulianDate(2457064, 13662.710572260446);
+
         var viewer = new Cesium.Viewer('cesiumContainer', {
             animation: false,
             geocoder: false,
@@ -44,7 +46,8 @@
             navigationInstructionsInitiallyVisible: false,
             fullscreenButton: true,
             baseLayerPicker: false,
-            scene3DOnly: true
+            scene3DOnly: true,
+            clock : new Cesium.Clock({ currentTime : currentTime })
         });
         viewer.scene.terrainProvider = new Cesium.CesiumTerrainProvider({
             url: '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
