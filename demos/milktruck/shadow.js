@@ -64,6 +64,7 @@ Shadow.prototype.update = function(context, frameState, commandList) {
     
     if (!Cesium.defined(this._rs)) {
         this._rs = context.createRenderState({
+        	blending : Cesium.BlendingState.ALPHA_BLEND,
         	depthTest : {
             	enabled : true
             },
