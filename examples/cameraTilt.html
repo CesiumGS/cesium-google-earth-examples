@@ -51,7 +51,7 @@ limitations under the License.
                     <li><a href="#" id="menuCesium" onclick="showPanel(this)">Show Cesium Code</a></li>
                     <li><a href="#" id="menuGoogle" onclick="showPanel(this)">Show Google Earth Code</a></li>
                     <li><a href="http://cesiumjs.org/for-google-earth-developers.html" target="_blank">For Google Earth Developers</a></li>
-                    <li><a href="/index.html" target="_blank">All Google Earth examples</a></li>
+                    <li><a href="../index.html" target="_blank">All Google Earth examples</a></li>
                     <li class="dropdown">
                         <a href="#" data-toggle="dropdown" class="dropdown-toggle">Additional Resources <b class="caret"></b></a>
                         <ul class="dropdown-menu">
@@ -112,8 +112,8 @@ limitations under the License.
         function relevantSource() {
             var tiltCamera = function(count) {
                 //Cesium angles are always in radians
-                var idealTilt = Cesium.Math.toRadians(-80);
-                var c0 = 0.95;
+                var idealTilt = Cesium.Math.toRadians(-90);
+                var c0 = 0.90;
                 camera.setView({
                     pitch: c0 * camera.pitch + (1 - c0) * idealTilt
                 });
