@@ -18,135 +18,168 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
--->  
+-->
 <head>
-  <title>Draggable Placemark</title>
-
-  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-  <style type="text/css">@import "static/examples.css";</style>
-  <style type="text/css">@import "static/prettify/prettify.css";</style>
-  <script type="text/javascript" src="static/prettify/prettify.js"></script>
-  <script type="text/javascript" src="static/showSource.js"></script>
-
-  <script src="../Cesium/Cesium.js"></script>
-  <style>
-    @import url(../Cesium/Widgets/widgets.css);
-  </style>
-  
+    <title>Draggable Placemark</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../Cesium//Widgets//widgets.css">
+    <link rel="stylesheet" href="static/codemirror.css">
+    <link rel="stylesheet" href="static/bootstrap-3.3.2-dist/css/bootstrap.css">
+    <link rel="stylesheet" href="static/bootstrap-3.3.2-dist/css/bootstrap.cerylean.min.css">
+    <link rel="stylesheet" href="static/examples.css">
+    <script src="static/codemirror-compressed.js"></script>
+    <script src="static/helpers.js"></script>
+    <script src="../Cesium/Cesium.js"></script>
+    <script src="static/jquery-2.1.3.min.js"></script>
+    <script src="static/bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
 </head>
-<body onload="if(window.prettyPrint)prettyPrint();">
-  <h1>Cesium Examples - Draggable Placemark</h1>
-  <div id="page">
-  <div id="preview">
-  <div id="cesiumContainer"></div>
-  </div>
-  <div id="source">
-  <h2>Relevant Cesium Source</h2><pre id="cesiumSource" class="prettyprint lang-js"></pre>
-  <h2>Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/placemark-dragdrop.html">link</a>)</h2><pre class="prettyprint lang-js">
-placemark.setName('Drag Me!');
 
-// listen for mousedown on the window (look specifically for point placemarks)
-google.earth.addEventListener(ge.getWindow(), 'mousedown', function(event) {
-  if (event.getTarget().getType() == 'KmlPlacemark' &&
-      event.getTarget().getGeometry().getType() == 'KmlPoint') {
-    //event.preventDefault();
-    var placemark = event.getTarget();
-    
-    dragInfo = {
-      placemark: event.getTarget(),
-      dragged: false
-    };
-  } 
-});
+<body onresize="onResize()">
+    <header class="container">
+        <div class="navbar navbar-default navbar-fixed-top">
+            <div class="navbar-header">
+                <button class="btn btn-primary navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="glyphicon glyphicon-menu-hamburger"></span>
+                </button>
+                <a class="navbar-brand" href="http://cesiumjs.org" target="_blank"><img src="static/Cesium_Logo_forDarkBackground.png" /></a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="#" id="menuPreview" onclick="showPanel(this)">Show Preview</a></li>
+                    <li><a href="#" id="menuCesium" onclick="showPanel(this)">Show Cesium Code</a></li>
+                    <li><a href="#" id="menuGoogle" onclick="showPanel(this)">Show Google Earth Code</a></li>
+                    <li><a href="http://cesiumjs.org/for-google-earth-developers.html" target="_blank">For Google Earth Developers</a></li>
+                    <li><a href="/index.html" target="_blank">All Google Earth examples</a></li>
+                    <li class="dropdown">
+                        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Additional Resources <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="http://cesiumjs.org/tutorials.html" target="_blank">Tutorials</a></li>
+                            <li><a href="http://cesiumjs.org/Cesium/Apps/Sandcastle/index.html" target="_blank">Cesium Sandcastle</a></li>
+                            <li> <a href="http://cesiumjs.org/refdoc.html" target="_blank">Reference Documentation</a> </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <div id="preview">
+        <div id="previewContent">
+            <div id="cesiumContainer"></div>
+        </div>
+    </div>
+    <div id="code">
+        <div class="panel panel-primary" id="czmPanel">
+            <div class="panel-heading">Relevant Cesium Source</div>
+            <div class="panel-body">
+                <textarea id="cesiumSource"></textarea>
+            </div>
+        </div>
+        <div class="panel panel-primary" id="gePanel">
+            <div class="panel-heading">Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/placemark-dragdrop.html">link</a>)</div>
+            <div class="panel-body">
+                <textarea id="gesource">
+                    placemark.setName('Drag Me!');
 
-// listen for mousemove on the globe
-google.earth.addEventListener(ge.getGlobe(), 'mousemove', function(event) {
-  if (dragInfo) {
-    event.preventDefault();
-    var point = dragInfo.placemark.getGeometry();
-    point.setLatitude(event.getLatitude());
-    point.setLongitude(event.getLongitude());
-    dragInfo.dragged = true;
-  }
-});
+                    // listen for mousedown on the window (look specifically for point placemarks)
+                    google.earth.addEventListener(ge.getWindow(), 'mousedown', function(event) {
+                        if (event.getTarget().getType() == 'KmlPlacemark' &&
+                            event.getTarget().getGeometry().getType() == 'KmlPoint') {
+                            //event.preventDefault();
+                            var placemark = event.getTarget();
 
-// listen for mouseup on the window
-google.earth.addEventListener(ge.getWindow(), 'mouseup', function(event) {
-  if (dragInfo) {
-    if (dragInfo.dragged) {
-      // if the placemark was dragged, prevent balloons from popping up
-      event.preventDefault();
-    }
-    
-    dragInfo = null;
-  }
-});</pre>
-  </div>
-  <div id="resources">
-  <h2>Resources:</h2>
-  <ul>
-  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/PinBuilder.html" target="_blank" >PinBuilder</a> </li>
-  </ul>
-  </div>
-  </div>
+                            dragInfo = {
+                                placemark : event.getTarget(),
+                                dragged : false
+                            };
+                        }
+                    });
 
-  <script>
-    var viewer = new Cesium.Viewer('cesiumContainer', {
-        infoBox: false,
-        selectionIndicator: false
-    });
-    var scene = viewer.scene;
-    var camera = viewer.camera;
+                    // listen for mousemove on the globe
+                    google.earth.addEventListener(ge.getGlobe(), 'mousemove', function(event) {
+                        if (dragInfo) {
+                            event.preventDefault();
+                            var point = dragInfo.placemark.getGeometry();
+                            point.setLatitude(event.getLatitude());
+                            point.setLongitude(event.getLongitude());
+                            dragInfo.dragged = true;
+                        }
+                    });
 
-    var pinBuilder = new Cesium.PinBuilder();
-    var position = Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude);
-    var entity = viewer.entities.add({
-        position: position,
-        billboard: {
-            image: pinBuilder.fromColor(Cesium.Color.SALMON, 48),
-            verticalOrigin: Cesium.VerticalOrigin.BOTTOM
+                    // listen for mouseup on the window
+                    google.earth.addEventListener(ge.getWindow(), 'mouseup', function(event) {
+                        if (dragInfo) {
+                            if (dragInfo.dragged) {
+                                // if the placemark was dragged, prevent balloons from popping up
+                                event.preventDefault();
+                            }
+
+                            dragInfo = null;
+                        }
+                    });
+                </textarea>
+            </div>
+        </div>
+    </div>
+    <script>
+        var viewer = new Cesium.Viewer('cesiumContainer', {
+            fullscreenElement: 'previewContent',
+            infoBox: false,
+            selectionIndicator: false
+        });
+        var scene = viewer.scene;
+        var camera = viewer.camera;
+
+        var pinBuilder = new Cesium.PinBuilder();
+        var position = Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude);
+        var entity = viewer.entities.add({
+            position: position,
+            billboard: {
+                image: pinBuilder.fromColor(Cesium.Color.SALMON, 48),
+                verticalOrigin: Cesium.VerticalOrigin.BOTTOM
+            }
+        });
+
+        function relevantSource() {
+            var dragging = false;
+            var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+            handler.setInputAction(
+                function(click) {
+                    var pickedObject = scene.pick(click.position);
+                    if (Cesium.defined(pickedObject) && (pickedObject.id === entity)) {
+                        entity.billboard.scale = 1.2;
+                        dragging = true;
+                        scene.screenSpaceCameraController.enableRotate = false;
+                    }
+                },
+                Cesium.ScreenSpaceEventType.LEFT_DOWN
+            );
+
+            handler.setInputAction(
+                function(movement) {
+                    if (dragging) {
+                        entity.position = camera.pickEllipsoid(movement.endPosition);
+                    }
+                },
+                Cesium.ScreenSpaceEventType.MOUSE_MOVE
+            );
+
+            handler.setInputAction(
+                function() {
+                    entity.billboard.scale = 1;
+                    dragging = false;
+                    scene.screenSpaceCameraController.enableRotate = true;
+                },
+                Cesium.ScreenSpaceEventType.LEFT_UP
+            );
         }
-    });
+        relevantSource();
+        showSource('cesiumSource', relevantSource);
 
-    function relevantSource() {
-        var dragging = false;
-        var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
-        handler.setInputAction(
-            function(click) {
-                var pickedObject = scene.pick(click.position);
-                if (Cesium.defined(pickedObject) && (pickedObject.id === entity)) {
-                    entity.billboard.scale = 1.2;
-                    dragging = true;
-                    scene.screenSpaceCameraController.enableRotate = false;
-                }
-            },
-            Cesium.ScreenSpaceEventType.LEFT_DOWN
-        );
-
-        handler.setInputAction(
-            function(movement) {
-                if (dragging) {
-                    entity.position = camera.pickEllipsoid(movement.endPosition);
-                }
-            },
-            Cesium.ScreenSpaceEventType.MOUSE_MOVE
-        );
-
-        handler.setInputAction(
-            function() {
-                entity.billboard.scale = 1;
-                dragging = false;
-                scene.screenSpaceCameraController.enableRotate = true;
-            },
-            Cesium.ScreenSpaceEventType.LEFT_UP
-        );
-    }
-    relevantSource();
-    showSource('cesiumSource', relevantSource);
-
-    camera.flyTo({
-        destination: Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude, 300000)
-    });
-  </script>
+        camera.flyTo({
+            destination: Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude, 300000)
+        });
+    </script>
 </body>
 </html>

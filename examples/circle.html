@@ -18,78 +18,110 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
--->  
+-->
 <head>
-  <title>Creating Circle Polygons</title>
-
-  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-  <style type="text/css">@import "static/examples.css";</style>
-  <style type="text/css">@import "static/prettify/prettify.css";</style>
-  <script type="text/javascript" src="static/prettify/prettify.js"></script>
-  <script type="text/javascript" src="static/showSource.js"></script>
-
-  <script src="../Cesium/Cesium.js"></script>
-  <style>
-    @import url(../Cesium/Widgets/widgets.css);
-  </style>
-  
+    <title>Creating Circle Polygons</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../Cesium//Widgets//widgets.css">
+    <link rel="stylesheet" href="static/codemirror.css">
+    <link rel="stylesheet" href="static/bootstrap-3.3.2-dist/css/bootstrap.css">
+    <link rel="stylesheet" href="static/bootstrap-3.3.2-dist/css/bootstrap.cerylean.min.css">
+    <link rel="stylesheet" href="static/examples.css">
+    <script src="static/codemirror-compressed.js"></script>
+    <script src="static/helpers.js"></script>
+    <script src="../Cesium/Cesium.js"></script>
+    <script src="static/jquery-2.1.3.min.js"></script>
+    <script src="static/bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
 </head>
-<body onload="if(window.prettyPrint)prettyPrint();">
-  <h1>Cesium Examples - Creating Circle Polygons</h1>
-  <div id="page">
-  <div id="preview">
-  <div id="cesiumContainer"></div>
-  </div>
-  <div id="source">
-  <h2>Relevant Cesium Source</h2><pre id="cesiumSource" class="prettyprint lang-js"></pre>
-  <h2>Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/polygon-circle.html">link</a>)</h2><pre class="prettyprint lang-js">
-function makeCircle(radius, x, y) {
-  var center = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
 
-  var ring = ge.createLinearRing('');
-  var steps = 25;
-  var pi2 = Math.PI * 2;
-  for (var i = 0; i < steps; i++) {
-    var lat = center.getLatitude() + x + radius * Math.cos(i / steps * pi2);
-    var lng = center.getLongitude() + y + radius * Math.sin(i / steps * pi2);
-    ring.getCoordinates().pushLatLngAlt(lat, lng, 0);
-  }
-  return ring;
-}
+<body onresize="onResize()">
+    <header class="container">
+        <div class="navbar navbar-default navbar-fixed-top">
+            <div class="navbar-header">
+                <button class="btn btn-primary navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="glyphicon glyphicon-menu-hamburger"></span>
+                </button>
+                <a class="navbar-brand" href="http://cesiumjs.org" target="_blank"><img src="static/Cesium_Logo_forDarkBackground.png" /></a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="#" id="menuPreview" onclick="showPanel(this)">Show Preview</a></li>
+                    <li><a href="#" id="menuCesium" onclick="showPanel(this)">Show Cesium Code</a></li>
+                    <li><a href="#" id="menuGoogle" onclick="showPanel(this)">Show Google Earth Code</a></li>
+                    <li><a href="http://cesiumjs.org/for-google-earth-developers.html" target="_blank">For Google Earth Developers</a></li>
+                    <li><a href="/index.html" target="_blank">All Google Earth examples</a></li>
+                    <li class="dropdown">
+                        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Additional Resources <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="http://cesiumjs.org/tutorials.html" target="_blank">Tutorials</a></li>
+                            <li><a href="http://cesiumjs.org/Cesium/Apps/Sandcastle/index.html" target="_blank">Cesium Sandcastle</a></li>
+                            <li> <a href="http://cesiumjs.org/refdoc.html" target="_blank">Reference Documentation</a> </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <div id="preview">
+        <div id="previewContent">
+            <div id="cesiumContainer"></div>
+        </div>
+    </div>
+    <div id="code">
+        <div class="panel panel-primary" id="czmPanel">
+            <div class="panel-heading">Relevant Cesium Source</div>
+            <div class="panel-body">
+                <textarea id="cesiumSource"></textarea>
+            </div>
+        </div>
+        <div class="panel panel-primary" id="gePanel">
+            <div class="panel-heading">Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/polygon-circle.html">link</a>)</div>
+            <div class="panel-body">
+                <textarea id="gesource">
+                    function makeCircle(radius, x, y) {
+                        var center = ge.getView().copyAsLookAt(ge.ALTITUDE_RELATIVE_TO_GROUND);
 
-var polygonPlacemark = ge.createPlacemark('');
-polygonPlacemark.setGeometry(ge.createPolygon(''));
-var outer = ge.createLinearRing('');
-polygonPlacemark.getGeometry().setOuterBoundary(makeCircle(.05, 0, 0));
-ge.getFeatures().appendChild(polygonPlacemark);</pre>
-  </div>
-  <div id="resources">
-  <h2>Resources:</h2>
-  <ul>
-  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/CircleGeometry.html" target="_blank">CircleGeometry</a> </li>
-  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/GeometryInstance.html" target="_blank">GeometryInstance</a> </li>
-  </ul>
-  </div>
-  </div>
-  
-  <script>
-    var viewer = new Cesium.Viewer('cesiumContainer');
+                        var ring = ge.createLinearRing('');
+                        var steps = 25;
+                        var pi2 = Math.PI * 2;
+                        for (var i = 0; i < steps; i++) {
+                            var lat = center.getLatitude() + x + radius * Math.cos(i / steps * pi2);
+                            var lng = center.getLongitude() + y + radius * Math.sin(i / steps * pi2);
+                            ring.getCoordinates().pushLatLngAlt(lat, lng, 0);
+                        }
+                        return ring;
+                    }
 
-    function relevantSource() {
-        var entity = viewer.entities.add({
-            position: Cesium.Cartesian3.fromDegrees(-95.0, 40.0),
-            ellipse: {
-                semiMajorAxis: 500.0,
-                semiMinorAxis: 500.0
-            }
+                    var polygonPlacemark = ge.createPlacemark('');
+                    polygonPlacemark.setGeometry(ge.createPolygon(''));
+                    var outer = ge.createLinearRing('');
+                    polygonPlacemark.getGeometry().setOuterBoundary(makeCircle(.05, 0, 0));
+                    ge.getFeatures().appendChild(polygonPlacemark);
+                </textarea>
+            </div>
+        </div>
+    </div>
+    <script>
+        var viewer = new Cesium.Viewer('cesiumContainer', {
+            fullscreenElement: 'previewContent'
         });
-    }
-    relevantSource();
-    showSource('cesiumSource', relevantSource);
+        function relevantSource() {
+            var entity = viewer.entities.add({
+                position: Cesium.Cartesian3.fromDegrees(-95.0, 40.0),
+                ellipse: {
+                    semiMajorAxis: 500.0,
+                    semiMinorAxis: 500.0
+                }
+            });
+        }
+        relevantSource();
+        showSource('cesiumSource', relevantSource);
 
-    viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(-95.0, 40.0, 2000.0)
-    });
-  </script>
+        viewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(-95.0, 40.0, 2000.0)
+        });
+    </script>
 </body>
 </html>

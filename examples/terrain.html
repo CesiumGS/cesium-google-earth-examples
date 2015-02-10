@@ -18,89 +18,122 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
--->  
+-->
 <head>
-  <title>Show/Hide Terrain</title>
-
-  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-  <style type="text/css">@import "static/examples.css";</style>
-  <style type="text/css">@import "static/prettify/prettify.css";</style>
-  <script type="text/javascript" src="static/prettify/prettify.js"></script>
-  <script type="text/javascript" src="static/showSource.js"></script>
-
-  <script src="../Cesium/Cesium.js"></script>
-  <style>
-    @import url(../Cesium/Widgets/widgets.css);
-  </style>
-  
+    <title>Show/Hide Terrain</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../Cesium//Widgets//widgets.css">
+    <link rel="stylesheet" href="static/codemirror.css">
+    <link rel="stylesheet" href="static/bootstrap-3.3.2-dist/css/bootstrap.css">
+    <link rel="stylesheet" href="static/bootstrap-3.3.2-dist/css/bootstrap.cerylean.min.css">
+    <link rel="stylesheet" href="static/examples.css">
+    <script src="static/codemirror-compressed.js"></script>
+    <script src="static/helpers.js"></script>
+    <script src="../Cesium/Cesium.js"></script>
+    <script src="static/jquery-2.1.3.min.js"></script>
+    <script src="static/bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
 </head>
-<body onload="if(window.prettyPrint)prettyPrint();">
-  <h1>Cesium Examples - Show/Hide Terrain</h1>
-  <div id="page">
-  <div id="preview">
-  <div id="buttonContainer">
-    <button onclick="showTerrain()" class="cesium-button">Show Terrain</button>
-    <button onclick="hideTerrain()" class="cesium-button">Hide Terrain</button>
-  </div>
-  <div id="cesiumContainer"></div>
-  </div>
-  <div id="source">
-  <h2>Relevant Cesium Source</h2><pre id="cesiumSource" class="prettyprint lang-js"></pre>
-  <h2>Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/terrain.html">link</a>)</h2><pre class="prettyprint lang-js">
-function showTerrain() {
-  var layerRoot = ge.getLayerRoot();
-  var terrainLayer = layerRoot.getLayerById(ge.LAYER_TERRAIN);
-  terrainLayer.setVisibility(true);
-  
-  // shortcut:
-  // layerRoot.enableLayerById(ge.LAYER_TERRAIN, true);
-}
 
-function hideTerrain() {
-  var layerRoot = ge.getLayerRoot();
-  var terrainLayer = layerRoot.getLayerById(ge.LAYER_TERRAIN);
-  terrainLayer.setVisibility(false);
-  
-  // shortcut:
-  // layerRoot.enableLayerById(ge.LAYER_TERRAIN, false);
-}</pre>
-  </div>
-  <div id="resources">
-  <h2>Resources:</h2>
-  <ul>
-  <li> <a href="http://cesiumjs.org/Cesium/Build/Documentation/CesiumTerrainProvider.html" target="_blank" >CesiumTerrainProvider</a> </li>
-  <li> <a href="http://cesiumjs.org/Cesium/Apps/Sandcastle/index.html?src=Terrain.html" target="_blank" >Terrain Demo</a> </li>
-  </ul>
-  </div>
-  </div>
+<body onresize="onResize()">
+    <header class="container">
+        <div class="navbar navbar-default navbar-fixed-top">
+            <div class="navbar-header">
+                <button class="btn btn-primary navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="glyphicon glyphicon-menu-hamburger"></span>
+                </button>
+                <a class="navbar-brand" href="http://cesiumjs.org" target="_blank"><img src="static/Cesium_Logo_forDarkBackground.png" /></a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="#" id="menuPreview" onclick="showPanel(this)">Show Preview</a></li>
+                    <li><a href="#" id="menuCesium" onclick="showPanel(this)">Show Cesium Code</a></li>
+                    <li><a href="#" id="menuGoogle" onclick="showPanel(this)">Show Google Earth Code</a></li>
+                    <li><a href="http://cesiumjs.org/for-google-earth-developers.html" target="_blank">For Google Earth Developers</a></li>
+                    <li><a href="/index.html" target="_blank">All Google Earth examples</a></li>
+                    <li class="dropdown">
+                        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Additional Resources <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="http://cesiumjs.org/tutorials.html" target="_blank">Tutorials</a></li>
+                            <li><a href="http://cesiumjs.org/Cesium/Apps/Sandcastle/index.html" target="_blank">Cesium Sandcastle</a></li>
+                            <li> <a href="http://cesiumjs.org/refdoc.html" target="_blank">Reference Documentation</a> </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <div id="preview">
+        <div id="previewContent">
+            <div id="buttonContainer">
+                <button onclick="showTerrain()" class="cesium-button">Show Terrain</button>
+                <button onclick="hideTerrain()" class="cesium-button">Hide Terrain</button>
+            </div>
+            <div id="cesiumContainer"></div>
+        </div>
+    </div>
+    <div id="code">
+        <div class="panel panel-primary" id="czmPanel">
+            <div class="panel-heading">Relevant Cesium Source</div>
+            <div class="panel-body">
+                <textarea id="cesiumSource"></textarea>
+            </div>
+        </div>
+        <div class="panel panel-primary" id="gePanel">
+            <div class="panel-heading">Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/terrain.html">link</a>)</div>
+            <div class="panel-body">
+                <textarea id="gesource">
+                    function showTerrain() {
+                        var layerRoot = ge.getLayerRoot();
+                        var terrainLayer = layerRoot.getLayerById(ge.LAYER_TERRAIN);
+                        terrainLayer.setVisibility(true);
 
-  <script>
-    var viewer = new Cesium.Viewer('cesiumContainer');
+                        // shortcut:
+                        // layerRoot.enableLayerById(ge.LAYER_TERRAIN, true);
+                    }
 
-    function relevantSource() {
-        var ellipsoidTerrainProvider = viewer.terrainProvider;
-        var cesiumTerrainProvider = new Cesium.CesiumTerrainProvider({
-            url: '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
+                    function hideTerrain() {
+                        var layerRoot = ge.getLayerRoot();
+                        var terrainLayer = layerRoot.getLayerById(ge.LAYER_TERRAIN);
+                        terrainLayer.setVisibility(false);
+
+                        // shortcut:
+                        // layerRoot.enableLayerById(ge.LAYER_TERRAIN, false);
+                    }
+                </textarea>
+            </div>
+        </div>
+    </div>
+    <script>
+        var viewer = new Cesium.Viewer('cesiumContainer', {
+            fullscreenElement: 'previewContent'
         });
 
-        function showTerrain() {
-            viewer.terrainProvider = cesiumTerrainProvider;
-        }
+        function relevantSource() {
+            var ellipsoidTerrainProvider = viewer.terrainProvider;
+            var cesiumTerrainProvider = new Cesium.CesiumTerrainProvider({
+                url: '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
+            });
 
-        function hideTerrain() {
-            viewer.terrainProvider = ellipsoidTerrainProvider;
-        }
-        window.showTerrain = showTerrain;
-        window.hideTerrain = hideTerrain;
-        showTerrain();
-    }
-    relevantSource();
-    showSource('cesiumSource', relevantSource, 3);
+            function showTerrain() {
+                viewer.terrainProvider = cesiumTerrainProvider;
+            }
 
-    var target = new Cesium.Cartesian3(-2489625.0836225147, -4393941.44443024, 3882535.9454173897);
-    var offset = new Cesium.Cartesian3(-6857.40902037546, 412.3284835694358, 2147.5545426812023);
-    viewer.camera.lookAt(target, offset);
-    viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
-  </script>
+            function hideTerrain() {
+                viewer.terrainProvider = ellipsoidTerrainProvider;
+            }
+            window.showTerrain = showTerrain;
+            window.hideTerrain = hideTerrain;
+            showTerrain();
+        }
+        relevantSource();
+        showSource('cesiumSource', relevantSource, 3);
+
+        var target = new Cesium.Cartesian3(-2489625.0836225147, -4393941.44443024, 3882535.9454173897);
+        var offset = new Cesium.Cartesian3(-6857.40902037546, 412.3284835694358, 1147.5545426812023);
+        viewer.camera.lookAt(target, offset);
+        viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+    </script>
 </body>
 </html>

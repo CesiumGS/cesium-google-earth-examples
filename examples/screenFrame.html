@@ -18,85 +18,125 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
--->  
+-->
 <head>
-  <title>Screen Overlay (Frame)</title>
-
-  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-  <style type="text/css">@import "static/examples.css";</style>
-  <style type="text/css">@import "static/prettify/prettify.css";</style>
-  <script type="text/javascript" src="static/prettify/prettify.js"></script>
-  <script type="text/javascript" src="static/showSource.js"></script>
-
-  <script src="../Cesium/Cesium.js"></script>
-  <style>
-    @import url(../Cesium/Widgets/widgets.css);
-  </style>
-  
+    <title>Screen Overlay (Frame)</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../Cesium//Widgets//widgets.css">
+    <link rel="stylesheet" href="static/codemirror.css">
+    <link rel="stylesheet" href="static/bootstrap-3.3.2-dist/css/bootstrap.css">
+    <link rel="stylesheet" href="static/bootstrap-3.3.2-dist/css/bootstrap.cerylean.min.css">
+    <link rel="stylesheet" href="static/examples.css">
+    <script src="static/codemirror-compressed.js"></script>
+    <script src="static/helpers.js"></script>
+    <script src="../Cesium/Cesium.js"></script>
+    <script src="static/jquery-2.1.3.min.js"></script>
+    <script src="static/bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
 </head>
-<body onload="if(window.prettyPrint)prettyPrint();">
-  <h1>Cesium Examples - Screen Overlay (Frame)</h1>
-  <div id="page">
-  <div id="preview">
-  <div id="cesiumContainer"></div>
-  </div>
-  <div id="source">
-  <h2>Relevant Cesium Source</h2><pre id="cesiumSource" class="prettyprint lang-js"></pre>
-  <h2>Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/screenoverlay-frame.html">link</a>)</h2><pre class="prettyprint lang-js">
-var screenOverlay = ge.createScreenOverlay('');
 
-// Set the visibility to false while we construct the overlay.
-screenOverlay.setVisibility(false);
+<body onresize="onResize()">
+    <header class="container">
+        <div class="navbar navbar-default navbar-fixed-top">
+            <div class="navbar-header">
+                <button class="btn btn-primary navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="glyphicon glyphicon-menu-hamburger"></span>
+                </button>
+                <a class="navbar-brand" href="http://cesiumjs.org" target="_blank"><img src="static/Cesium_Logo_forDarkBackground.png" /></a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="#" id="menuPreview" onclick="showPanel(this)">Show Preview</a></li>
+                    <li><a href="#" id="menuCesium" onclick="showPanel(this)">Show Cesium Code</a></li>
+                    <li><a href="#" id="menuGoogle" onclick="showPanel(this)">Show Google Earth Code</a></li>
+                    <li><a href="http://cesiumjs.org/for-google-earth-developers.html" target="_blank">For Google Earth Developers</a></li>
+                    <li><a href="/index.html" target="_blank">All Google Earth examples</a></li>
+                    <li class="dropdown">
+                        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Additional Resources <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="http://cesiumjs.org/tutorials.html" target="_blank">Tutorials</a></li>
+                            <li><a href="http://cesiumjs.org/Cesium/Apps/Sandcastle/index.html" target="_blank">Cesium Sandcastle</a></li>
+                            <li> <a href="http://cesiumjs.org/refdoc.html" target="_blank">Reference Documentation</a> </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <div id="preview">
+        <div id="previewContent">
+            <div id="cesiumContainer"></div>
+        </div>
+    </div>
+    <div id="code">
+        <div class="panel panel-primary" id="czmPanel">
+            <div class="panel-heading">Relevant Cesium Source</div>
+            <div class="panel-body">
+                <textarea id="cesiumSource"></textarea>
+            </div>
+        </div>
+        <div class="panel panel-primary" id="gePanel">
+            <div class="panel-heading">Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/screenoverlay-frame.html">link</a>)</div>
+            <div class="panel-body">
+                <textarea id="gesource">
+                    var screenOverlay = ge.createScreenOverlay('');
 
-var icon = ge.createIcon('');
-icon.setHref('http://earth-api-samples.googlecode.com/svn/trunk/examples/' +
-             'static/frame.png');  // Loads an gilded picture frame.
-screenOverlay.setIcon(icon);
+                    // Set the visibility to false while we construct the overlay.
+                    screenOverlay.setVisibility(false);
 
-// Position the overlay.  ScreenXY(0,0) is mapped to OverlayXY(0,0)
-var screenXY = screenOverlay.getScreenXY();
-screenXY.setXUnits(ge.UNITS_PIXELS);
-screenXY.setYUnits(ge.UNITS_PIXELS);
-screenXY.setX(0);
-screenXY.setY(0);
+                    var icon = ge.createIcon('');
+                    icon.setHref('http://earth-api-samples.googlecode.com/svn/trunk/examples/' +
+                                 'static/frame.png'); // Loads an gilded picture frame.
+                    screenOverlay.setIcon(icon);
 
-var overlayXY = screenOverlay.getOverlayXY();
-overlayXY.setXUnits(ge.UNITS_PIXELS);
-overlayXY.setYUnits(ge.UNITS_PIXELS);
-overlayXY.setX(0);
-overlayXY.setY(0);
+                    // Position the overlay.  ScreenXY(0,0) is mapped to OverlayXY(0,0)
+                    var screenXY = screenOverlay.getScreenXY();
+                    screenXY.setXUnits(ge.UNITS_PIXELS);
+                    screenXY.setYUnits(ge.UNITS_PIXELS);
+                    screenXY.setX(0);
+                    screenXY.setY(0);
 
-// Set object's size in fractions of the 3d view window.  By setting
-// to (1, 1), this image will cover the entire Earth window.
-var overlaySize = screenOverlay.getSize()
-overlaySize.setXUnits(ge.UNITS_FRACTION);
-overlaySize.setYUnits(ge.UNITS_FRACTION);
-overlaySize.setX(1);
-overlaySize.setY(1);
+                    var overlayXY = screenOverlay.getOverlayXY();
+                    overlayXY.setXUnits(ge.UNITS_PIXELS);
+                    overlayXY.setYUnits(ge.UNITS_PIXELS);
+                    overlayXY.setX(0);
+                    overlayXY.setY(0);
 
-screenOverlay.setVisibility(true);
+                    // Set object's size in fractions of the 3d view window.  By setting
+                    // to (1, 1), this image will cover the entire Earth window.
+                    var overlaySize = screenOverlay.getSize()
+                    overlaySize.setXUnits(ge.UNITS_FRACTION);
+                    overlaySize.setYUnits(ge.UNITS_FRACTION);
+                    overlaySize.setX(1);
+                    overlaySize.setY(1);
 
-ge.getFeatures().appendChild(screenOverlay);</pre>
-  </div>
-  </div>
+                    screenOverlay.setVisibility(true);
 
-  <script>
-    var widget = new Cesium.CesiumWidget('cesiumContainer');
+                    ge.getFeatures().appendChild(screenOverlay);
+                </textarea>
+            </div>
+        </div>
+    </div>
+    <script>
+        var widget = new Cesium.CesiumWidget('cesiumContainer');
 
-    function relevantSource() {
-        //add overlay by creating an HTML element
-        var img = document.createElement('img');
-        img.src = './static/frame.png';
-        widget.container.appendChild(img)
+        function relevantSource() {
+            //add overlay by creating an HTML element
+            var img = document.createElement('img');
+            img.src = './static/frame.png';
+            widget.container.appendChild(img)
 
-        //position overlay with CSS styling
-        img.style.position = 'absolute';
-        img.style.top = '0';
-        img.style.left = '0';
-        img.style['pointer-events'] = 'none';
-    }
-    relevantSource();
-    showSource('cesiumSource', relevantSource);
-  </script>
+            //position overlay with CSS styling
+            img.style.position = 'absolute';
+            img.style.top = 0;
+            img.style.left = 0;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style['pointer-events'] = 'none';
+        }
+        relevantSource();
+        showSource('cesiumSource', relevantSource);
+    </script>
 </body>
 </html>

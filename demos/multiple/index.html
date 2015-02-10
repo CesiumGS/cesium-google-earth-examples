@@ -124,7 +124,7 @@ limitations under the License.
             var rectangle = Cesium.Rectangle.fromDegrees(bbox[1], bbox[0], bbox[3], bbox[2]);
 
             for (var i = 0; i < widgets.length; i++){
-                widgets[i].camera.flyToRectangle({
+                widgets[i].camera.flyTo({
                     destination : rectangle,
                     endTransform : Cesium.Matrix4.IDENTITY,
                     convert : false
