@@ -1,353 +1,398 @@
 <!DOCTYPE html>
 <html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2008 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
 <head>
-  <title>Cesium Examples from Google Earth</title>
-  <style>
-    .examplesTable {
-        margin-bottom: 1em;
-        margin-top: 1em;
-    }
-    .examplesTable td {
-        padding-left: 1em;
-        padding-right: 1em;
-        padding-bottom: 0.75em;
-        padding-top: 0.75em;
-    }
-    .examplesTable tr:nth-child(even) {
-        background: #EEEEEE;
-    }
-    .examplesTable tr:nth-child(odd) {
-        background: #CCCCCC;
-    }
-    .smallFont { 
-        font-size:70%;
-    }
-    .page
-    {
-        margin-left: auto; 
-        margin-right: auto;
-        padding-left: 32px;
-        padding-right: 32px;
-        width: 640px;
-        background-color: #FFFFFF;
-        border-style: solid;
-        border-width: 1px;
-        border-color: #000000;
-        font-family: Helvetica;
-        text-align:justify;
-    }    
-  </style>
+    <title>Cesium Examples from Google Earth</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Cesium//Widgets//widgets.css">
+    <link rel="stylesheet" href="examples/static/codemirror.css">
+    <link rel="stylesheet" href="examples/static/bootstrap-3.3.2-dist/css/bootstrap.css">
+    <link rel="stylesheet" href="examples/static/bootstrap-3.3.2-dist/css/bootstrap.cerylean.min.css">
+    <link rel="stylesheet" href="examples/static/examples.css">
+    <script src="examples/static/codemirror-compressed.js"></script>
+    <script src="examples/static/helpers.js"></script>
+    <script src="Cesium/Cesium.js"></script>
+    <script src="examples/static/jquery-2.1.3.min.js"></script>
+    <script src="examples/static/bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
+    <style>
+        .examplesTable {
+            margin-bottom: 1em;
+            margin-top: 1em;
+        }
+
+            .examplesTable td {
+                padding: 0.75em 1em;
+            }
+
+            .examplesTable tr:nth-child(even) {
+                background: #EEEEEE;
+            }
+
+            .examplesTable tr:nth-child(odd) {
+                background: #CCCCCC;
+            }
+
+        .smallFont {
+            font-size: 70%;
+        }
+    </style>
 </head>
-<body>
-<div class="page">
-<a href="https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/8b6b8ccc6da3aa5722903da7b58eb5ab1081adee/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_orange_ff7600.png"></a>
+<body style="overflow:auto">
+    <header class="container">
+        <div class="navbar navbar-default navbar-fixed-top">
+            <div class="navbar-header">
+                <button class="btn btn-primary navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="glyphicon glyphicon-menu-hamburger"></span>
+                </button>
+                <img class="navbar-brand" src="examples/static/Cesium_Logo_forDarkBackground.png" style="visibility:hidden" />
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="#" id="menuPreview" onclick="showPanel(this)">Show Preview</a></li>
+                    <li><a href="#" id="menuCesium" onclick="showPanel(this)">Show Cesium Code</a></li>
+                    <li><a href="#" id="menuGoogle" onclick="showPanel(this)">Show Google Earth Code</a></li>
+                    <li><a href="http://cesiumjs.org/for-google-earth-developers.html" target="_blank">For Google Earth Developers</a></li>
+                    <li class="dropdown">
+                        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Additional Resources <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="http://cesiumjs.org/tutorials.html" target="_blank">Tutorials</a></li>
+                            <li><a href="http://cesiumjs.org/Cesium/Apps/Sandcastle/index.html" target="_blank">Cesium Sandcastle</a></li>
+                            <li> <a href="http://cesiumjs.org/refdoc.html" target="_blank">Reference Documentation</a> </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <div class="container" style="margin-top:51px;">
+        <a href="https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples"><img style="position: absolute; top: 0; left: 0; border: 0; position:fixed; z-index: 1031;" src="https://camo.githubusercontent.com/8b6b8ccc6da3aa5722903da7b58eb5ab1081adee/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_orange_ff7600.png"></a>
 
-<p align="center">
-<a href="http://cesiumjs.org/" target="_blank">
-<img src="examples/static/Cesium_Logo_Color.jpg" width="50%" />
-</a>
-</p>
-<p>
-Google Earth plugin API samples ported to Cesium, the open-source WebGL virtual globe and map engine.
-</p>
-<p>
-Click on any example below to run it.  To learn more about Cesium, check out the <a href="http://cesiumjs.org/for-google-earth-developers.html" target="_blank">Cesium for Google Earth Developers</a> tutorial series or the <a href="https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples" target="_blank">GitHub repo for these examples</a>.
-</p>
+        <p align="center">
+            <a href="http://cesiumjs.org/" target="_blank">
+                <img src="examples/static/Cesium_Logo_Color.jpg" style="width:50%" />
+            </a>
+        </p>
+        <p>
+            Google Earth plugin API samples ported to Cesium, the open-source WebGL virtual globe and map engine.
+        </p>
+        <p>
+            Click on any example below to run it.  To learn more about Cesium, check out the <a href="http://cesiumjs.org/for-google-earth-developers.html" target="_blank">Cesium for Google Earth Developers</a> tutorial series or the <a href="https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples" target="_blank">GitHub repo for these examples</a>.
+        </p>
 
-<table class="examplesTable" align="center">
-    <tr>
-        <td>
-          <a href="demos/helloearth/" target="_blank"><img src="demos/helloearth/thumb.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="demos/helloearth/" target="_blank">Hello, Earth</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/demos/helloearth/index.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    
-    <tr>
-        <td>
-          <a href="demos/geolocation/" target="_blank"><img src="demos/geolocation/thumb.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="demos/geolocation/" target="_blank">HTML5/Gears/IP Geolocation</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/demos/geolocation/index.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    <tr>
-        <td>
-          <a href="demos/multiple/" target="_blank"><img src="demos/multiple/thumb.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="demos/multiple/" target="_blank">Multiple Globes</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/demos/multiple/index.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    </tr>
-        <tr>
-        <td>
-          <a href="demos/draw/" target="_blank"><img src="demos/draw/thumb.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="demos/draw/" target="_blank">Draw</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/demos/draw/index.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    <tr>
-        <td>
-          <a href="examples/groundoverlay.html" target="_blank"><img src="examples/static/thumbs/groundoverlay.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/groundoverlay.html" target="_blank">Basic Sample: Creating Ground Overlays </a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/groundoverlay.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
+        <table align="center" class="examplesTable">
+            <tr>
+                <td>
+                    <a href="demos/helloearth/" target="_blank"><img src="demos/helloearth/thumb.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="demos/helloearth/" target="_blank">Hello, Earth</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/demos/helloearth/index.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
 
-    <tr>
-        <td>
-          <a href="examples/hittest.html" target="_blank"><img src="examples/static/thumbs/hittest.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/hittest.html" target="_blank">Basic Sample: Hit-Testing</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/hittest.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-        
-    <tr>
-        <td>
-          <a href="examples/pinPoint.html" target="_blank"><img src="examples/static/thumbs/pinPoint.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/pinPoint.html" target="_blank">Basic Sample: Creating Placemarks </a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/placemark-point.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    
-    <tr>
-        <td>
-          <a href="examples/pinStyle.html" target="_blank"><img src="examples/static/thumbs/pinStyle.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/pinStyle.html" target="_blank">Basic Sample: Styling Placemarks </a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/placemark-stylemap.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    
-    <tr>
-        <td>
-          <a href="examples/pinDrag.html" target="_blank"><img src="examples/static/thumbs/pinDrag.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/pinDrag.html" target="_blank">Basic Sample: Draggable Placemark </a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/placemark-dragdrop.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    
-    <tr>
-        <td>
-          <a href="examples/polyline.html" target="_blank"><img src="examples/static/thumbs/polyline.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/polyline.html" target="_blank">Basic Sample: Creating Line Strings </a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/linestring.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    
-    <tr>
-        <td>
-          <a href="examples/polylineStyle.html" target="_blank"><img src="examples/static/thumbs/polylineStyle.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/polylineStyle.html" target="_blank">Basic Sample: Line String Styling </a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/linestring-style.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    
-    <tr>
-        <td>
-          <a href="examples/cameraMove.html" target="_blank"><img src="examples/static/thumbs/cameraMove.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/cameraMove.html" target="_blank">Basic Sample: Move Camera</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/camera-move.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    
-    <tr>
-        <td>
-          <a href="examples/cameraTilt.html" target="_blank"><img src="examples/static/thumbs/cameraTilt.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/cameraTilt.html" target="_blank">Basic Sample: Tilt Camera</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/camera-tilt.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    
-    <tr>
-        <td>
-          <a href="examples/cameraTimeout.html" target="_blank"><img src="examples/static/thumbs/cameraTimeout.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/cameraTimeout.html" target="_blank">Basic Sample: Move Camera with Timeouts </a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/camera-move-timeouts.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    
-    <tr>
-        <td>
-          <a href="examples/model.html" target="_blank"><img src="examples/static/thumbs/model.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/model.html" target="_blank">Basic Sample: Creating 3D Models</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/model.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    
-    <tr>
-        <td>
-          <a href="examples/terrain.html" target="_blank"><img src="examples/static/thumbs/terrain.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/terrain.html" target="_blank">Basic Sample: Show/Hide Terrain</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/terrain.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    
-    <tr>
-        <td>
-          <a href="examples/groundAlt.html" target="_blank"><img src="examples/static/thumbs/groundAlt.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/groundAlt.html" target="_blank">Basic Sample: Retrieving Ground Altitude Data</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/groundaltitude.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    
-    <tr>
-        <td>
-          <a href="examples/sun.html" target="_blank"><img src="examples/static/thumbs/sun.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/sun.html" target="_blank">Basic Sample: Show/Hide Sun (Dusk to Dawn)</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/sun.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    <tr>
-        <td>
-          <a href="examples/globeEvent.html" target="_blank"><img src="examples/static/thumbs/globeEvent.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/globeEvent.html" target="_blank">Basic Sample: Globe/Window Event Handling</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/event-globe.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    
-    <tr>
-        <td>
-          <a href="examples/eventListeners.html" target="_blank"><img src="examples/static/thumbs/eventListeners.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/eventListeners.html" target="_blank">Basic Sample: Toggling Event Listeners</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/event-listeners.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
+            <tr>
+                <td>
+                    <a href="demos/geolocation/" target="_blank"><img src="demos/geolocation/thumb.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="demos/geolocation/" target="_blank">HTML5/Gears/IP Geolocation</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/demos/geolocation/index.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="demos/multiple/" target="_blank"><img src="demos/multiple/thumb.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="demos/multiple/" target="_blank">Multiple Globes</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/demos/multiple/index.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+            </tr>
+            <tr>
+                <td>
+                    <a href="demos/draw/" target="_blank"><img src="demos/draw/thumb.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="demos/draw/" target="_blank">Draw</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/demos/draw/index.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="examples/groundoverlay.html" target="_blank"><img src="examples/static/thumbs/groundoverlay.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/groundoverlay.html" target="_blank">Basic Sample: Creating Ground Overlays </a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/groundoverlay.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
 
-    <tr>
-        <td>
-          <a href="examples/pinEvent.html" target="_blank"><img src="examples/static/thumbs/pinEvent.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/pinEvent.html" target="_blank">Basic Sample: Placemark Click Event Handling</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/event-placemark.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-        
-    <tr>
-        <td>
-          <a href="examples/frameAnimation.html" target="_blank"><img src="examples/static/thumbs/frameAnimation.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/frameAnimation.html" target="_blank">Basic Sample: Smooth Animation with frameend</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/event-frameend.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    
-    <tr>
-        <td>
-          <a href="examples/viewchangeEvent.html" target="_blank"><img src="examples/static/thumbs/viewchangeEvent.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/viewchangeEvent.html" target="_blank">Basic Sample: viewchange Event</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/event-viewchange.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    <tr>
-        <td>
-          <a href="examples/circle.html" target="_blank"><img src="examples/static/thumbs/circle.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/circle.html" target="_blank">Basic Sample: Creating Circle Polygons </a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/polygon-circle.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    <tr>
-        <td>
-          <a href="examples/nestedCircle.html" target="_blank"><img src="examples/static/thumbs/nestedCircle.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/nestedCircle.html" target="_blank">Basic Sample: Creating Multi-Geometry Placemarks</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/multigeometry.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    <tr>
-        <td>
-          <a href="examples/polygon.html" target="_blank"><img src="examples/static/thumbs/polygon.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/polygon.html" target="_blank">Basic Sample: Creating Polygons </a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/polygon.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    <tr>
-        <td>
-          <a href="examples/polygonStyle.html" target="_blank"><img src="examples/static/thumbs/polygonStyle.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/polygonStyle.html" target="_blank">Basic Sample: Polygon Styling</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/polygon-style.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    <tr>
-        <td>
-          <a href="examples/screenOverlay.html" target="_blank"><img src="examples/static/thumbs/screenOverlay.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/screenOverlay.html" target="_blank">Basic Sample: Creating Screen Overlays</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/screenoverlay.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
+            <tr>
+                <td>
+                    <a href="examples/hittest.html" target="_blank"><img src="examples/static/thumbs/hittest.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/hittest.html" target="_blank">Basic Sample: Hit-Testing</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/hittest.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
 
-    <tr>
-        <td>
-          <a href="examples/screenFrame.html" target="_blank"><img src="examples/static/thumbs/screenFrame.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="examples/screenFrame.html" target="_blank">Basic Sample: Screen Overlay (Frame)</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/screenoverlay-frame.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    
-    <tr>
-        <td>
-          <a href="demos/milktruck/" target="_blank"><img src="demos/milktruck/thumb.png" width="162" height="130"></a>
-        </td>
-        <td>
-          <a href="demos/milktruck/" target="_blank">Monster Milktruck</a>
-          <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/demos/milktruck/index.html" target="_blank">version</a>)</p>
-        </td>
-    </tr>
-    
-  </table>
-</div>
+            <tr>
+                <td>
+                    <a href="examples/pinPoint.html" target="_blank"><img src="examples/static/thumbs/pinPoint.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/pinPoint.html" target="_blank">Basic Sample: Creating Placemarks </a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/placemark-point.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <a href="examples/pinStyle.html" target="_blank"><img src="examples/static/thumbs/pinStyle.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/pinStyle.html" target="_blank">Basic Sample: Styling Placemarks </a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/placemark-stylemap.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <a href="examples/pinDrag.html" target="_blank"><img src="examples/static/thumbs/pinDrag.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/pinDrag.html" target="_blank">Basic Sample: Draggable Placemark </a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/placemark-dragdrop.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <a href="examples/polyline.html" target="_blank"><img src="examples/static/thumbs/polyline.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/polyline.html" target="_blank">Basic Sample: Creating Line Strings </a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/linestring.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <a href="examples/polylineStyle.html" target="_blank"><img src="examples/static/thumbs/polylineStyle.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/polylineStyle.html" target="_blank">Basic Sample: Line String Styling </a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/linestring-style.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <a href="examples/cameraMove.html" target="_blank"><img src="examples/static/thumbs/cameraMove.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/cameraMove.html" target="_blank">Basic Sample: Move Camera</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/camera-move.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <a href="examples/cameraTilt.html" target="_blank"><img src="examples/static/thumbs/cameraTilt.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/cameraTilt.html" target="_blank">Basic Sample: Tilt Camera</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/camera-tilt.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <a href="examples/cameraTimeout.html" target="_blank"><img src="examples/static/thumbs/cameraTimeout.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/cameraTimeout.html" target="_blank">Basic Sample: Move Camera with Timeouts </a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/camera-move-timeouts.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <a href="examples/model.html" target="_blank"><img src="examples/static/thumbs/model.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/model.html" target="_blank">Basic Sample: Creating 3D Models</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/model.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <a href="examples/terrain.html" target="_blank"><img src="examples/static/thumbs/terrain.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/terrain.html" target="_blank">Basic Sample: Show/Hide Terrain</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/terrain.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <a href="examples/groundAlt.html" target="_blank"><img src="examples/static/thumbs/groundAlt.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/groundAlt.html" target="_blank">Basic Sample: Retrieving Ground Altitude Data</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/groundaltitude.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <a href="examples/sun.html" target="_blank"><img src="examples/static/thumbs/sun.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/sun.html" target="_blank">Basic Sample: Show/Hide Sun (Dusk to Dawn)</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/sun.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="examples/globeEvent.html" target="_blank"><img src="examples/static/thumbs/globeEvent.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/globeEvent.html" target="_blank">Basic Sample: Globe/Window Event Handling</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/event-globe.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <a href="examples/eventListeners.html" target="_blank"><img src="examples/static/thumbs/eventListeners.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/eventListeners.html" target="_blank">Basic Sample: Toggling Event Listeners</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/event-listeners.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <a href="examples/pinEvent.html" target="_blank"><img src="examples/static/thumbs/pinEvent.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/pinEvent.html" target="_blank">Basic Sample: Placemark Click Event Handling</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/event-placemark.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <a href="examples/frameAnimation.html" target="_blank"><img src="examples/static/thumbs/frameAnimation.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/frameAnimation.html" target="_blank">Basic Sample: Smooth Animation with frameend</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/event-frameend.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <a href="examples/viewchangeEvent.html" target="_blank"><img src="examples/static/thumbs/viewchangeEvent.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/viewchangeEvent.html" target="_blank">Basic Sample: viewchange Event</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/event-viewchange.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="examples/circle.html" target="_blank"><img src="examples/static/thumbs/circle.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/circle.html" target="_blank">Basic Sample: Creating Circle Polygons </a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/polygon-circle.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="examples/nestedCircle.html" target="_blank"><img src="examples/static/thumbs/nestedCircle.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/nestedCircle.html" target="_blank">Basic Sample: Creating Multi-Geometry Placemarks</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/multigeometry.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="examples/polygon.html" target="_blank"><img src="examples/static/thumbs/polygon.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/polygon.html" target="_blank">Basic Sample: Creating Polygons </a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/polygon.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="examples/polygonStyle.html" target="_blank"><img src="examples/static/thumbs/polygonStyle.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/polygonStyle.html" target="_blank">Basic Sample: Polygon Styling</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/polygon-style.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="examples/screenOverlay.html" target="_blank"><img src="examples/static/thumbs/screenOverlay.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/screenOverlay.html" target="_blank">Basic Sample: Creating Screen Overlays</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/screenoverlay.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <a href="examples/screenFrame.html" target="_blank"><img src="examples/static/thumbs/screenFrame.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="examples/screenFrame.html" target="_blank">Basic Sample: Screen Overlay (Frame)</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/screenoverlay-frame.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <a href="demos/milktruck/" target="_blank"><img src="demos/milktruck/thumb.png" width="162" height="130"></a>
+                </td>
+                <td>
+                    <a href="demos/milktruck/" target="_blank">Monster Milktruck</a>
+                    <p class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/demos/milktruck/index.html" target="_blank">version</a>)</p>
+                </td>
+            </tr>
+
+        </table>
+    </div>
 </body>
 </html>
