@@ -291,6 +291,16 @@ Click on any example below to run it.  To learn more about Cesium, check out the
           <p>(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/screenoverlay-frame.html" target="_blank">version</a>)</p>
         </td>
     </tr>
+    
+    <tr>
+        <td>
+          <a href="http://analyticalgraphicsinc.github.io/cesium-google-earth-examples/demos/milktruck/" target="_blank"><img src="demos/milktruck/thumb.png" width="162" height="130"></a>
+        </td>
+        <td>
+          <a href="http://analyticalgraphicsinc.github.io/cesium-google-earth-examples/demos/milktruck/" target="_blank">Monster Milktruck</a>
+          <p>(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/demos/milktruck/index.html" target="_blank">version</a>)</p>
+        </td>
+    </tr>
 </table>
 </p>
 <p>
