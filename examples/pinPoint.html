@@ -114,26 +114,34 @@ limitations under the License.
         var pinBuilder = new Cesium.PinBuilder();
 
         function addPin() {
-            var entity = viewer.entities.add({
-                name: 'pin' + counter,
-                position: Cesium.Ellipsoid.WGS84.scaleToGeodeticSurface(camera.position),
-                label: {
-                    text: 'pin' + counter,
-                    verticalOrigin: Cesium.VerticalOrigin.TOP
-                },
-                billboard: {
-                    image: pinBuilder.fromColor(Cesium.Color.SALMON, 48),
-                    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-                }
-            });
+            var centerOfScreen = new Cesium.Cartesian2(viewer.canvas.clientWidth / 2,
+                                                       viewer.canvas.clientHeight / 2);
+            var surfacePosition = viewer.camera.pickEllipsoid(centerOfScreen);
+            if (Cesium.defined(surfacePosition)) {
+                var entity = viewer.entities.add({
+                    name: 'pin' + counter,
+                    position: surfacePosition,
+                    label: {
+                        text: 'pin' + counter,
+                        verticalOrigin: Cesium.VerticalOrigin.TOP
+                    },
+                    billboard: {
+                        image: pinBuilder.fromColor(Cesium.Color.SALMON, 48),
+                        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                    }
+                });
+            }
 
             counter++;
         }
         showSource('cesiumSource', addPin);
         addPin();
 
+        var centerOfScreen = new Cesium.Cartesian2(viewer.canvas.clientWidth / 2,
+                                                   viewer.canvas.clientHeight / 2);
         camera.flyTo({
-            destination: Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude, 30000.0)
+            destination: viewer.camera.pickEllipsoid(centerOfScreen),
+            range: 30000.0
         });
     </script>
 </body>
