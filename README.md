@@ -50,6 +50,38 @@ Click on any example below to run it.  To learn more about Cesium, check out the
     </tr>
     <tr>
         <td>
+            <img src="examples/static/thumbs/kmlFetch.png" title="KML Fetch" alt="KML Fetch" />
+        </td>
+        <td>
+            <p><strong>KML Fetching</strong></p>
+            <p>
+                <a href="http://analyticalgraphicsinc.github.io/cesium-google-earth-examples/examples/kmlFetchGood.html">KML Fetch</a>
+                <span style="white-space: nowrap;" class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/kml-fetch-good.html" target="_blank">version</a>)</span>
+            </p>
+            <p>
+                <a href="http://analyticalgraphicsinc.github.io/cesium-google-earth-examples/examples/kmlFetchInteractive.html">KML Fetch: Interactive</a>
+                <span style="white-space: nowrap;" class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/kml-fetch-interactive.html" target="_blank">version</a>)</span>
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <img src="examples/static/thumbs/kmlParsing.png" title="KML Parsing" alt="KML Parsing" />
+        </td>
+        <td>
+            <p><strong>KML Parsing</strong></p>
+            <p>
+                <a href="http://analyticalgraphicsinc.github.io/cesium-google-earth-examples/examples/kmlParse.html">KML Parsing</a>
+                <span style="white-space: nowrap;" class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/kml-parse.html" target="_blank">version</a>)</span>
+            </p>
+            <p>
+                <a href="http://analyticalgraphicsinc.github.io/cesium-google-earth-examples/examples/kmlParseTimeSpan.html">Parsing KML: Time Span</a>
+                <span style="white-space: nowrap;" class="smallFont">(Google Earth <a href="http://earth-api-samples.googlecode.com/svn/trunk/examples/kml-parse-timespan.html" target="_blank">version</a>)</span>
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
           <a href="http://analyticalgraphicsinc.github.io/cesium-google-earth-examples/examples/groundoverlay.html" target="_blank"><img src="examples/static/thumbs/groundoverlay.png" width="162" height="130"></a>
         </td>
         <td>

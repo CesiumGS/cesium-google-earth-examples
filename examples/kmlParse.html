@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Original Work:
+
+Copyright 2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+-->
+<head>
+    <meta charset="utf-8">
+    <title>Cesium API Sample - KML Parse Timespan</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../Cesium/Widgets/widgets.css">
+    <link rel="stylesheet" href="static/codemirror.css">
+    <link rel="stylesheet" href="static/bootstrap-3.3.2-dist/css/bootstrap.css">
+    <link rel="stylesheet" href="static/bootstrap-3.3.2-dist/css/bootstrap.cerylean.min.css">
+    <link rel="stylesheet" href="static/examples.css">
+    <script src="static/codemirror-compressed.js"></script>
+    <script src="static/helpers.js"></script>
+    <script src="../Cesium/Cesium.js"></script>
+    <script src="static/jquery-2.1.3.min.js"></script>
+    <script src="static/bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
+</head>
+
+<body onresize="onResize()">
+<header class="container">
+    <div class="navbar navbar-default navbar-fixed-top">
+        <div class="navbar-header">
+            <button class="btn btn-primary navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="glyphicon glyphicon-menu-hamburger"></span>
+            </button>
+            <a class="navbar-brand" href="http://cesiumjs.org" target="_blank"><img src="static/Cesium_Logo_forDarkBackground.png" /></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="#" id="menuPreview" onclick="showPanel(this)">Show Preview</a></li>
+                <li><a href="#" id="menuCesium" onclick="showPanel(this)">Show Cesium Code</a></li>
+                <li><a href="#" id="menuGoogle" onclick="showPanel(this)">Show Google Earth Code</a></li>
+                <li><a href="http://cesiumjs.org/for-google-earth-developers.html" target="_blank">For Google Earth Developers</a></li>
+                <li><a href="../index.html" target="_blank">All Google Earth examples</a></li>
+                <li class="dropdown">
+                    <a href="#" data-toggle="dropdown" class="dropdown-toggle">Additional Resources <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="http://cesiumjs.org/tutorials.html" target="_blank">Tutorials</a></li>
+                        <li><a href="http://cesiumjs.org/Cesium/Apps/Sandcastle/index.html" target="_blank">Cesium Sandcastle</a></li>
+                        <li> <a href="http://cesiumjs.org/refdoc.html" target="_blank">Reference Documentation</a> </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>
+<div id="preview">
+    <div id="previewContent">
+        <div id="cesiumContainer"></div>
+    </div>
+</div>
+<div id="code">
+    <div class="panel panel-primary" id="czmPanel">
+        <div class="panel-heading">Relevant Cesium Source</div>
+        <div class="panel-body">
+            <textarea id="cesiumSource"></textarea>
+        </div>
+    </div>
+    <div class="panel panel-primary" id="gePanel">
+        <div class="panel-heading">Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/hittest.html">link</a>)</div>
+        <div class="panel-body">
+                <textarea id="gesource">
+                    // Sample KML taken from
+                    //   http://code.google.com/apis/kml/documentation/kml_tut.html#polygons
+                    var pentagon = ge.parseKml(
+                      '&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;' +
+                      '&lt;kml xmlns=&quot;http://www.opengis.net/kml/2.2&quot;&gt;' +
+                      '  &lt;Placemark&gt;' +
+                      '    &lt;name&gt;The Pentagon&lt;/name&gt;' +
+                      '    &lt;Polygon&gt;' +
+                      '      &lt;extrude&gt;1&lt;/extrude&gt;' +
+                      '      &lt;altitudeMode&gt;relativeToGround&lt;/altitudeMode&gt;' +
+                      '      &lt;outerBoundaryIs&gt;' +
+                      '        &lt;LinearRing&gt;' +
+                      '          &lt;coordinates&gt;' +
+                      '            -77.05788457660967,38.87253259892824,100 ' +
+                      '            -77.05465973756702,38.87291016281703,100 ' +
+                      '            -77.05315536854791,38.87053267794386,100 ' +
+                      '            -77.05552622493516,38.868757801256,100 ' +
+                      '            -77.05844056290393,38.86996206506943,100 ' +
+                      '            -77.05788457660967,38.87253259892824,100' +
+                      '          &lt;/coordinates&gt;' +
+                      '        &lt;/LinearRing&gt;' +
+                      '      &lt;/outerBoundaryIs&gt;' +
+                      '      &lt;innerBoundaryIs&gt;' +
+                      '        &lt;LinearRing&gt;' +
+                      '          &lt;coordinates&gt;' +
+                      '            -77.05668055019126,38.87154239798456,100 ' +
+                      '            -77.05542625960818,38.87167890344077,100 ' +
+                      '            -77.05485125901024,38.87076535397792,100 ' +
+                      '            -77.05577677433152,38.87008686581446,100 ' +
+                      '            -77.05691162017543,38.87054446963351,100 ' +
+                      '            -77.05668055019126,38.87154239798456,100' +
+                      '          &lt;/coordinates&gt;' +
+                      '        &lt;/LinearRing&gt;' +
+                      '      &lt;/innerBoundaryIs&gt;' +
+                      '    &lt;/Polygon&gt;' +
+                      '  &lt;/Placemark&gt;' +
+                      '&lt;/kml&gt;');
+
+                    ge.getFeatures().appendChild(pentagon);
+
+                    // Fly to the Pentagon
+                    var la = ge.createLookAt('');
+                    la.set(38.867, -77.0565, 500, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 45, 900);
+                    ge.getView().setAbstractView(la);
+                </textarea>
+        </div>
+    </div>
+</div>
+<script>
+    var viewer = new Cesium.Viewer('cesiumContainer', {
+        fullscreenElement: 'previewContent',
+        selectionIndicator: false,
+        infoBox: false
+    });
+
+    var kmlDocument = new DOMParser().parseFromString(
+        '<?xml version="1.0" encoding="UTF-8"?>' +
+        '<kml xmlns="http://www.opengis.net/kml/2.2">' +
+        '  <Placemark>' +
+        '    <name>The Empty Box</name>' +
+        '    <Polygon>' +
+        '      <extrude>1</extrude>' +
+        '      <altitudeMode>relativeToGround</altitudeMode>' +
+        '      <outerBoundaryIs>' +
+        '        <LinearRing>' +
+        '          <coordinates>' +
+        '            -90.0,30.0,10000 ' +
+        '            -90.0,31.0,10000 ' +
+        '            -91.0,31.0,10000 ' +
+        '            -91.0,30.0,10000 ' +
+        '          </coordinates>' +
+        '        </LinearRing>' +
+        '      </outerBoundaryIs>' +
+        '      <innerBoundaryIs>' +
+        '        <LinearRing>' +
+        '          <coordinates>' +
+        '            -90.66,30.33,10000 ' +
+        '            -90.33,30.33,10000 ' +
+        '            -90.33,30.66,10000 ' +
+        '            -90.66,30.66,10000 ' +
+        '          </coordinates>' +
+        '        </LinearRing>' +
+        '      </innerBoundaryIs>' +
+        '    </Polygon>' +
+        '  </Placemark>' +
+        '</kml>', "application/xml");
+
+    //Load the KML object and move camera to point to it.
+    viewer.flyTo(
+        viewer.dataSources.add(
+            Cesium.KmlDataSource.load(kmlDocument)
+        )
+    );
+
+    function relevantSource() {
+        //sample KML polygon box with an interior boundary
+        var kmlDocument = new DOMParser().parseFromString(
+            '<?xml version="1.0" encoding="UTF-8"?>' +
+            '<kml xmlns="http://www.opengis.net/kml/2.2">' +
+            '  <Placemark>' +
+            '    <name>The Empty Box</name>' +
+            '    <Polygon>' +
+            '      <extrude>1</extrude>' +
+            '      <altitudeMode>relativeToGround</altitudeMode>' +
+            '      <outerBoundaryIs>' +
+            '        <LinearRing>' +
+            '          <coordinates>' +
+            '            -90.0,30.0,10000 ' +
+            '            -90.0,31.0,10000 ' +
+            '            -91.0,31.0,10000 ' +
+            '            -91.0,30.0,10000 ' +
+            '          </coordinates>' +
+            '        </LinearRing>' +
+            '      </outerBoundaryIs>' +
+            '      <innerBoundaryIs>' +
+            '        <LinearRing>' +
+            '          <coordinates>' +
+            '            -90.66,30.33,10000 ' +
+            '            -90.33,30.33,10000 ' +
+            '            -90.33,30.66,10000 ' +
+            '            -90.66,30.66,10000 ' +
+            '          </coordinates>' +
+            '        </LinearRing>' +
+            '      </innerBoundaryIs>' +
+            '    </Polygon>' +
+            '  </Placemark>' +
+            '</kml>', "application/xml");
+
+        //Load the KML object and move camera to point to it.
+        viewer.flyTo(
+            viewer.dataSources.add(
+                Cesium.KmlDataSource.load(kmlDocument)
+            )
+        );
+    }
+    showSource('cesiumSource', relevantSource);
+
+</script>
+</body>
+</html>

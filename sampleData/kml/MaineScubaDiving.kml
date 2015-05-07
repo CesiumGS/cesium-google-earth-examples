@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+	<name>MaineScubaDiving.kml</name>
+	<Style id="sh_water">
+		<IconStyle>
+			<scale>1.4</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/shapes/water.png</href>
+			</Icon>
+			<hotSpot x="0.5" y="0" xunits="fraction" yunits="fraction"/>
+		</IconStyle>
+		<ListStyle>
+		</ListStyle>
+	</Style>
+	<Style id="sn_water">
+		<IconStyle>
+			<scale>1.2</scale>
+			<Icon>
+				<href>http://maps.google.com/mapfiles/kml/shapes/water.png</href>
+			</Icon>
+			<hotSpot x="0.5" y="0" xunits="fraction" yunits="fraction"/>
+		</IconStyle>
+		<ListStyle>
+		</ListStyle>
+	</Style>
+	<StyleMap id="msn_water">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#sn_water</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#sh_water</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Folder>
+		<name>Portland Area Scuba Diving</name>
+		<open>1</open>
+		<Style>
+			<ListStyle>
+				<listItemType>check</listItemType>
+				<ItemIcon>
+					<state>open</state>
+					<href>:/mysavedplaces_open.png</href>
+				</ItemIcon>
+				<ItemIcon>
+					<state>closed</state>
+					<href>:/mysavedplaces_closed.png</href>
+				</ItemIcon>
+				<bgColor>00ffffff</bgColor>
+				<maxSnippetLines>2</maxSnippetLines>
+			</ListStyle>
+		</Style>
+		<Placemark>
+			<name>Two Lights (Dyer Cove)</name>
+			<LookAt>
+				<longitude>-70.19614327088985</longitude>
+				<latitude>43.56407610092381</latitude>
+				<altitude>0</altitude>
+				<heading>0.005721901271317009</heading>
+				<tilt>0</tilt>
+				<range>1032.924643200811</range>
+				<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+			</LookAt>
+			<styleUrl>#msn_water</styleUrl>
+			<Point>
+				<gx:drawOrder>1</gx:drawOrder>
+				<coordinates>-70.19851561266309,43.56518137538722,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Ft Williams</name>
+			<description>30-65 Ft
+Free parking</description>
+			<LookAt>
+				<longitude>-70.21224393621128</longitude>
+				<latitude>43.62602634978145</latitude>
+				<altitude>0</altitude>
+				<heading>-0.005023411931936011</heading>
+				<tilt>22.47331455228214</tilt>
+				<range>404.3217940943707</range>
+				<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+			</LookAt>
+			<styleUrl>#msn_water</styleUrl>
+			<Point>
+				<gx:drawOrder>1</gx:drawOrder>
+				<coordinates>-70.21297525869396,43.6254352929708,0</coordinates>
+			</Point>
+		</Placemark>
+		<Placemark>
+			<name>Biddeford Pool</name>
+			<LookAt>
+				<longitude>-70.33905163232077</longitude>
+				<latitude>43.44545067410524</latitude>
+				<altitude>0</altitude>
+				<heading>0.2827201332560385</heading>
+				<tilt>0</tilt>
+				<range>259.679407890024</range>
+				<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+			</LookAt>
+			<styleUrl>#msn_water</styleUrl>
+			<Point>
+				<gx:drawOrder>1</gx:drawOrder>
+				<coordinates>-70.33967757616416,43.44522220360595,0</coordinates>
+			</Point>
+		</Placemark>
+	</Folder>
+</Document>
+</kml>
