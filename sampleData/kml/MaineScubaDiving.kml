@@ -89,23 +89,6 @@ Free parking</description>
 			</Point>
 		</Placemark>
 		<Placemark>
-			<name>Monkey Skull Cove (Ram Island)</name>
-			<LookAt>
-				<longitude>-70.1887695109051</longitude>
-				<latitude>43.63590892046476</latitude>
-				<altitude>0</altitude>
-				<heading>34.76987477618307</heading>
-				<tilt>23.98349809652515</tilt>
-				<range>199.6765255762913</range>
-				<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
-			</LookAt>
-			<styleUrl>#msn_water</styleUrl>
-			<Point>
-				<gx:drawOrder>1</gx:drawOrder>
-				<coordinates>-70.1887695109051,43.63590892046476,0</coordinates>
-			</Point>
-		</Placemark>
-		<Placemark>
 			<name>Biddeford Pool</name>
 			<LookAt>
 				<longitude>-70.33905163232077</longitude>

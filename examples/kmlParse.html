@@ -173,9 +173,14 @@ limitations under the License.
         '</kml>', "application/xml");
 
     //Load the KML object and move camera to point to it.
-    viewer.flyTo(viewer.dataSources.add(Cesium.KmlDataSource.load(kmlDocument)));
+    viewer.flyTo(
+        viewer.dataSources.add(
+            Cesium.KmlDataSource.load(kmlDocument)
+        )
+    );
 
     function relevantSource() {
+        //sample KML polygon box with an interior boundary
         var kmlDocument = new DOMParser().parseFromString(
             '<?xml version="1.0" encoding="UTF-8"?>' +
             '<kml xmlns="http://www.opengis.net/kml/2.2">' +
@@ -209,7 +214,11 @@ limitations under the License.
             '</kml>', "application/xml");
 
         //Load the KML object and move camera to point to it.
-        viewer.flyTo(viewer.dataSources.add(Cesium.KmlDataSource.load(kmlDocument)));
+        viewer.flyTo(
+            viewer.dataSources.add(
+                Cesium.KmlDataSource.load(kmlDocument)
+            )
+        );
     }
     showSource('cesiumSource', relevantSource);
 
