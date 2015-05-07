@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+See https://github.com/AnalyticalGraphicsInc/cesium-google-earth-examples/blob/master/LICENSE.md
+
+Fenway Model was used from the publicly available Model on Sketchup
+https://3dwarehouse.sketchup.com/model.html?id=21eee70f917ce34af7a0c817ab72c49b
+
+Original Work:
+
+Copyright 2009 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+-->
+<head>
+    <meta charset="utf-8">
+    <title>Cesium API Sample - KML Parse Timespan</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../Cesium/Widgets/widgets.css">
+    <link rel="stylesheet" href="static/codemirror.css">
+    <link rel="stylesheet" href="static/bootstrap-3.3.2-dist/css/bootstrap.css">
+    <link rel="stylesheet" href="static/bootstrap-3.3.2-dist/css/bootstrap.cerylean.min.css">
+    <link rel="stylesheet" href="static/examples.css">
+    <script src="static/codemirror-compressed.js"></script>
+    <script src="static/helpers.js"></script>
+    <script src="../Cesium/Cesium.js"></script>
+    <script src="static/jquery-2.1.3.min.js"></script>
+    <script src="static/bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
+</head>
+
+<body onresize="onResize()">
+<header class="container">
+    <div class="navbar navbar-default navbar-fixed-top">
+        <div class="navbar-header">
+            <button class="btn btn-primary navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="glyphicon glyphicon-menu-hamburger"></span>
+            </button>
+            <a class="navbar-brand" href="http://cesiumjs.org" target="_blank"><img src="static/Cesium_Logo_forDarkBackground.png" /></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="#" id="menuPreview" onclick="showPanel(this)">Show Preview</a></li>
+                <li><a href="#" id="menuCesium" onclick="showPanel(this)">Show Cesium Code</a></li>
+                <li><a href="#" id="menuGoogle" onclick="showPanel(this)">Show Google Earth Code</a></li>
+                <li><a href="http://cesiumjs.org/for-google-earth-developers.html" target="_blank">For Google Earth Developers</a></li>
+                <li><a href="../index.html" target="_blank">All Google Earth examples</a></li>
+                <li class="dropdown">
+                    <a href="#" data-toggle="dropdown" class="dropdown-toggle">Additional Resources <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="http://cesiumjs.org/tutorials.html" target="_blank">Tutorials</a></li>
+                        <li><a href="http://cesiumjs.org/Cesium/Apps/Sandcastle/index.html" target="_blank">Cesium Sandcastle</a></li>
+                        <li> <a href="http://cesiumjs.org/refdoc.html" target="_blank">Reference Documentation</a> </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>
+<div id="preview">
+    <div id="previewContent">
+        <div id="cesiumContainer"></div>
+    </div>
+</div>
+<div id="code">
+    <div class="panel panel-primary" id="czmPanel">
+        <div class="panel-heading">Relevant Cesium Source</div>
+        <div class="panel-body">
+            <textarea id="cesiumSource"></textarea>
+        </div>
+    </div>
+    <div class="panel panel-primary" id="gePanel">
+        <div class="panel-heading">Relevant Google Earth Source (<a target="_blank" href="https://code.google.com/p/earth-api-samples/source/browse/trunk/examples/hittest.html">link</a>)</div>
+        <div class="panel-body">
+                <textarea id="gesource">
+                    // Sample KML taken from
+                    //   http://code.google.com/apis/kml/documentation/kml_tut.html#polygons
+                    var timeAwareDoc = ge.parseKml(
+                      '&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;' +
+                      '&lt;kml xmlns=&quot;http://www.opengis.net/kml/2.2&quot;&gt;' +
+                      '  &lt;Document&gt;' +
+                      '    &lt;Placemark&gt;' +
+                      '      &lt;name&gt;Placemark 1&lt;/name&gt;' +
+                      '      &lt;TimeSpan&gt;' +
+                      '        &lt;begin&gt;2007-01-14T21:05:02Z&lt;/begin&gt;' +
+                      '        &lt;end&gt;2007-01-14T21:05:20Z&lt;/end&gt;' +
+                      '      &lt;/TimeSpan&gt;' +
+                      '      &lt;Point&gt;' +
+                      '        &lt;coordinates&gt;-122.536226,37.86047,0&lt;/coordinates&gt;' +
+                      '      &lt;/Point&gt;' +
+                      '    &lt;/Placemark&gt;' +
+                      '    &lt;Placemark&gt;' +
+                      '      &lt;name&gt;Placemark 2&lt;/name&gt;' +
+                      '      &lt;TimeSpan&gt;' +
+                      '        &lt;begin&gt;2007-01-14T21:05:20Z&lt;/begin&gt;' +
+                      '        &lt;end&gt;2007-01-14T21:05:43Z&lt;/end&gt;' +
+                      '      &lt;/TimeSpan&gt;' +
+                      '      &lt;Point&gt;' +
+                      '        &lt;coordinates&gt;-122.536422,37.860303,0&lt;/coordinates&gt;' +
+                      '      &lt;/Point&gt;' +
+                      '    &lt;/Placemark&gt;' +
+                      '    &lt;Placemark&gt;' +
+                      '      &lt;name&gt;Placemark 3&lt;/name&gt;' +
+                      '      &lt;TimeSpan&gt;' +
+                      '        &lt;begin&gt;2007-01-14T21:05:43Z&lt;/begin&gt;' +
+                      '        &lt;end&gt;2007-01-14T21:06:04Z&lt;/end&gt;' +
+                      '      &lt;/TimeSpan&gt;' +
+                      '      &lt;Point&gt;' +
+                      '        &lt;coordinates&gt;-122.536688,37.860072,0&lt;/coordinates&gt;' +
+                      '      &lt;/Point&gt;' +
+                      '    &lt;/Placemark&gt;' +
+                      '  &lt;/Document&gt;' +
+                      '&lt;/kml&gt;');
+
+                    ge.getFeatures().appendChild(timeAwareDoc);
+
+                    // Fly to the Pentagon
+                    var la = ge.createLookAt('');
+                    la.set(37.860303, -122.536422, 0, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 45, 75);
+                    ge.getView().setAbstractView(la);
+                </textarea>
+        </div>
+    </div>
+</div>
+<script>
+    var viewer = new Cesium.Viewer('cesiumContainer', {
+        fullscreenElement: 'previewContent',
+        selectionIndicator: false,
+        infoBox: false
+    });
+
+    var timeAwareDoc = new DOMParser().parseFromString(
+        '<?xml version="1.0" encoding="UTF-8"?>' +
+        '<kml xmlns="http://www.opengis.net/kml/2.2">' +
+        '  <Document>' +
+        '    <Placemark>' +
+        '      <name>Two Lights</name>' +
+        '      <id>TwoLights</id>' +
+        '      <TimeSpan>' +
+        '        <begin>2007-01-14T21:05:02Z</begin>' +
+        '        <end>2007-01-14T21:05:20Z</end>' +
+        '      </TimeSpan>' +
+        '      <Point>' +
+        '        <coordinates>-70.19614327088985,43.56407610092381,0</coordinates>' +
+        '      </Point>' +
+        '    </Placemark>' +
+        '    <Placemark>' +
+        '      <name>Ft Williams</name>' +
+        '      <id>FtWilliams</id>' +
+        '      <TimeSpan>' +
+        '        <begin>2007-01-14T21:05:20Z</begin>' +
+        '        <end>2007-01-14T21:05:43Z</end>' +
+        '      </TimeSpan>' +
+        '      <Point>' +
+        '        <coordinates>-70.21224393621128,43.62602634978145,0</coordinates>' +
+        '      </Point>' +
+        '    </Placemark>' +
+        '    <Placemark>' +
+        '      <name>Biddeford Pool</name>' +
+        '      <id>Placemark3</id>' +
+        '      <TimeSpan>' +
+        '        <begin>2007-01-14T21:05:43Z</begin>' +
+        '        <end>2007-01-14T21:06:04Z</end>' +
+        '      </TimeSpan>' +
+        '      <Point>' +
+        '        <coordinates>-70.33905163232077,43.44545067410524,0</coordinates>' +
+        '      </Point>' +
+        '    </Placemark>' +
+        '  </Document>' +
+        '</kml>', "application/xml");
+
+    //Load the KML object
+    viewer.dataSources.add(Cesium.KmlDataSource.load(timeAwareDoc));
+
+    //Fly to Maine
+    viewer.camera.flyTo({
+        destination : Cesium.Cartesian3.fromDegrees(-70.3836062, 43.5692348, 150000.0)
+    });
+
+    function relevantSource() {
+        var timeAwareDoc = new DOMParser().parseFromString(
+            '<?xml version="1.0" encoding="UTF-8"?>' +
+            '<kml xmlns="http://www.opengis.net/kml/2.2">' +
+            '  <Document>' +
+            '    <Placemark>' +
+            '      <name>Two Lights</name>' +
+            '      <id>TwoLights</id>' +
+            '      <TimeSpan>' +
+            '        <begin>2007-01-14T21:05:02Z</begin>' +
+            '        <end>2007-01-14T21:05:20Z</end>' +
+            '      </TimeSpan>' +
+            '      <Point>' +
+            '        <coordinates>-70.19614327088985,43.56407610092381,0</coordinates>' +
+            '      </Point>' +
+            '    </Placemark>' +
+            '    <Placemark>' +
+            '      <name>Ft Williams</name>' +
+            '      <id>FtWilliams</id>' +
+            '      <TimeSpan>' +
+            '        <begin>2007-01-14T21:05:20Z</begin>' +
+            '        <end>2007-01-14T21:05:43Z</end>' +
+            '      </TimeSpan>' +
+            '      <Point>' +
+            '        <coordinates>-70.21224393621128,43.62602634978145,0</coordinates>' +
+            '      </Point>' +
+            '    </Placemark>' +
+            '    <Placemark>' +
+            '      <name>Biddeford Pool</name>' +
+            '      <id>Placemark3</id>' +
+            '      <TimeSpan>' +
+            '        <begin>2007-01-14T21:05:43Z</begin>' +
+            '        <end>2007-01-14T21:06:04Z</end>' +
+            '      </TimeSpan>' +
+            '      <Point>' +
+            '        <coordinates>-70.33905163232077,43.44545067410524,0</coordinates>' +
+            '      </Point>' +
+            '    </Placemark>' +
+            '  </Document>' +
+            '</kml>', "application/xml");
+
+        //Load the KML object
+        viewer.dataSources.add(Cesium.KmlDataSource.load(kmlDocument));
+
+        //Fly to Maine
+        viewer.camera.flyTo({
+            destination : Cesium.Cartesian3.fromDegrees(-70.3836062, 43.5692348, 150000.0)
+        });
+
+    }
+
+//    relevantSource();
+    showSource('cesiumSource', relevantSource);
+
+</script>
+</body>
+</html>

@@ -87,48 +87,47 @@ limitations under the License.
                 <textarea id="gesource">
                     // Sample KML taken from
                     //   http://code.google.com/apis/kml/documentation/kml_tut.html#polygons
-                    var timeAwareDoc = ge.parseKml(
+                    var pentagon = ge.parseKml(
                       '&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;' +
                       '&lt;kml xmlns=&quot;http://www.opengis.net/kml/2.2&quot;&gt;' +
-                      '  &lt;Document&gt;' +
-                      '    &lt;Placemark&gt;' +
-                      '      &lt;name&gt;Placemark 1&lt;/name&gt;' +
-                      '      &lt;TimeSpan&gt;' +
-                      '        &lt;begin&gt;2007-01-14T21:05:02Z&lt;/begin&gt;' +
-                      '        &lt;end&gt;2007-01-14T21:05:20Z&lt;/end&gt;' +
-                      '      &lt;/TimeSpan&gt;' +
-                      '      &lt;Point&gt;' +
-                      '        &lt;coordinates&gt;-122.536226,37.86047,0&lt;/coordinates&gt;' +
-                      '      &lt;/Point&gt;' +
-                      '    &lt;/Placemark&gt;' +
-                      '    &lt;Placemark&gt;' +
-                      '      &lt;name&gt;Placemark 2&lt;/name&gt;' +
-                      '      &lt;TimeSpan&gt;' +
-                      '        &lt;begin&gt;2007-01-14T21:05:20Z&lt;/begin&gt;' +
-                      '        &lt;end&gt;2007-01-14T21:05:43Z&lt;/end&gt;' +
-                      '      &lt;/TimeSpan&gt;' +
-                      '      &lt;Point&gt;' +
-                      '        &lt;coordinates&gt;-122.536422,37.860303,0&lt;/coordinates&gt;' +
-                      '      &lt;/Point&gt;' +
-                      '    &lt;/Placemark&gt;' +
-                      '    &lt;Placemark&gt;' +
-                      '      &lt;name&gt;Placemark 3&lt;/name&gt;' +
-                      '      &lt;TimeSpan&gt;' +
-                      '        &lt;begin&gt;2007-01-14T21:05:43Z&lt;/begin&gt;' +
-                      '        &lt;end&gt;2007-01-14T21:06:04Z&lt;/end&gt;' +
-                      '      &lt;/TimeSpan&gt;' +
-                      '      &lt;Point&gt;' +
-                      '        &lt;coordinates&gt;-122.536688,37.860072,0&lt;/coordinates&gt;' +
-                      '      &lt;/Point&gt;' +
-                      '    &lt;/Placemark&gt;' +
-                      '  &lt;/Document&gt;' +
+                      '  &lt;Placemark&gt;' +
+                      '    &lt;name&gt;The Pentagon&lt;/name&gt;' +
+                      '    &lt;Polygon&gt;' +
+                      '      &lt;extrude&gt;1&lt;/extrude&gt;' +
+                      '      &lt;altitudeMode&gt;relativeToGround&lt;/altitudeMode&gt;' +
+                      '      &lt;outerBoundaryIs&gt;' +
+                      '        &lt;LinearRing&gt;' +
+                      '          &lt;coordinates&gt;' +
+                      '            -77.05788457660967,38.87253259892824,100 ' +
+                      '            -77.05465973756702,38.87291016281703,100 ' +
+                      '            -77.05315536854791,38.87053267794386,100 ' +
+                      '            -77.05552622493516,38.868757801256,100 ' +
+                      '            -77.05844056290393,38.86996206506943,100 ' +
+                      '            -77.05788457660967,38.87253259892824,100' +
+                      '          &lt;/coordinates&gt;' +
+                      '        &lt;/LinearRing&gt;' +
+                      '      &lt;/outerBoundaryIs&gt;' +
+                      '      &lt;innerBoundaryIs&gt;' +
+                      '        &lt;LinearRing&gt;' +
+                      '          &lt;coordinates&gt;' +
+                      '            -77.05668055019126,38.87154239798456,100 ' +
+                      '            -77.05542625960818,38.87167890344077,100 ' +
+                      '            -77.05485125901024,38.87076535397792,100 ' +
+                      '            -77.05577677433152,38.87008686581446,100 ' +
+                      '            -77.05691162017543,38.87054446963351,100 ' +
+                      '            -77.05668055019126,38.87154239798456,100' +
+                      '          &lt;/coordinates&gt;' +
+                      '        &lt;/LinearRing&gt;' +
+                      '      &lt;/innerBoundaryIs&gt;' +
+                      '    &lt;/Polygon&gt;' +
+                      '  &lt;/Placemark&gt;' +
                       '&lt;/kml&gt;');
 
-                    ge.getFeatures().appendChild(timeAwareDoc);
+                    ge.getFeatures().appendChild(pentagon);
 
                     // Fly to the Pentagon
                     var la = ge.createLookAt('');
-                    la.set(37.860303, -122.536422, 0, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 45, 75);
+                    la.set(38.867, -77.0565, 500, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 45, 900);
                     ge.getView().setAbstractView(la);
                 </textarea>
         </div>
@@ -144,103 +143,74 @@ limitations under the License.
     var kmlDocument = new DOMParser().parseFromString(
         '<?xml version="1.0" encoding="UTF-8"?>' +
         '<kml xmlns="http://www.opengis.net/kml/2.2">' +
-        '  <Document>' +
-        '    <Placemark>' +
-        '      <name>Two Lights</name>' +
-        '      <id>TwoLights</id>' +
-        '      <TimeSpan>' +
-        '        <begin>2007-01-14T21:05:02Z</begin>' +
-        '        <end>2007-01-14T21:05:20Z</end>' +
-        '      </TimeSpan>' +
-        '      <Point>' +
-        '        <coordinates>-70.19614327088985,43.56407610092381,0</coordinates>' +
-        '      </Point>' +
-        '    </Placemark>' +
-        '    <Placemark>' +
-        '      <name>Ft Williams</name>' +
-        '      <id>FtWilliams</id>' +
-        '      <TimeSpan>' +
-        '        <begin>2007-01-14T21:05:20Z</begin>' +
-        '        <end>2007-01-14T21:05:43Z</end>' +
-        '      </TimeSpan>' +
-        '      <Point>' +
-        '        <coordinates>-70.21224393621128,43.62602634978145,0</coordinates>' +
-        '      </Point>' +
-        '    </Placemark>' +
-        '    <Placemark>' +
-        '      <name>Biddeford Pool</name>' +
-        '      <id>Placemark3</id>' +
-        '      <TimeSpan>' +
-        '        <begin>2007-01-14T21:05:43Z</begin>' +
-        '        <end>2007-01-14T21:06:04Z</end>' +
-        '      </TimeSpan>' +
-        '      <Point>' +
-        '        <coordinates>-70.33905163232077,43.44545067410524,0</coordinates>' +
-        '      </Point>' +
-        '    </Placemark>' +
-        '  </Document>' +
+        '  <Placemark>' +
+        '    <name>The Empty Box</name>' +
+        '    <Polygon>' +
+        '      <extrude>1</extrude>' +
+        '      <altitudeMode>relativeToGround</altitudeMode>' +
+        '      <outerBoundaryIs>' +
+        '        <LinearRing>' +
+        '          <coordinates>' +
+        '            -90.0,30.0,10000 ' +
+        '            -90.0,31.0,10000 ' +
+        '            -91.0,31.0,10000 ' +
+        '            -91.0,30.0,10000 ' +
+        '          </coordinates>' +
+        '        </LinearRing>' +
+        '      </outerBoundaryIs>' +
+        '      <innerBoundaryIs>' +
+        '        <LinearRing>' +
+        '          <coordinates>' +
+        '            -90.66,30.33,10000 ' +
+        '            -90.33,30.33,10000 ' +
+        '            -90.33,30.66,10000 ' +
+        '            -90.66,30.66,10000 ' +
+        '          </coordinates>' +
+        '        </LinearRing>' +
+        '      </innerBoundaryIs>' +
+        '    </Polygon>' +
+        '  </Placemark>' +
         '</kml>', "application/xml");
 
-    //Load the KML object
-    viewer.dataSources.add(Cesium.KmlDataSource.load(kmlDocument));
-
-    //Fly to Maine
-    viewer.camera.flyTo({
-        destination : Cesium.Cartesian3.fromDegrees(-70.3836062, 43.5692348, 150000.0)
-    });
+    //Load the KML object and move camera to point to it.
+    viewer.flyTo(viewer.dataSources.add(Cesium.KmlDataSource.load(kmlDocument)));
 
     function relevantSource() {
-        var timeAwareDoc = new DOMParser().parseFromString(
+        var kmlDocument = new DOMParser().parseFromString(
             '<?xml version="1.0" encoding="UTF-8"?>' +
             '<kml xmlns="http://www.opengis.net/kml/2.2">' +
-            '  <Document>' +
-            '    <Placemark>' +
-            '      <name>Two Lights</name>' +
-            '      <id>TwoLights</id>' +
-            '      <TimeSpan>' +
-            '        <begin>2007-01-14T21:05:02Z</begin>' +
-            '        <end>2007-01-14T21:05:20Z</end>' +
-            '      </TimeSpan>' +
-            '      <Point>' +
-            '        <coordinates>-70.19614327088985,43.56407610092381,0</coordinates>' +
-            '      </Point>' +
-            '    </Placemark>' +
-            '    <Placemark>' +
-            '      <name>Ft Williams</name>' +
-            '      <id>FtWilliams</id>' +
-            '      <TimeSpan>' +
-            '        <begin>2007-01-14T21:05:20Z</begin>' +
-            '        <end>2007-01-14T21:05:43Z</end>' +
-            '      </TimeSpan>' +
-            '      <Point>' +
-            '        <coordinates>-70.21224393621128,43.62602634978145,0</coordinates>' +
-            '      </Point>' +
-            '    </Placemark>' +
-            '    <Placemark>' +
-            '      <name>Biddeford Pool</name>' +
-            '      <id>Placemark3</id>' +
-            '      <TimeSpan>' +
-            '        <begin>2007-01-14T21:05:43Z</begin>' +
-            '        <end>2007-01-14T21:06:04Z</end>' +
-            '      </TimeSpan>' +
-            '      <Point>' +
-            '        <coordinates>-70.33905163232077,43.44545067410524,0</coordinates>' +
-            '      </Point>' +
-            '    </Placemark>' +
-            '  </Document>' +
+            '  <Placemark>' +
+            '    <name>The Empty Box</name>' +
+            '    <Polygon>' +
+            '      <extrude>1</extrude>' +
+            '      <altitudeMode>relativeToGround</altitudeMode>' +
+            '      <outerBoundaryIs>' +
+            '        <LinearRing>' +
+            '          <coordinates>' +
+            '            -90.0,30.0,10000 ' +
+            '            -90.0,31.0,10000 ' +
+            '            -91.0,31.0,10000 ' +
+            '            -91.0,30.0,10000 ' +
+            '          </coordinates>' +
+            '        </LinearRing>' +
+            '      </outerBoundaryIs>' +
+            '      <innerBoundaryIs>' +
+            '        <LinearRing>' +
+            '          <coordinates>' +
+            '            -90.66,30.33,10000 ' +
+            '            -90.33,30.33,10000 ' +
+            '            -90.33,30.66,10000 ' +
+            '            -90.66,30.66,10000 ' +
+            '          </coordinates>' +
+            '        </LinearRing>' +
+            '      </innerBoundaryIs>' +
+            '    </Polygon>' +
+            '  </Placemark>' +
             '</kml>', "application/xml");
 
-        //Load the KML object
-        viewer.dataSources.add(Cesium.KmlDataSource.load(kmlDocument));
-
-        //Fly to Maine
-        viewer.camera.flyTo({
-            destination : Cesium.Cartesian3.fromDegrees(-70.3836062, 43.5692348, 150000.0)
-        });
-
+        //Load the KML object and move camera to point to it.
+        viewer.flyTo(viewer.dataSources.add(Cesium.KmlDataSource.load(kmlDocument)));
     }
-
-//    relevantSource();
     showSource('cesiumSource', relevantSource);
 
 </script>
