@@ -121,24 +121,16 @@ limitations under the License.
         });
 
         function relevantSource() {
-            var lastTime = Cesium.getTimestamp();
-            var lastPosition = viewer.scene.camera.position.clone();
+            var camera = viewer.camera;
 
-            function preRender(scene) {
-                var time = Cesium.getTimestamp();
-                var position = scene.camera.position;
-                if (!Cesium.Cartesian3.equalsEpsilon(lastPosition, position, Cesium.Math.EPSILON4)) {
-                    document.getElementById('viewChanged').style.display = 'block';
-                    lastTime = time;
-                } else if (time - lastTime > 250) {
-                    //hide the 'view changed' message after 250 ms of inactivity
-                    lastTime = time;
-                    document.getElementById('viewChanged').style.display = 'none';
-                }
-                lastPosition = position.clone();
-            }
+            camera.moveStart.addEventListener(function() {
+                document.getElementById('viewChanged').style.display = 'block';
+            });
 
-            viewer.scene.preRender.addEventListener(preRender);
+            camera.moveEnd.addEventListener(function() {
+                document.getElementById('viewChanged').style.display = 'none';
+            });
+
         }
         relevantSource();
         showSource('cesiumSource', relevantSource);
