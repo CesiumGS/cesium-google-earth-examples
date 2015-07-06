@@ -19,7 +19,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
--->  
+-->
   <title>HTML5/Gears/IP Geolocation</title>
   <script src="../../Cesium/Cesium.js"></script>
   <style>
@@ -33,7 +33,7 @@ limitations under the License.
   <div id="cesiumContainer"></div>
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
-    
+
     function fly(position) {
         var source = new Cesium.CustomDataSource();
         viewer.dataSources.add(source);
@@ -44,17 +44,22 @@ limitations under the License.
                 semiMinorAxis : 100.0,
                 material : new Cesium.ColorMaterialProperty(new Cesium.Color(0.2, 0.2, 1.0, 0.5))
             },
+            billboard : {
+                image : '../images/whiteShapes.png',
+                imageSubRegion : new Cesium.BoundingRectangle(49, 43, 18, 18),
+                color : Cesium.Color.LIME
+            },
             label : {
                 text: 'You are here',
                 verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
                 show: false
             }
         });
-        
+
         function showLabel() {
             entity.label.show = true;
         }
-        
+
         viewer.camera.flyTo({
             destination : Cesium.Cartesian3.fromDegrees(position.coords.longitude, position.coords.latitude, 1005.0),
             complete: showLabel
