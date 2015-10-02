@@ -63,7 +63,7 @@ Shadow.prototype.update = function(context, frameState, commandList) {
     }
     
     if (!Cesium.defined(this._rs)) {
-        this._rs = context.createRenderState({
+        this._rs = Cesium.RenderState.fromCache({
         	blending : Cesium.BlendingState.ALPHA_BLEND,
         	depthTest : {
             	enabled : true
@@ -78,12 +78,25 @@ Shadow.prototype.update = function(context, frameState, commandList) {
     if (!Cesium.defined(this._va)) {
     	var size = 4 * 2 * 3 * Cesium.ComponentDatatype.getSizeInBytes(Cesium.ComponentDatatype.FLOAT);
     	var usage = Cesium.BufferUsage.DYNAMIC_DRAW;
-        var positionBuffer = this._positionBuffer = context.createVertexBuffer(size, usage);
+        var positionBuffer = this._positionBuffer = Cesium.Buffer.createVertexBuffer({
+            context: context,
+            sizeInBytes: size,
+            usage: usage
+        });
         
     	usage = Cesium.BufferUsage.STATIC_DRAW;
-        var textureCoordinateBuffer = context.createVertexBuffer(new Float32Array([0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0]), usage);
+        var textureCoordinateBuffer = Cesium.Buffer.createVertexBuffer({
+            context: context,
+            typedArray: new Float32Array([0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0]),
+            usage: usage
+        });
         
-        var indexBuffer = context.createIndexBuffer(new Uint16Array([0, 1, 2, 0, 2, 3]), Cesium.BufferUsage.STATIC_DRAW, Cesium.IndexDatatype.UNSIGNED_SHORT);
+        var indexBuffer = Cesium.Buffer.createIndexBuffer({
+            context: context,
+            typedArray: new Uint16Array([0, 1, 2, 0, 2, 3]),
+            usage: Cesium.BufferUsage.STATIC_DRAW,
+            indexDatatype: Cesium.IndexDatatype.UNSIGNED_SHORT
+        });
         
         var attributes = [{
         	index                  : attributeLocations.positionHigh,
@@ -106,7 +119,11 @@ Shadow.prototype.update = function(context, frameState, commandList) {
         	componentDatatype      : Cesium.ComponentDatatype.FLOAT
         }];
         
-        this._va = context.createVertexArray(attributes, indexBuffer);
+        this._va = new Cesium.VertexArray({
+            context: context,
+            attributes: attributes,
+            indexBuffer: indexBuffer
+        });
     }
 
     if (!Cesium.defined(this._sp)) {
@@ -127,7 +144,12 @@ Shadow.prototype.update = function(context, frameState, commandList) {
     		'    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0 - smoothstep(0.3, 0.5, length(v_textureCoordinates - vec2(0.5))));\n' +
     		'}\n';
     	
-    	this._sp = context.createShaderProgram(vs, fs, attributeLocations);
+    	this._sp = Cesium.ShaderProgram.fromCache({
+            context: context,
+            vertexShaderSource : vs,
+            fragmentShaderSource : fs,
+            attributeLocations: attributeLocations
+        });
     }
     
     if (!Cesium.defined(this._command)) {

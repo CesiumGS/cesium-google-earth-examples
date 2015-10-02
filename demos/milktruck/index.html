@@ -57,7 +57,7 @@
             clock : new Cesium.Clock({ currentTime : currentTime })
         });
         viewer.scene.terrainProvider = new Cesium.CesiumTerrainProvider({
-            url: '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
+            url : '//assets.agi.com/stk-terrain/world'
         });
         viewer.scene.globe.depthTestAgainstTerrain = true;
         viewer.scene.screenSpaceCameraController.enableInputs = false;
