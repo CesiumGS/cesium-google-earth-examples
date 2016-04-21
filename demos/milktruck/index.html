@@ -76,7 +76,7 @@
                 return;
             }
 
-            var promise = Cesium.jsonp('//dev.virtualearth.net/REST/v1/Locations', {
+            var promise = Cesium.loadJsonp('//dev.virtualearth.net/REST/v1/Locations', {
                 parameters: {
                     query: query,
                     key: bingKey
@@ -137,12 +137,12 @@
             Cesium.when(positionPromise, function () {
                 if (Cesium.defined(position[0].height)) {
                     viewer.scene.camera.setView({
-                        positionCartographic: Cesium.Cartographic.fromDegrees(lon, lat, height + 1)
+                        destination: Cesium.Cartesian3.fromDegrees(lon, lat, height + 1)
                     });
                     findHeight(lon, lat, level + 1, position[0].height);
                 } else {
                     viewer.scene.camera.setView({
-                        positionCartographic: Cesium.Cartographic.fromDegrees(lon, lat, height + 1)
+                        destination: Cesium.Cartesian3.fromDegrees(lon, lat, height + 1)
                     });
 
                     Cesium.when(truck.model.readyPromise).then(function (model) {

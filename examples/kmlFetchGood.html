@@ -115,7 +115,10 @@ limitations under the License.
 
     function relevantSource() {
         viewer.dataSources.add(Cesium.KmlDataSource
-            .load('../sampleData/kml/MaineScubaDiving.kml')
+            .load('../sampleData/kml/MaineScubaDiving.kml', {
+                camera: viewer.camera,
+                canvas: viewer.canvas
+            })
         )
         .then( function (dataSource) {
             viewer.flyTo(dataSource.entities);
