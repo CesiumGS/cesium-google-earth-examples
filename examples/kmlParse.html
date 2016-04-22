@@ -172,7 +172,10 @@ limitations under the License.
     //Load the KML object and move camera to point to it.
     viewer.flyTo(
         viewer.dataSources.add(
-            Cesium.KmlDataSource.load(kmlDocument)
+            Cesium.KmlDataSource.load(kmlDocument, {
+                camera: viewer.camera,
+                canvas: viewer.canvas
+            })
         )
     );
 
@@ -213,7 +216,10 @@ limitations under the License.
         //Load the KML object and move camera to point to it.
         viewer.flyTo(
             viewer.dataSources.add(
-                Cesium.KmlDataSource.load(kmlDocument)
+                Cesium.KmlDataSource.load(kmlDocument, {
+                    camera: viewer.camera,
+                    canvas: viewer.canvas
+                })
             )
         );
     }

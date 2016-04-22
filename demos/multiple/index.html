@@ -97,7 +97,7 @@ limitations under the License.
             return;
         }
 
-        var promise = Cesium.jsonp('//dev.virtualearth.net/REST/v1/Locations', {
+        var promise = Cesium.loadJsonp('//dev.virtualearth.net/REST/v1/Locations', {
             parameters : {
                 query : query,
                 key : Cesium.BingMapsApi.getKey()

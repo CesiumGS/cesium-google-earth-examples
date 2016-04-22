@@ -44,14 +44,10 @@ limitations under the License.
                 semiMinorAxis : 100.0,
                 material : new Cesium.ColorMaterialProperty(new Cesium.Color(0.2, 0.2, 1.0, 0.5))
             },
-            billboard : {
-                image : '../images/whiteShapes.png',
-                imageSubRegion : new Cesium.BoundingRectangle(49, 43, 18, 18),
-                color : Cesium.Color.LIME
-            },
             label : {
                 text: 'You are here',
                 verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                eyeOffset: new Cesium.Cartesian3(0,0,-30),
                 show: false
             }
         });

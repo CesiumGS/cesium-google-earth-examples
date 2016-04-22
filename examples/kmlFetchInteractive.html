@@ -139,7 +139,10 @@ limitations under the License.
 
         //Load the KML object
         viewer.dataSources
-            .add(Cesium.KmlDataSource.load(kmlInput.value))
+            .add(Cesium.KmlDataSource.load(kmlInput.value, {
+                camera: viewer.camera,
+                canvas: viewer.canvas
+            }))
             .then( function (kmlData) {
                 viewer.flyTo(kmlData.entities);
             }, function (error) {
@@ -158,8 +161,11 @@ limitations under the License.
 //            viewer.entities.removeAll();
 //
 //            //Load the KML object
-//            viewer.dataSources
-//                .add(Cesium.KmlDataSource.load(kmlInput.value))
+//            viewer.dataSources.add(
+//                Cesium.KmlDataSource.load(kmlInput.value, {
+//                    camera: viewer.camera,
+//                    canvas: viewer.canvas
+//                }))
 //
 //                //Use Promise to Handle Callbacks
 //                .then(

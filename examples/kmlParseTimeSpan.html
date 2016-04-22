@@ -179,7 +179,10 @@ limitations under the License.
         '</kml>', "application/xml");
 
     //Load the KML object
-    viewer.dataSources.add(Cesium.KmlDataSource.load(timeAwareDoc));
+    viewer.dataSources.add(Cesium.KmlDataSource.load(timeAwareDoc, {
+        camera: viewer.camera, 
+        canvas: viewer.canvas
+    }));
 
     //Fly to Maine
     viewer.camera.flyTo({
@@ -228,7 +231,10 @@ limitations under the License.
             '</kml>', "application/xml");
 
         //Load the KML object
-        viewer.dataSources.add(Cesium.KmlDataSource.load(kmlDocument));
+        viewer.dataSources.add(Cesium.KmlDataSource.load(timeAwareDoc, {
+            camera: viewer.camera, 
+            canvas: viewer.canvas
+        }));
 
         //Fly to Maine
         viewer.camera.flyTo({

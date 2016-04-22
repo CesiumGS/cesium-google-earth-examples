@@ -113,10 +113,10 @@ limitations under the License.
             var camera = viewer.camera;
             var moveCamera = function(count) {
                 var position = Cesium.Cartographic.clone(camera.positionCartographic);
-                position.latitude += Cesium.Math.toRadians(0.1);
-                position.longitude += Cesium.Math.toRadians(5.0);
+                var longitude = position.longitude + Cesium.Math.toRadians(5.0);
+                var latitude = position.latitude + Cesium.Math.toRadians(0.1);
                 camera.setView({
-                    positionCartographic: position
+                    destination: Cesium.Cartesian3.fromRadians(longitude, latitude, position.height)
                 });
                 if (count < 40) {
                     setTimeout(function() {
