@@ -107,12 +107,12 @@ limitations under the License.
             fullscreenElement: 'previewContent'
         });
         var camera = viewer.camera;
-        camera.setView({ pitch: 0.0 });
+        camera.setView({ orientation: { pitch: 0.0 }});
 
         function relevantSource() {
             function tiltCamera(count) {
                 //Cesium angles are always in radians
-                var idealTilt = Cesium.Math.toRadians(80);
+                var idealTilt = Cesium.Math.toRadians(-90);
                 var c0 = 0.90;
                 camera.setView({
                     orientation: {
