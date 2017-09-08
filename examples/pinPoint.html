@@ -141,8 +141,7 @@ limitations under the License.
         var centerOfScreen = new Cesium.Cartesian2(viewer.canvas.clientWidth / 2,
                                                    viewer.canvas.clientHeight / 2);
         camera.flyTo({
-            destination: viewer.camera.pickEllipsoid(centerOfScreen),
-            range: 30000.0
+            destination: Cesium.Cartesian3.fromRadians(camera.positionCartographic.longitude, camera.positionCartographic.latitude, 300000)
         });
     </script>
 </body>
