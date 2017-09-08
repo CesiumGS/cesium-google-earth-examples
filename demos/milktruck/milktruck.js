@@ -17,6 +17,7 @@ limitations under the License.
 
 // Code for Monster Milktruck demo, using Earth Plugin.
 
+	Cesium.BingMapsApi.defaultKey = 'AgH8JB-gA1Wo9ZbGL9oCEqfD-4YAkMnMp_XzzoGbynt_CC6l27GFWqN8SJaYm6aC';
 var MODEL_URL = 'model/Cesium Milk Truck.gltf';
 var INIT_LOC = {
 	lon : -123.0744619, 
@@ -537,7 +538,7 @@ Truck.prototype.teleportTo = function(lon, lat, height, heading) {
 	var location = this.ellipsoid.cartographicToCartesian(cart);
 	heading = Cesium.Math.toRadians(Cesium.defaultValue(heading, 0.0));
 	
-	this.model.modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(location, heading, 0.0, 0.0);
+	this.model.modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(location, new Cesium.HeadingPitchRoll(heading, 0.0, 0.0));
 	
 	heading = Cesium.Math.zeroToTwoPi(Cesium.Math.PI + heading + Cesium.Math.PI_OVER_FOUR);
 	this.scene.camera.lookAt(location, new Cesium.HeadingPitchRange(heading, PITCH, RANGE));
