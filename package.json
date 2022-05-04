@@ -1,20 +1,21 @@
 {
-    "name": "cesium-starter-app",
+    "name": "cesium-google-earth-examples",
     "version": "1.4.0",
-    "description": "A simple JavaScript starter app for creating apps with Cesium, the open-source WebGL virtual globe and map engine.",
-    "homepage": "http://cesiumjs.org",
+    "description": "Google Earth plugin API samples ported to Cesium, the open-source WebGL virtual globe and map engine.",
+    "homepage": "http://cesium.com/cesiumjs/",
     "license": "Apache-2.0",
+    "author": {
+      "name": "Cesium GS, Inc.",
+      "url": "https://cesium.com"
+    },
     "repository": {
         "type": "git",
-        "url": "hhttps://github.com/pjcozzi/cesium-starter-app"
+        "url": "https://github.com/CesiumGS/cesium-google-earth-examples"
     },
-    "dependencies": {
+    "devDependencies": {
       "express": "~4.9.x",
-        "compression": "1.0.8",
-        "request": "2.36.0",
-        "yargs": "1.2.6"
-    },
-    "engines": {
-      "node": "0.10.x"
+      "compression": "1.0.8",
+      "request": "2.36.0",
+      "yargs": "1.2.6"
     }
 }
