@@ -1,4 +1,4 @@
-Copyright 2014-2017 Analytical Graphics, Inc. and Contributors
+Copyright 2014-2022 Analytical Graphics, Inc. and Contributors
 
                                  Apache License
                            Version 2.0, January 2004
@@ -207,7 +207,7 @@ Original Work
 
 Code samples were ported from [earth-api-samples](https://code.google.com/p/earth-api-samples/).
 
-Copyright 2008-2014 Google Inc.
+Copyright 2008-2022 Google Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -230,7 +230,7 @@ This project includes the following third-party code.
 
 http://cesiumjs.org/
 
-Copyright 2011-2014 Cesium Contributors
+Copyright 2011-2022 Cesium Contributors
 
 > Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 >
