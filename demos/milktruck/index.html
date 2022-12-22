@@ -40,6 +40,48 @@
         </div>
     </div>
 
+    <table class="bottomControls">
+        <tr>
+            <td>
+                To drive: use the buttons, or keyboard arrows (with focus on page).
+
+                <div>
+                    <form name='searchform' id='searchform' action='javascript:submitLocation();void(0);'>
+                        <input type="text" size="58" id='address' placeholder='(enter a location to go there)' />
+                        <input type="submit" class="cesium-button" value='Teleport!'>
+                    </form>
+
+                    Presets:
+                    <input type="button" class="cesium-button" value="Whistler" onclick="teleportTo(-122.855824,50.085734);">
+                    <input type="button" class="cesium-button" value="Grand Canyon" onclick="teleportTo(-112.7422594,36.3079874);">
+                    <input type="button" class="cesium-button" value="Meteor Crater" onclick="teleportTo(-111.02255803482507,35.03285647546941);">
+                    <input type="button" class="cesium-button" value="El Capitan" onclick="teleportTo(-119.63751256720771,37.733875309213396);">
+                </div>
+
+
+            </td>
+            <td>
+                <table>
+                    <tr>
+                        <td></td>
+                        <td><input type=button id="buttonGas" class="cesium-button medw" value="gas"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><input type=button id="buttonLeft" class="cesium-button medw" value="left"></td>
+                        <td></td>
+                        <td><input type=button id="buttonRight" class="cesium-button medw" value="right"></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><input type=button id="buttonReverse" class="cesium-button medw" value="reverse"></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
     <script>
         var currentTime = new Cesium.JulianDate(2457064, 13662.710572260446);
         var viewer = new Cesium.Viewer('cesiumContainer', {
@@ -178,49 +220,50 @@
         }
 
         teleportTo(-123.0744619, 44.0503706);
+        
+        function registerMouseDown(element, callback) {
+            var listener = function(event) {
+                callback();
+                event.preventDefault();
+            };
+            
+            if (Cesium.defined(window.PointerEvent)) {
+                element.addEventListener('pointerdown', listener, false);
+            } else {
+                element.addEventListener('mousedown', listener, false);
+                element.addEventListener('touchstart', listener, false);
+            }
+        }
+        
+        function registerMouseUp(element, callback) {
+            var listener = function(event) {
+                callback();
+                event.preventDefault();
+            };
+            
+            if (Cesium.defined(window.PointerEvent)) {
+                element.addEventListener('pointerup', listener, false);
+            } else {
+                element.addEventListener('mouseup', listener, false);
+                element.addEventListener('touchend', listener, false);
+            }
+        }
+        
+        var element = document.getElementById('buttonGas');
+        registerMouseDown(element, function() { gasButtonDown = true; });
+        registerMouseUp(element, function() { gasButtonDown = false; });
+        
+        var element = document.getElementById('buttonLeft');
+        registerMouseDown(element, function() { leftButtonDown = true; });
+        registerMouseUp(element, function() { leftButtonDown = false; });
+        
+        var element = document.getElementById('buttonRight');
+        registerMouseDown(element, function() { rightButtonDown = true; });
+        registerMouseUp(element, function() { rightButtonDown = false; });
+        
+        var element = document.getElementById('buttonReverse');
+        registerMouseDown(element, function() { reverseButtonDown = true; });
+        registerMouseUp(element, function() { reverseButtonDown = false; });
     </script>
-
-    <table class="bottomControls">
-        <tr>
-            <td>
-                To drive: use the buttons, or keyboard arrows (with focus on page).
-
-                <div>
-                    <form name='searchform' id='searchform' action='javascript:submitLocation();void(0);'>
-                        <input type="text" size="58" id='address' placeholder='(enter a location to go there)' />
-                        <input type="submit" class="cesium-button" value='Teleport!'>
-                    </form>
-
-                    Presets:
-                    <input type="button" class="cesium-button" value="Whistler" onclick="teleportTo(-122.855824,50.085734);">
-                    <input type="button" class="cesium-button" value="Grand Canyon" onclick="teleportTo(-112.7422594,36.3079874);">
-                    <input type="button" class="cesium-button" value="Meteor Crater" onclick="teleportTo(-111.02255803482507,35.03285647546941);">
-                    <input type="button" class="cesium-button" value="El Capitan" onclick="teleportTo(-119.63751256720771,37.733875309213396);">
-                </div>
-
-
-            </td>
-            <td>
-                <table>
-                    <tr>
-                        <td></td>
-                        <td><input type=button id="buttonGas" class="cesium-button medw" onmousedown="gasButtonDown=true;" onmouseup="gasButtonDown=false;" value="gas"></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><input type=button id="buttonLeft" class="cesium-button medw" onmousedown="leftButtonDown=true;" onmouseup="leftButtonDown=false;" value="left"></td>
-                        <td></td>
-                        <td><input type=button id="buttonRight" class="cesium-button medw" onmousedown="rightButtonDown=true;" onmouseup="rightButtonDown=false;" value="right"></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td><input type=button id="buttonReverse" class="cesium-button medw" onmousedown="reverseButtonDown=true;" onmouseup="reverseButtonDown=false;" value="reverse"></td>
-                        <td></td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-
 </body>
 </html>
