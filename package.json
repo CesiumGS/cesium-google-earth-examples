@@ -14,7 +14,7 @@
     },
     "devDependencies": {
       "express": "~4.9.x",
-      "compression": "1.0.8",
+      "compression": "1.8.2",
       "request": "2.36.0",
       "yargs": "1.2.6"
     }
